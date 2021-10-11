@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { BigNumber } from "@ethersproject/bignumber";
-import { Input, Button, Typography, Spin, Slider, Statistic, Row, Col } from "antd";
+import { hexlify, zeroPad } from "@ethersproject/bytes";
+import { Input, Button, Typography, Spin, Slider, Statistic, Row, Col, message } from "antd";
 import ReactJson from "react-json-view";
 
-import { randE, to256Bytes } from '../vdf/rsa';
-import { evaluate } from "../vdf/vdf.js";
+import { Transactor as tx } from "../helpers";
+import { randE } from '../vdf/rsa';
+import { evaluate, verify } from "../vdf/vdf.js";
 
 import worker from 'workerize-loader!../vdf/vdf.worker';
 
@@ -12,7 +14,24 @@ let instance = worker()  // `new` is optional
 
 const { Text } = Typography;
 
-export default function VdfInterface() {
+function to256Bytes(i) {
+  return hexlify(zeroPad(i, 256));
+}
+
+function toSolidityCalldataProof(g, t, proof) {
+  let newProof = [
+    to256Bytes(BigNumber.from(g).toHexString()),
+    to256Bytes(BigNumber.from(proof.pi).toHexString()),
+    to256Bytes(BigNumber.from(proof.y).toHexString()),
+    to256Bytes(BigNumber.from(proof.q).toHexString()),
+    '0x',
+    proof.challenge.nonce,
+    t
+  ];
+  return newProof;
+}
+
+export default function VdfInterface({ verifyFn }) {
 
   const [input, setInput] = useState(randE());
 
@@ -20,11 +39,22 @@ export default function VdfInterface() {
 
   const [vdfProof, setVdfProof] = useState(1);
 
+  const [vdfSolidityProof, setVdfSolidityProof] = useState()
+
+  const [verifyResult, setVerifyResult] = useState(undefined);
+
+  const [verifySolResult, setVerifySolResult] = useState(undefined);
+
   function vdf() {
+    setVerifyResult(undefined);
+    setVerifySolResult(undefined);
     setVdfProof(undefined);
     instance.vdf(input, userT).then( proof => {
       console.log(proof);
       setVdfProof(proof);
+      proof = toSolidityCalldataProof(input, userT, proof)
+      console.log(proof);
+      setVdfSolidityProof(proof);
     });
   }
 
@@ -108,6 +138,56 @@ export default function VdfInterface() {
         <div>
           {vdfProof ? vdfProofDisp : <Spin sixe="large"/>}
         </div>
+        <div>
+          <Button
+            type="primary"
+            onClick={
+              () => {
+                try {
+                  let res = verify(
+                    input,
+                    userT,
+                    {
+                      challenge: {
+                        l: BigNumber.from(vdfProof.challenge.l),
+                        nonce: BigNumber.from(vdfProof.challenge.nonce)
+                      },
+                      y: BigNumber.from(vdfProof.y),
+                      pi: BigNumber.from(vdfProof.pi),
+                      q: BigNumber.from(vdfProof.q),
+                    }
+                  );
+                  setVerifySolResult(res);
+                } catch (err) {
+                  console.error(err);
+                  message.error("Something has gone wrong");
+                }
+              }
+            }
+          >
+            Verify Locally
+          </Button>
+        </div>
+        {verifySolResult ? JSON.stringify(verifySolResult) : "undefined"}
+        <div style={{paddingTop: "2vw"}}>
+          <Button
+            type="primary"
+            onClick={
+              async () => {
+                try {
+                  let res = await verifyFn(...vdfSolidityProof);
+                  setVerifyResult(res);
+                } catch (err) {
+                  console.error(err);
+                  message.error("Something has gone wrong");
+                }
+              }
+            }
+          >
+            Verify VDF with smart contract
+          </Button>
+        </div>
+        {verifyResult ? JSON.stringify(verifyResult) : "undefined"}
       </div>
     </div>
   );

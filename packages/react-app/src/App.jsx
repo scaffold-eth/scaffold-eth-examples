@@ -512,7 +512,9 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
-            <VdfInterface/>
+            <VdfInterface
+              verifyFn={readContracts && readContracts.YourContract ? readContracts.YourContract.verify : null}
+            />
 
             <Contract
               name="YourContract"
