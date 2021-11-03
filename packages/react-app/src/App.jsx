@@ -19,7 +19,7 @@ import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import WalletLink from "walletlink";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch, ZkpInterface } from "./components";
+import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch, SmtInterface, ZkpInterface } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
@@ -30,8 +30,8 @@ import { ExampleUI, Hints, Subgraph, ZkHashUI } from "./views";
 
 const { ethers } = require("ethers");
 
-const wasm = `${process.env.PUBLIC_URL}/circuits/init.wasm`;
-const zkey = `${process.env.PUBLIC_URL}/circuits/init.zkey`;
+const wasm = `${process.env.PUBLIC_URL}/circuits/add2Tree.wasm`;
+const zkey = `${process.env.PUBLIC_URL}/circuits/add2Tree.zkey`;
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -509,11 +509,15 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
+            <SmtInterface/>
+
             <ZkpInterface
               inputFields={
                 {
-                  x: "1764",
-                  hash: "15893827533473716138720882070731822975159228540693753428689375377280130954696"
+                  root: "0",
+                  key: "0",
+                  value: "0",
+                  siblings: new Array(3).fill("0")
                 }
               }
               wasm={wasm}

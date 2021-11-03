@@ -19,3 +19,5 @@ export { default as TokenBalance } from "./TokenBalance";
 export { default as Wallet } from "./Wallet";
 export { default as L2Bridge } from "./L2Bridge";
 export { default as ZkpInterface } from "./ZkpInterface";
+export { default as EdDSABurner } from "./EdDSABurner";
+export { default as SmtInterface } from "./SmtInterface";
