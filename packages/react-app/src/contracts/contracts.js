@@ -1,0 +1,1 @@
+module.exports = ["Diamond","DiamondCutFacet","DiamondLoupeFacet","YourContract"];
