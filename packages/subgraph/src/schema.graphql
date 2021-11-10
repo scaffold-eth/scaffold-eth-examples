@@ -1,0 +1,33 @@
+type BurnyBoy @entity {
+  id: ID!
+  baseFee: BigInt!
+  owner: Bytes!
+  minter: Minter!
+  createdAt: BigInt!
+  block: Block!
+}
+
+type Minter @entity {
+  id: ID!
+  burnyBoys: [BurnyBoy!] @derivedFrom(field: "minter")
+  burnyBoyCount: BigInt!
+  minBaseFee: BigInt!
+  maxBaseFee: BigInt!
+  minBaseFeeBurnyBoy: BurnyBoy!
+  maxBaseFeeBurnyBoy: BurnyBoy!
+}
+
+type Block @entity {
+  id: ID!
+  number: BigInt!
+  baseFee: BigInt!
+  timestamp: BigInt!
+  burnyBoys: [BurnyBoy!] @derivedFrom(field: "block")
+  burnyBoyCount: BigInt!
+  burnyBoyTotal: BigInt!
+  minterTotal: BigInt!
+  minBaseFee: BigInt!
+  minBaseFeeBurnyBoy: BurnyBoy!
+  maxBaseFeeBurnyBoy: BurnyBoy!
+  maxBaseFee: BigInt!
+}
