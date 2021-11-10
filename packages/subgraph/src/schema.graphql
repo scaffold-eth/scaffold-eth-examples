@@ -1,0 +1,84 @@
+type Project @entity {
+  id: ID!
+  idBytes: Bytes!
+  title: String!
+  desc: String!
+  repo: String!
+  owner: Owner!
+  timestamp: BigInt!
+  quests: [Quest!] @derivedFrom(field: "project")
+}
+
+type Owner @entity {
+  id: ID!
+  projects: [Project!] @derivedFrom(field: "owner")
+}
+
+type Quest @entity {
+  id: ID!
+  idBytes: Bytes!
+  project: Project!
+  title: String!
+  desc: String!
+  link: String!
+  author: Author!
+  timestamp: BigInt!
+  works: [Work!] @derivedFrom(field: "quest")
+  looks: [Look!] @derivedFrom(field: "quest")
+  finished: Boolean
+  recipient: Builder
+  sender: Sender
+  amount: BigInt
+  support: BigInt
+}
+
+type Author @entity {
+  id: ID!
+  quests: [Quest!] @derivedFrom(field: "author")
+}
+
+type Sender @entity {
+  id: ID!
+  quests: [Quest!] @derivedFrom(field: "sender")
+}
+
+type Builder @entity {
+  id: ID!
+  isActive: Boolean
+  looks: [Look!] @derivedFrom(field: "builder")
+  works: [Work!] @derivedFrom(field: "builder")
+  quests: [Quest!] @derivedFrom(field: "recipient")
+}
+
+type Round @entity {
+  id: ID!
+  started: BigInt!
+  duration: BigInt!
+}
+
+type Supporter @entity {
+  id: ID!
+  isActive: Boolean
+}
+
+type Look @entity {
+  id: ID!
+  quest: Quest!
+  builder: Builder!
+  timestamp: BigInt!
+}
+
+type Work @entity {
+  id: ID!
+  quest: Quest!
+  builder: Builder!
+  link: String!
+  timestamp: BigInt!
+}
+
+type Recipient @entity {
+  id: ID!
+  index: BigInt!
+  addr: Bytes!
+  project: Project!
+}

@@ -1,0 +1,112 @@
+specVersion: 0.0.2
+schema:
+  file: ./src/schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Projects
+    network: localhost
+    source:
+      address: '{{ProjectsAddress}}'
+      abi: Projects
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Project
+      abis:
+        - name: Projects
+          file: ./abis/Projects.json
+      eventHandlers:
+         - event: ProjectUpdate(bytes32,string,string,string,address)
+           handler: handleProjectUpdate
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: Quests
+    network: localhost
+    source:
+      address: '{{QuestsAddress}}'
+      abi: Quests
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Quest
+      abis:
+        - name: Quests
+          file: ./abis/Quests.json
+      eventHandlers:
+        - event: QuestUpdate(indexed bytes32,indexed bytes32,string,string,string,address)
+          handler: handleQuestUpdate
+        - event: QuestWork(indexed bytes32,address,string)
+          handler: handleQuestWork
+        - event: QuestLook(indexed bytes32,address)
+          handler: handleQuestLook
+        - event: QuestFinished(indexed bytes32,address,uint256,address)
+          handler: handleQuestFinished
+        - event: QuestSupport(indexed bytes32,address,uint256,uint256)
+          handler: handleQuestSupport
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: Builders
+    network: localhost
+    source:
+      address: '{{BuildersAddress}}'
+      abi: Builders
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Builder
+      abis:
+        - name: Builders
+          file: ./abis/Builders.json
+      eventHandlers:
+        - event: BuilderUpdate(indexed address,bool)
+          handler: handleBuilderUpdate
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: Supporters
+    network: localhost
+    source:
+      address: '{{SupportersAddress}}'
+      abi: Supporters
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Supporter
+      abis:
+        - name: Supporters
+          file: ./abis/Supporters.json
+      eventHandlers:
+        - event: SupporterUpdate(indexed address,bool)
+          handler: handleSupporterUpdate
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: SupportRound
+    network: localhost
+    source:
+      address: '{{SupportRoundAddress}}'
+      abi: SupportRound
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SupportRound
+      abis:
+        - name: SupportRound
+          file: ./abis/SupportRound.json
+      eventHandlers:
+        - event: RecipientAdded(address,string,uint256)
+          handler: handleRecipientAdded
+      file: ./src/mapping.ts
