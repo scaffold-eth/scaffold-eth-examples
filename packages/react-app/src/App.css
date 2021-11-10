@@ -1,0 +1,67 @@
+#WEB3_CONNECT_MODAL_ID {
+  z-index: 999;
+  position: absolute;
+}
+
+#ACCOUNT_HEADER_ID {
+  z-index: 900;
+}
+
+.artist_blockie {
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #b5b5b5, 0 0 0 1px #b5b5b5;
+  padding: 5px;
+}
+
+.avatar-uploader {
+  width: auto;
+}
+
+.network-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.site-main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+.content {
+  flex: 1 0 auto;
+}
+
+/* Antd Overrides */
+.ant-btn-lg {
+  font-weight: 500;
+}
+.ant-btn-round,
+.ant-btn-round.ant-btn-lg {
+  border-radius: 6px;
+}
+.ant-btn.button--xl {
+  height: auto;
+  padding: 8px 22px;
+  font-size: 20px;
+}
+
+/* Utilities */
+.container {
+  margin: 0 auto;
+  padding: 0 40px;
+  max-width: 1800px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+}

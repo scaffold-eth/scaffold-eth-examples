@@ -1,0 +1,48 @@
+.site-nav {
+  margin: 0 auto;
+  padding: 40px 40px;
+  max-width: 1800px;
+}
+
+.nav-menu-wrapper {
+  justify-content: flex-end;
+}
+
+.nav-menu {
+  margin: 0 30px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-menu li,
+.nav-menu li a {
+  display: inline-block;
+}
+
+.nav-menu li {
+  margin: 0 10px;
+}
+
+.nav-menu li a {
+  padding: 5px 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.nav-menu li a:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 992px) {
+  .logo {
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .nav-menu-wrapper {
+    justify-content: center;
+  }
+  .nav-menu {
+    margin-right: 0;
+  }
+}
