@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Pink",
+    "description": "It's the pink Boombox IRL NFT song!",
+    "external_url": "https://someexternallinktosomething.org",
+    "image": "/pink.png",
+    "attributes": [
+      {
+        "trait_type": "TapeColor",
+        "value": "pink"
+      },
+      {
+        "trait_type": "Main Instrument",
+        "value": "banjo"
+      },
+      {
+        "trait_type": "Length",
+        "value": 42
+      },
+      {
+          "trait_type": "Notation",
+          "value": "X:1;T:A la santé de Noe;A:Valle d'Aosta;B:;C:trad.;O:Italia;Z:Gian Mario Navillod;Q:1/4=120;M:2/4;L:1/16;K:G;G2B2 |d2d2 e2e2 |d2 z2 G2A2 |B2B2 A4 |G2 z2 G2B2 |d2d2 e2e2 |d2 z2 G2A2 |B2B2 A4 |G4 g2g2 |f2f2 e2e2 |d2 z2 e2e2 |d2d2 c2c2 |B2 z2 G2B2 |d2d2 d2 z2 |G2B2 d2d2 |d2 z2 G2B2 |d2 z2 G2B2 |d2 z2 G2B2 |d2d2 e4 |;d2 z2 A2B2 |c2B2 A4 |G2 z2 |]"
+      }
+    ]
+  },
+  {
+    "name": "Blue",
+    "description": "It's the blue Boombox IRL NFT song!",
+    "external_url": "https://someexternallinktosomething.org",
+    "image": "/blue.png",
+    "attributes": [
+      {
+        "trait_type": "TapeColor",
+        "value": "blue"
+      },
+      {
+        "trait_type": "Main Instrument",
+        "value": "harp"
+      },
+      {
+        "trait_type": "Length",
+        "value": 32
+      },
+      {
+          "trait_type": "Notation",
+          "value": "X:1;T:A la santé de Noe;A:Valle d'Aosta;B:;C:trad.;O:Italia;Z:Gian Mario Navillod;Q:1/4=120;M:2/4;L:1/16;K:G;G2B2 |d2d2 e2e2 |d2 z2 G2A2 |B2B2 A4 |G2 z2 G2B2 |d2d2 e2e2 |d2 z2 G2A2 |B2B2 A4 |G4 g2g2 |f2f2 e2e2 |d2 z2 e2e2 |d2d2 c2c2 |B2 z2 G2B2 |d2d2 d2 z2 |G2B2 d2d2 |d2 z2 G2B2 |d2 z2 G2B2 |d2 z2 G2B2 |d2d2 e4 |;d2 z2 A2B2 |c2B2 A4 |G2 z2 |]"
+      }
+    ]
+  },
+  {
+    "name": "Yellow",
+    "description": "It's the yella' Boombox IRL NFT song!",
+    "external_url": "https://someexternallinktosomething.org",
+    "image": "/yella.png",
+    "attributes": [
+      {
+        "trait_type": "TapeColor",
+        "value": "yellow"
+      },
+      {
+        "trait_type": "Main Instrument",
+        "value": "theremin"
+      },
+      {
+        "trait_type": "Length",
+        "value": 21
+      },
+      {
+          "trait_type": "Notation",
+          "value": "X:1;T:A la santé de Noe;A:Valle d'Aosta;B:;C:trad.;O:Italia;Z:Gian Mario Navillod;Q:1/4=120;M:2/4;L:1/16;K:G;G2B2 |d2d2 e2e2 |d2 z2 G2A2 |B2B2 A4 |G2 z2 G2B2 |d2d2 e2e2 |d2 z2 G2A2 |B2B2 A4 |G4 g2g2 |f2f2 e2e2 |d2 z2 e2e2 |d2d2 c2c2 |B2 z2 G2B2 |d2d2 d2 z2 |G2B2 d2d2 |d2 z2 G2B2 |d2 z2 G2B2 |d2 z2 G2B2 |d2d2 e4 |;d2 z2 A2B2 |c2B2 A4 |G2 z2 |]"
+      }
+    ]
+  }
+]
