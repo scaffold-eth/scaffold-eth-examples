@@ -1,0 +1,5 @@
+type User @entity {
+  id: ID!
+  reserveBalance: BigDecimal!
+  bondingCurveTokenBalance: BigDecimal!
+}
