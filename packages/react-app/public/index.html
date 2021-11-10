@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bufficorn Buidl Brigade</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <!--  TODO Bufficorn -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@EthereumDenver" />
+<meta name="twitter:title" content="Bufficorn Buidle Brigade" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:image" content="" />
+
+</head>
+
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+
+
+
+    <style type="text/css">
+      body{
+        color:  #c9b8ff;
+        /* background: url('background_3.png') repeat; */
+        text-align: left;
+        font-family: "Space Mono",monospace;
+        font-style: normal;
+        font-variant-ligatures: normal;
+        font-variant-caps: normal;
+        font-variant-numeric: normal;
+        font-variant-east-asian: normal;
+          }
+        #preview{
+          padding:  30px 0px;
+        }
+      #preview img{
+        margin: 5px;
+        height: 90px;
+        width:  90px;
+        text-align: left;
+        border-radius: 45px;
+        filter: grayscale(0.25);
+        border:  5px solid white;
+      }
+      #preview img:nth-child(5n){
+        height: 110px;
+        width:  110px;
+        border-radius: 55px;
+        border:  10px solid #8ac6ac;
+      }
+      #preview img:nth-child(5n+1){
+        height: 80px;
+        width:  80px;
+        border-radius: 55px;
+        border:  5px dotted #DA5892;
+      }
+      #preview img:nth-child(5n+2){
+        height: 95px;
+        width:  95px;
+        border-radius: 55px;
+        border:  4px inset #7F51D6;
+      }
+      #preview img:nth-child(5n+3){
+        height: 105px;
+        width:  105px;
+        border-radius: 55px;
+        border:  7px outset #B44878;
+      }
+      #preview img:nth-child(6n+3){
+        height: 130px;
+        width:  130px;
+        border-radius: 105px;
+        border:  7px dashed #DA5892;
+      }
+      #preview img:nth-child(10n+1){
+        height: 140px;
+        width:  140px;
+        border-radius: 105px;
+        border:  3px dotted #7F51D6;
+      }
+      #preview img:hover{
+        filter: grayscale(0);
+        border-width: 5px;
+      }
+      .ant-page-header{
+        background-color:rgb(151, 96, 255, 1);
+        color: white;
+      }
+      .logo_moonshot{
+        width: 300px;
+        height: 300px;
+        max-width: 300px;
+        max-height: 300px;
+      }
+      .logo_moonshot.sub{
+        width: 200px;
+        height: 200px;
+        max-width: 200px;
+        max-height: 200px;
+      }
+      .ant-page-header-heading-title, .ant-typography a, .ant-typography-copy{
+        color: white;
+      }
+      .ant-btn-primary{
+        background-color: #FA72AF;
+        border: 5px solid #B44878;
+        font-size: 36px;
+        height: 75px;
+      }
+      .ant-btn-primary:hover{
+        background-color: #B44878;
+        border: 7px solid #B44878;
+      }
+      .colorme{
+        padding: 0px 25px;
+      }
+      .colorme2{
+        background-color:rgb(151, 96, 255, 0.7);
+      }
+      .colorme3{
+        background-color:rgb(106, 67, 179, 0.7);
+      }
+
+      /* begin vg edits */
+
+      .background {
+        background-color:#13415D;
+      }
+
+      .Section {
+        width: 100%;
+        padding-top: 75px;
+        padding-bottom: 75px;
+      }
+
+      .Content {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        padding-left: 25px;
+        padding-right: 25px;
+      }
+
+      .FlexRow {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .Block {
+        padding-top: 150px;
+        padding-bottom: 150px;
+      }
+      .Lore {
+        background-color: #172734;        
+        font-size: 1.5em;
+      }
+      .Hero {
+        min-height: 65vh;
+        background: url('mtns_2.jpg') no-repeat center bottom;
+        background-size: cover;
+      }
+      .Mint {
+        background-color: #13415D;
+        font-size: 2em;
+      }
+      .Trailmap {
+        background-color: #13415D;
+        font-size: 1.5em;
+        background: url('topo.jpg') no-repeat center bottom;
+      }
+      .Column {
+        display: flex;
+        flex-direction: column;
+        width: 45%;
+        align-items: start;
+        justify-content: center;
+      }
+      .Title {
+        line-height: 1em;
+        color: white;
+      }
+      .Button {
+        background-color: #FC508F;
+        vertical-align: middle;
+      }
+      img {
+        max-width: 100%;
+      }
+      .Stop {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        margin: 0;
+      }
+      .Point {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid white;
+      }
+
+      .Point.Filled {
+        background-color: white;
+      }
+
+      /* end vg edits */
+
+      .Testimonial {
+        display: inline-block;
+        width: 30%;
+      }
+      .Testimonial img{
+        width: 150px;
+        height: 150px;
+      }
+      
+      h5{
+        font-size: 18px;
+        color: white;
+      }
+      .Testimonial p{
+        font-size: italic;
+      }
+      h1, h3, h4{
+        color: #DA5892;
+        font-family: "Avenir Next", sans-serif;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-style: italic;
+        letter-spacing: 0.05em;
+      }
+      a{
+        color: #54D8D0;
+      }
+      h1{
+        font-size: 36px;
+      }
+      h4{
+        font-size: 24px;
+        font-weight: bold;
+        display: inline;
+        padding: 5px;
+        text-transform: uppercase;
+      }
+      ul.rocks{
+        margin-top: 10px;
+        font-size: 18px;
+      }
+      ul.rocks li{
+        margin: 5px;
+        list-style: none;
+      }
+      h1{
+        font-weight: bold;
+      }
+      #bot_interlude {
+        padding-top: 25px;
+      }
+      #bot_interlude img{
+        width: 100px;
+        height: 100px;
+        margin: 10px;
+      }
+      #bot_interlude img:nth-child(even){
+        width: 120px;
+        height: 120px;
+        margin: 10px;
+      }
+      .publicgoodsgood{
+        padding: 18px;
+        background-color:rgb(127, 81, 214, 0.7);
+        border:  2px solid #DA5892;
+        border-radius: 5px;
+        width: 55%;
+        margin: 20px auto 10px;
+        font-size: 20px;
+      }
+      .bondingcurvegood{
+        padding: 18px;
+        background-color:rgb(127, 81, 214, 0.7);
+        border:  2px solid rgb(84, 216, 208, 1);
+        border-radius: 5px;
+        width: 55%;
+        margin: 20px auto 10px;
+        font-size: 20px;
+      }
+      .latestBots{
+        padding: 18px; 
+        background-color:rgb(127, 81, 214, 0.7);
+        border:  2px solid #FA72AF;
+        border-radius: 5px;
+        width: 80%;
+        margin: 20px auto 10px;
+        font-size: 20px;
+      }
+      #bot_interlude2 {
+        padding-top: 5px;
+      }
+      #bot_interlude2 img{
+        width: 50px;
+        height: 50;
+        margin: 5px;
+      }
+      #bot_interlude2 img:nth-child(even){
+        width: 60px;
+        height: 60px;
+        margin: 5px;
+      }
+
+
+h1 {
+  position: relative;
+  font-family: "Avenir Next", sans-serif;
+  font-weight: 900;
+  font-size: 64px;
+  text-transform: uppercase;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  margin-bottom: 0px;
+}
+
+.Heading {
+  font-family: "Avenir Next", sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+/* We create a pseudo element and blur it using the SVG filter. We’ll grab the content from the custom HTML attribute. */
+
+h1:before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  content: attr(filter-content);
+
+  filter: url(#motion-blur-filter);
+}
+      a:hover{
+        color: #54D8D0;
+        font-weight: bold;
+      }
+      h2{
+        color: #eee;
+        font-family: "Avenir Next", sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-style: italic;
+  letter-spacing: 0.05em;
+      }
+      .chart{
+        max-width: 600px;
+      }
+      h3{ color: white;
+        font-family: "Avenir Next", sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-style: italic;
+  letter-spacing: 0.05em; }
+      h1 img{
+        max-width: 50px;
+        max-height: 50px;
+        margin-right: 10px;
+        margin-bottom: -10px;
+      }
+      button{
+        background-color: #6f3ff5;
+        color:  #c9b8ff;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      footer{
+        padding-bottom: 150px;
+        font-size: 24px;
+      }
+
+      @media all and (max-width: 1200px) {
+        .Column {
+          width: 100%;
+          margin-top: 40px;
+        }
+      }
+
+    </style>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>
