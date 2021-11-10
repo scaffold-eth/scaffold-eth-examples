@@ -1,0 +1,15 @@
+{
+   "solidity.packageDefaultDependenciesDirectory": "node_modules/@scaffold-eth/hardhat/node_modules/",
+   "solidity-va.test.defaultUnittestTemplate": "hardhat",
+   "explorerExclude.backup": null,
+   "eslint.workingDirectories": [
+   
+      { "directory": "packages/eth-hooks", "changeProcessCWD": true },
+      { "directory": "packages/hardhat-ts", "changeProcessCWD": true },
+      { "directory": "packages/vite-app-ts", "changeProcessCWD": true },
+   ],
+   "search.exclude": {
+      "**/yarn-error.log": true,
+      "**/yarn.lock": true
+   }
+}
