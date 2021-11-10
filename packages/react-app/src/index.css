@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  background-image:url('assets/background.png');
+  background-size: cover;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
