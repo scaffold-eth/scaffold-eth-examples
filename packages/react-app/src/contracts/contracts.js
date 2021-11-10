@@ -1,0 +1,1 @@
+module.exports = ["Attack","Bank","HoneyPot"];
