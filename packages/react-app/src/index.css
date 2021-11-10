@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.ant-table-cell .ant-table-filter-column {
+  margin: 0;
+}
