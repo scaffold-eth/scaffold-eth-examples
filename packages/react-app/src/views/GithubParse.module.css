@@ -1,0 +1,56 @@
+.container {
+    max-width: 450px;
+    margin: 0 auto;
+    text-align: left;
+    margin-top: 30px;
+    padding-bottom: 50px;
+}
+
+.interval {
+    margin-bottom: 7px;
+}
+
+.spinner {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.header {
+    font-size: 28px;
+}
+
+.branchCard {
+    display: flex;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.branchCard > p {
+    margin: 0;
+}
+
+.lastCommit {
+    margin: 0;
+}
+
+.branchName {
+    font-weight: bold;
+    margin-bottom: -1px;
+}
+
+.description {
+    margin-left: 15px;
+}
+
+.select {
+    margin-bottom: 100px;
+}
+
+.branches {
+    margin-top: 40px;
+}
+
+.empty {
+    margin-top: 15px;
+    font-weight: bold;
+}
