@@ -1,0 +1,1 @@
+module.exports = ["Attack","GoodAuction","VulnerableAuction","YourContract"];
