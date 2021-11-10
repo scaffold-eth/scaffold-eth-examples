@@ -1,0 +1,1 @@
+module.exports = ["Collectible","Collections","EMEMToken","YourContract"];
