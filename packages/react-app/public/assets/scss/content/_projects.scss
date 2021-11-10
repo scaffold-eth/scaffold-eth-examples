@@ -1,0 +1,82 @@
+@use '../variables' as *;
+
+.content-projects{
+	margin: auto;
+	margin-top:3em;
+	padding: 0em 5em;
+	max-width: 1300px;
+
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+	grid-gap: 4em;
+	
+	figure{
+		width: 100%;
+		img, svg, object {
+			width: 100%;
+			display:block;
+			margin-bottom: 2em;
+		}
+
+		figcaption{
+			text-align: center;
+		}
+
+		a{
+			color: var(--ember);
+		}
+
+
+		cursor: pointer;
+
+		&:hover{
+			a{
+				color: var(--moon);
+			}
+			figcaption{
+				animation: projects-animation 3s ease-in-out infinite;
+			}
+		}
+
+	}
+	
+
+}
+
+
+
+@media #{$laptop} { 
+	section.content-projects{
+		padding: 0em 4em;
+		grid-template-columns: 1fr 1fr 1fr 1fr;
+	}
+}
+
+@media #{$tablet} { 
+	section.content-projects{
+		padding: 0em 3em;
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+}
+
+@media #{$phone} { 
+	section.content-projects{
+		padding: 0em 1em;
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+
+
+
+@keyframes projects-animation {
+  0% {
+    box-shadow: 0px 0px 100px 0px var(--violet);
+  }
+  50% {
+    box-shadow: 0px 0px 100px 0px var(--moon);
+  }
+  100% {
+    box-shadow: 0px 0px 100px 0px var(--violet);
+  }
+}

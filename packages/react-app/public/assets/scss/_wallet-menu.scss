@@ -1,0 +1,90 @@
+.wallet-menu{
+
+	position: fixed;
+	top: 1em;
+	right: 1em;
+	width: 350px;
+  top: 1em;
+  right: 1em;
+  background-color: var(--space);
+  animation: wallet-menu-boxshadow 6s ease-in-out infinite;
+	display: none;
+
+	&.visible{
+		display: block;
+	}
+
+	
+
+}
+
+
+.wallet-menu .action{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1em;
+	background-color: var(--space);
+	padding: 0.5em 1em;
+	cursor: pointer;
+	font-size: 100%;
+	
+
+	user-select: none;
+
+	span{
+		color: var(--elder);
+	}
+	
+	svg{ stroke: var(--elder); }
+		
+
+
+	&:hover{
+		span{ color: var(--violet); }
+		svg{ stroke: var(--violet); }
+	}
+
+	&.hide{
+		display: none;
+	}
+
+}
+
+.wallet-menu .wallet-detail{
+	padding: 1em 1.5em;
+	background: linear-gradient(295deg, rgba(14, 3, 51, 0) 40%, var(--violet) 55%, var(--moon) 100%);
+ 	background-repeat: no-repeat;
+ 	background-position: left top;
+ 	background-size: 70%;
+ 	transition: all 200ms linear;
+
+	div{
+		padding: 0.25em 0em;
+		text-align: right;
+		color: var(--violet);
+	}
+
+ 	&:hover{
+ 		 background-size: 180%;
+ 		 div{
+ 		 	color: var(--ember);
+ 		 }
+ 	}
+
+
+}
+
+
+
+@keyframes wallet-menu-boxshadow {
+  0% {
+    box-shadow: 0px 0px 200px -20px var(--violet);
+  }
+  50% {
+    box-shadow: 0px 0px 200px -40px var(--moon);
+  }
+  100% {
+    box-shadow: 0px 0px 200px -20px var(--violet);
+  }
+}

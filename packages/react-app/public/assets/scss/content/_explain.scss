@@ -1,0 +1,74 @@
+@use '../variables' as *;
+
+.content-explain{
+	margin: auto;
+	margin-top:3em;
+	padding: 0em 5em;
+	max-width: 1300px;
+
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-gap: 4em;
+
+	figure{
+		width: 100%;
+		img, svg, object{
+			display: block;
+			width: 100%;
+			margin-bottom: 2em;
+		}
+		figcaption{
+			text-align: center;
+			span{
+				color: var(--moon);
+				&:after{ content: " "; }
+			}
+		}
+
+		&:hover{
+			a{
+				color: var(--moon);
+			}
+			figcaption{
+				animation: explain-animation 3s ease-in-out infinite;
+			}
+		}
+
+
+	}
+}
+
+
+
+@media #{$laptop} { 
+	section.content-explain{
+		padding: 0em 4em;
+	}
+}
+
+@media #{$tablet} { 
+	section.content-explain{
+		padding: 0em 3em;
+		grid-template-columns: 1fr 1fr ;
+	}
+}
+
+@media #{$phone} { 
+	section.content-explain{
+		padding: 0em 1em;
+	}
+}
+
+
+
+@keyframes explain-animation {
+  0% {
+    box-shadow: 0px 0px 100px 0px var(--violet);
+  }
+  50% {
+    box-shadow: 0px 0px 100px 0px var(--moon);
+  }
+  100% {
+    box-shadow: 0px 0px 100px 0px var(--violet);
+  }
+}

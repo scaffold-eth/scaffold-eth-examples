@@ -1,0 +1,27 @@
+@use 'variables' as *;
+
+section.column{
+	margin: auto;
+	padding: 0em 5em;
+	max-width: 1300px;
+}
+
+
+
+@media #{$laptop} { 
+	section.column{
+		padding: 0em 4em;
+	}
+}
+
+@media #{$tablet} { 
+	section.column{
+		padding: 0em 3em;
+	}
+}
+
+@media #{$phone} { 
+	section.column{
+		padding: 0em 1em;
+	}
+}

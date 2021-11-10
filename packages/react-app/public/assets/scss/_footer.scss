@@ -1,0 +1,46 @@
+@use 'variables' as *;
+
+
+footer{
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 5em;
+
+	.wrapper{
+		display: flex;
+		align-items: center;
+		width: auto;
+
+		img, svg, object{
+			width:64px;
+			margin-right:1em;
+		}
+	}
+
+}
+
+
+
+@media #{$tablet} { 
+
+  footer{
+  	margin: 5em 1em;
+  	.wrapper{
+  		display: block;
+  		text-align:center;
+  		margin: 0px auto;
+  		img{
+  			display: inline;
+  			margin-right:0px;
+  			margin-bottom:1em;
+  		}
+  	}
+  }
+
+}
+
+
+
+

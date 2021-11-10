@@ -1,0 +1,94 @@
+@use 'variables' as *;
+
+nav{
+
+	display: block;
+
+	ul{
+		display: flex;
+		gap: 1em;
+	}
+
+	li{
+		list-style: none;
+		position: relative;
+	}
+
+	a{
+		text-decoration: none;
+		color: var(--violet);
+
+		&:hover{
+			color: var(--elder);
+		};
+	}
+
+	[aria-current="page"] {
+	color: var(--moon);
+
+		&:after{
+			top: 2em;
+			left:0;
+			right:0;
+			margin: auto;
+			width: 1ch;
+			content: "●";
+			position: absolute;
+		}
+	}
+
+}
+
+
+
+// mobile style for nav
+
+@media #{$tablet} { 
+  nav{
+  	position: absolute;
+  	display: none;
+
+  	top: 120px;
+  	right: 1em;
+
+  	background-color: var(--space);
+  	padding:2em;
+
+  	animation: page-menu-boxshadow 6s ease-in-out infinite;
+
+  	ul{
+  		display: flex;
+  		flex-flow: column wrap;
+  		gap: 1em;
+  	}
+
+  	&.visible{
+  		display: block;
+  	}
+
+	[aria-current="page"] {
+		&:after{
+			top:0;
+			left: 0.5em;
+			content: "●";
+			position: relative;
+		}
+	}
+
+
+  }
+
+}
+
+
+@keyframes page-menu-boxshadow {
+  0% {
+    box-shadow: 0px 0px 200px -20px var(--violet);
+  }
+  50% {
+    box-shadow: 0px 0px 200px -40px var(--moon);
+  }
+  100% {
+    box-shadow: 0px 0px 200px -20px var(--violet);
+  }
+}

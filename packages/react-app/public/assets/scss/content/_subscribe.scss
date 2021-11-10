@@ -1,0 +1,84 @@
+@use '../variables' as *;
+
+.content-subscribe{
+	margin: auto;
+	padding: 0em 5em;
+	max-width: 1300px;
+
+	text-align: center;
+
+	.wrapper{
+		width: 100%;
+		position: relative;
+		margin-bottom:3em;
+
+		&:after{
+			content: "";
+			position: absolute;
+			bottom:0;
+			left:0;
+			right:0;
+			height: 2px;
+			margin: auto;
+			width: 100%;
+			background: var(--elder);
+		}
+
+		&:hover{
+			&:after{
+				content: "";
+				background: linear-gradient(90deg, var(--violet) 0%, var(--moon) 100%);
+			}
+		}
+
+
+	}
+
+	input{
+    	font-size: 180%;
+    	font-family: 'Space Mono', monospace;
+    	background-color: transparent;
+    	text-align:center;
+    	color: var(--moon);
+    	padding: 0.5em;
+    	width: 100%;
+
+
+    	&:focus {
+    		outline: none;
+    	}
+	}
+
+
+
+	::placeholder {
+	  color: var(--elder);
+	}
+
+	button{
+		font-size:100%;
+	}
+
+}
+
+
+
+@media #{$laptop} { 
+	section.content-subscribe{
+		padding: 0em 4em;
+	}
+}
+
+@media #{$tablet} { 
+	section.content-subscribe{
+		padding: 0em 3em;
+		
+	}
+}
+
+@media #{$phone} { 
+	section.content-subscribe{
+
+		padding: 0em 1em;
+	}
+}

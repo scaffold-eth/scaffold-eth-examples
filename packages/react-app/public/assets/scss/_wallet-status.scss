@@ -1,0 +1,21 @@
+.wallet-status{
+	margin-left: 2em;
+	display: flex;
+	align-items: center;
+	gap: 0.3em;
+
+	.icon{
+
+	}
+
+	.provider{
+		cursor: pointer;
+		img{
+			display: block;
+			width: 48px;
+			height: 48px;
+		}
+	}
+
+
+}

@@ -1,0 +1,11 @@
+@use 'variables' as *;
+
+.burger{
+	display: none;
+}
+
+@media #{$tablet} { 
+  .burger{
+  	display: block;
+  }
+}

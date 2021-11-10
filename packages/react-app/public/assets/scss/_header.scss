@@ -1,0 +1,37 @@
+@use 'variables' as *;
+
+header{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 130px;
+	margin: 0em 2em;
+	margin-bottom:3em;
+	user-select: none;
+
+
+	.header-logo{
+		width: 200px;
+		img, svg, object{
+			width: 100%;
+			display: block;
+		}
+	}
+
+	.header-navigation{
+		display: flex;
+		align-items: center;
+	}
+
+}
+
+
+
+@media #{$phone} { 
+  header{
+  	margin: 0em 1em;
+		.header-logo{
+			width: 140px;
+		}
+  }
+}

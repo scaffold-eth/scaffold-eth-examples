@@ -1,0 +1,59 @@
+@use '../variables' as *;
+
+.content-intro{
+	margin: auto;
+	padding: 0em 5em;
+	max-width: 1300px;
+	display: flex;
+	gap: 2em;
+
+	div{
+		width:60%;
+	}
+
+	figure{
+		width:40%;
+		align-self: center;
+	}
+
+}
+
+
+
+@media #{$laptop} { 
+	section.content-intro{
+		padding: 0em 4em;
+	}
+}
+
+@media #{$tablet} { 
+	section.content-intro{
+		padding: 0em 3em;
+
+		div{ 
+			width:50%; 
+		}
+		
+		figure{ 
+			width:50%; 
+		}			
+
+	}
+}
+
+@media #{$phone} { 
+	section.content-intro{
+		flex-wrap: wrap-reverse;
+		
+		div{ 
+			width:100%; 
+		}
+
+		figure{ 
+			width:100%;
+			padding:0em 0em; 
+		}		
+
+		padding: 0em 1em;
+	}
+}

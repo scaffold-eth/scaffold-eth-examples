@@ -1,0 +1,46 @@
+.btn {
+	margin: 0em;
+	margin-right: .5em;
+	margin-bottom: .5em;
+	
+	display: inline-block;
+	padding: 0.6em 1.6em;
+	
+	font-weight: 600;
+	text-decoration: none;
+	white-space: nowrap;
+	border: none;
+	cursor: pointer;
+	line-height: 1.5em;
+
+	border-radius: 50px;
+
+	background-color: var(--violet);
+	color: var(--space);
+	user-select: none;
+
+	&:hover {
+		color: var(--space);
+		animation: button-animation 3s ease-in-out infinite;
+	}
+
+}
+
+
+
+@keyframes button-animation {
+  0% {
+    box-shadow: 0px 0px 150px 0px var(--violet);
+  }
+  50% {
+    box-shadow: 0px 0px 150px 0px var(--moon);
+  }
+  100% {
+    box-shadow: 0px 0px 150px 0px var(--violet);
+  }
+}
+
+
+
+
+

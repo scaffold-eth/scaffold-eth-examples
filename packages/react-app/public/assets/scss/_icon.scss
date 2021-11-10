@@ -1,0 +1,19 @@
+.icon{
+	cursor: pointer;
+	svg, img, object{
+		display: block;
+		background-color: transparent;
+		stroke: var(--violet);
+		stroke-width: 3;
+		stroke-miterlimit: 5;
+		width: 48px;
+		height: 48px;
+		fill: none;
+	}
+
+	&:hover{
+		svg, img, object{
+			stroke: var(--elder);
+		}
+	}	
+}

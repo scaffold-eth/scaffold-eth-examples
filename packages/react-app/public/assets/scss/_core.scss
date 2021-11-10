@@ -1,0 +1,37 @@
+:root {
+    --space: #0E0333;
+    --space_dark: #0B0228;
+    --elder: #C9B8FF;
+    --moon: #FFCC00;
+
+    --violet: #6F3FF5;
+    --violet_dark: #2B156D;
+
+}
+
+*{
+    margin:0;
+    padding:0;
+    border:0;
+    box-sizing: border-box;
+}
+
+img{
+    display: block;
+    width: 100%;
+}
+
+
+body{
+    background-color: var(--space);
+    color : var(--elder);
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+::-moz-selection, ::selection { 
+    background: var(--elder);
+}
+
