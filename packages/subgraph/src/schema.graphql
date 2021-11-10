@@ -1,0 +1,22 @@
+type Nata @entity {
+  id: ID!
+  ipfsHash: String!
+  owner: Bytes!
+  minter: Minter!
+  createdAt: BigInt!
+  block: String!
+  transfers: [TokenTransfer!] @derivedFrom(field: "nata")
+}
+
+type Minter @entity {
+  id: ID!
+  natas: [Nata!] @derivedFrom(field: "minter")
+  nataCount: BigInt!
+}
+
+type TokenTransfer @entity {
+  id: ID!
+  nata: Nata
+  from: Bytes
+  to: Bytes
+}
