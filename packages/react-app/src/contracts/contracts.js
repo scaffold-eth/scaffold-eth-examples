@@ -1,0 +1,1 @@
+module.exports = ["DAI","MyV2FlashLoan"];
