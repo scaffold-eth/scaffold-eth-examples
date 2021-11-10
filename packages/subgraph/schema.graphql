@@ -1,0 +1,21 @@
+type Ink @entity {
+  id: ID!
+  inkNumber: BigInt!
+  jsonUrl: String!
+  artist: Artist!
+  limit: BigInt!
+  createdAt: BigInt
+}
+
+type Artist @entity {
+  id: ID!
+  address: Bytes!
+  inks: [Ink]! @derivedFrom(field: "artist")
+  inkCount: BigInt!
+}
+
+type DayTotal @entity {
+  id: ID!
+  inks: BigInt
+  artists: BigInt
+}

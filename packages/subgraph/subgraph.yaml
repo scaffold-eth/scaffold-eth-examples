@@ -1,0 +1,25 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: NiftyInk
+    network: xdai
+    source:
+      address: "0x49dE55fbA08af88f55EB797a456fdf76B151c8b0"
+      abi: NiftyInk
+      startBlock: 11296637
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Ink
+        - Artist
+      abis:
+        - name: NiftyInk
+          file: ./abis/NiftyInk.json
+      eventHandlers:
+        - event: newInk(uint256,indexed address,string,string,uint256)
+          handler: handlenewInk
+      file: ./src/mapping.ts
