@@ -1,0 +1,45 @@
+{
+  "name": "scaffold-eth-api",
+  "version": "0.1.0",
+  "description": "A TypeScript starter for Serverless Framework",
+  "main": "handler.js",
+  "private": true,
+  "scripts": {
+    "lint": "npx eslint src/**/*.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "serverless-bundle test",
+    "deploy": "npx serverless deploy --stage dev"
+  },
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnomalyInnovations/serverless-typescript-starter.git"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.64",
+    "@types/jest": "^26.0.14",
+    "eslint": "^7.5.0",
+    "serverless": "^2.34.0",
+    "serverless-bundle": "4.0.1",
+    "serverless-domain-manager": "^5.1.0",
+    "serverless-dotenv-plugin": "^3.0.0",
+    "serverless-offline": "^6.8.0",
+    "serverless-iam-roles-per-function": "3.1.0"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "ethers": "^5.0.17",
+    "uuidv4": "6.2.7",
+    "mailparser": "^2.3.4",
+    "mime-types": "2.1.30",
+    "@aws-sdk/client-s3": "3.11.0",
+    "@aws-sdk/s3-request-presigner": "3.11.0",
+    "ipfs-only-hash": "4.0.0"
+  },
+  "workspaces": {
+    "nohoist": [
+      "**"
+    ]
+  }
+}

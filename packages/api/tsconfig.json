@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "es6",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    // Required for Dynamorm
+    "experimentalDecorators": true, // required
+    "emitDecoratorMetadata": true // required
+  }
+}
