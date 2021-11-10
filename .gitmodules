@@ -1,0 +1,3 @@
+[submodule "docker/optimism-integration"]
+	path = docker/optimism-integration
+	url = https://github.com/ethereum-optimism/optimism-integration
