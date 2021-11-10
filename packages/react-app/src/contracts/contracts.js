@@ -1,0 +1,1 @@
+module.exports = ["Burnable","Fixed","Inflating","Unlimited"];
