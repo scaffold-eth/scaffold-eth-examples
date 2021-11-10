@@ -1,0 +1,1 @@
+module.exports = ["AKITAERC20Token","BurnVendor"];
