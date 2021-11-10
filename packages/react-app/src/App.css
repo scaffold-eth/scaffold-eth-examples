@@ -1,0 +1,14 @@
+@import '~antd/dist/antd.dark.css';
+
+#root {
+  height: 100%
+}
+
+.App {
+  text-align: center;
+  font-family: 'Press Start 2P', cursive;
+}
+
+.anticon {
+  image-rendering: "pixelated"
+}
