@@ -1,0 +1,1 @@
+module.exports = ["Allocator","ExampleToken","WETH9"];
