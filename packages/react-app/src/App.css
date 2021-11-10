@@ -1,0 +1,143 @@
+.App {
+  text-align: center;
+}
+
+#WEB3_CONNECT_MODAL_ID {
+  z-index: 999;
+  position: absolute;
+}
+
+#ACCOUNT_HEADER_ID {
+  z-index: 900;
+}
+
+.artist_blockie {
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #b5b5b5, 0 0 0 1px #b5b5b5;
+  padding: 3px;
+}
+
+.holdings_blockie {
+  border-radius: 10%;
+  box-shadow: 0 0 0 1px #b5b5b5, 0 0 0 1px #b5b5b5;
+  padding: 3px;
+}
+
+.inks-grid li:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 3px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.artists-leaderboard {
+  padding: 15px 10px;
+}
+
+.artists-leaderboard ul {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}
+
+.artists-leadboard-entry {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgb(229, 229, 230);
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+
+.artists-leadboard-entry-rank {
+  width: 65px;
+  padding: 12px;
+  margin: 0 10px;
+}
+
+.artists-leadboard-entry-rank h3 {
+  font-weight: bold;
+}
+
+
+.artists-leadboard-entry-address {
+  width: 475px;
+  /* flex-grow: 1; */
+  zoom: 0.6;
+}
+
+.artists-leadboard-entry-stats {
+  padding: 5px 20px;
+}
+
+.artists-leadboard-entry-stats p {
+  margin: 0;
+  font-size: 0.7rem;
+}
+
+.token-transfer-table-address span:nth-of-type(2) {
+  font-size: 14px !important;
+  vertical-align: top !important;
+}
+
+.token-transfer-table-address canvas.identicon {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.ant-menu-vertical .ant-menu-item {
+  font-size: 24px
+}
+.ant-slider .ant-slider-rail{
+  height: 8px;
+}
+.ant-slider .ant-slider-track{
+  height: 8px;
+}
+.ant-slider .ant-slider-step{
+  height: 8px;
+}
+.ant-slider .ant-slider-handle{
+  width: 19px;
+  height: 19px;
+}
+
+.create-ink-container {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-wrap: wrap
+}
+
+.canvas {
+  display: block;
+  flex: 1 0 auto;
+  /* margin-left: 10%; */
+}
+
+.title-top {
+  display: block;
+  flex: 1 0 100%;
+}
+.edit-tools {
+  display: block;
+  flex: 1 3 35%;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.edit-tools-bottom {
+  margin-top: 10px;
+  flex: 1 0 100%;
+}
+
+.edit-tools-side {
+  margin-top: 50px;
+}
+
+@media (orientation: portrait) {
+  .create-ink-container {
+    display: block;
+    text-align: center;
+  }
+  .bottom-block {
+    margin-top: 5px;
+  }
+}

@@ -1,0 +1,171 @@
+enum SaleType {
+  primary
+  secondary
+}
+
+enum Network {
+  xdai
+  mainnet
+}
+
+type Ink @entity {
+  id: ID!
+  inkNumber: BigInt!
+  jsonUrl: String!
+  artist: Artist!
+  limit: BigInt!
+  count: BigInt!
+  tokens: [Token!]!
+  sales: [Sale!] @derivedFrom(field: "ink")
+  likes: [Like!] @derivedFrom(field: "ink")
+  tokenTransfers: [TokenTransfer!] @derivedFrom(field: "ink")
+  createdAt: BigInt
+  mintPrice: BigInt!
+  mintPriceSetAt: BigInt
+  mintPriceNonce: BigInt
+  bestPrice: BigInt!
+  bestPriceSource: String
+  bestPriceSetAt: BigInt
+  likeCount: BigInt
+  burnedCount: BigInt
+  burned: Boolean
+}
+
+type Token @entity {
+  id: ID!
+  ink: Ink!
+  owner: User!
+  createdAt: BigInt!
+  network: Network!
+  price: BigInt!
+  priceSetAt: BigInt
+  transferCount: BigInt
+  transfers: [TokenTransfer!] @derivedFrom(field: "token")
+  sales: [Sale!] @derivedFrom(field: "token")
+  upgradeTransfer: TokenTransfer
+  burned: Boolean
+  artist: Artist
+  edition: BigInt
+  lastTransferAt: BigInt
+}
+
+type Artist @entity {
+  id: ID!
+  address: Bytes!
+  inks: [Ink]! @derivedFrom(field: "artist")
+  inkCount: BigInt!
+  earnings: BigInt
+  sales: [Sale!] @derivedFrom(field: "artist")
+  likes: [Like!] @derivedFrom(field: "artist")
+  tokenTransfers: [TokenTransfer!] @derivedFrom(field: "artist")
+  tokens: [Token!] @derivedFrom(field: "artist")
+  likeCount: BigInt
+  saleCount: BigInt
+  createdAt: BigInt!
+  lastInkAt: BigInt
+  lastLikeAt: BigInt
+  lastSaleAt: BigInt
+}
+
+type User @entity {
+  id: ID!
+  artist: Artist
+  address: Bytes!
+  tokens: [Token!] @derivedFrom(field: "owner")
+  sales: [Sale!] @derivedFrom(field: "seller")
+  purchases: [Sale!] @derivedFrom(field: "buyer")
+  likes: [Like!] @derivedFrom(field: "liker")
+  transfersFrom: [TokenTransfer!] @derivedFrom(field: "from")
+  transfersTo: [TokenTransfer!] @derivedFrom(field: "to")
+  tokenCount: BigInt
+  fromCount: BigInt
+  toCount: BigInt
+  likeCount: BigInt
+  purchaseCount: BigInt
+  purchaseValue: BigInt
+  saleCount: BigInt
+  saleValue: BigInt
+  lastLikeAt: BigInt
+  lastPurchaseAt: BigInt
+  lastSaleAt: BigInt
+  lastTransferAt: BigInt
+  createdAt: BigInt
+  lastInkAt: BigInt
+  inkCount: BigInt
+}
+
+type Sale @entity {
+  id: ID!
+  buyer: User!
+  seller: User
+  price: BigInt!
+  token: Token!
+  ink: Ink!
+  artist: Artist!
+  createdAt: BigInt!
+  artistTake: BigInt!
+  saleType: SaleType
+  transfer: TokenTransfer!
+  transactionHash: String
+}
+
+type TokenTransfer @entity {
+  id: ID!
+  token: Token!
+  from: User!
+  to: User!
+  createdAt: BigInt!
+  network: Network
+  ink: Ink
+  artist: Artist
+  transactionHash: String!
+  sale: Sale
+}
+
+type RelayPrice @entity {
+  id: ID!
+  createdAt: BigInt!
+  price: BigInt!
+}
+
+type MetaData @entity {
+  id: ID!
+  value: String!
+}
+
+type Total @entity {
+  id: ID!
+  day: BigInt
+  inks: BigInt
+  tokens: BigInt
+  sales: BigInt
+  upgrades: BigInt
+  artists: BigInt
+  saleValue: BigInt
+  users: BigInt
+}
+
+type DailyTotal @entity {
+  id: ID!
+  day: BigInt
+  inks: BigInt
+  tokens: BigInt
+  sales: BigInt
+  upgrades: BigInt
+  artists: BigInt
+  saleValue: BigInt
+  users: BigInt
+}
+
+type InkLookup @entity {
+  id: ID!
+  inkId: String!
+}
+
+type Like @entity {
+  id: ID!
+  ink: Ink!
+  artist: Artist!
+  liker: User!
+  createdAt: BigInt!
+}
