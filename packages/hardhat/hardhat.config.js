@@ -9,7 +9,6 @@ require("@tenderly/hardhat-tenderly");
 require("hardhat-deploy");
 require("hardhat-gas-reporter");
 
-require("@eth-optimism/hardhat-ovm");
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-etherscan");
 
@@ -27,7 +26,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "localhost";
+const defaultNetwork = "localOptimism";
 
 const mainnetGwei = 21;
 
@@ -67,10 +66,10 @@ module.exports = {
   networks: {
     localhost: {
       url: "http://localhost:8545",
-      /*      
+      /*
         notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
         (you can put in a mnemonic here to set the deployer locally)
-      
+
       */
     },
 
@@ -205,10 +204,19 @@ module.exports = {
         l2: "localArbitrum",
       },
     },
+    optimism: {
+      url: "https://mainnet.optimism.io",
+      accounts: {
+        mnemonic: '<Insert your account mnemonic>',
+      },
+      companionNetworks: {
+        l1: "mainnet",
+      },
+    },
     kovanOptimism: {
       url: "https://kovan.optimism.io",
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: '<Insert your account mnemonic>',
       },
       companionNetworks: {
         l1: "kovan",
@@ -216,11 +224,11 @@ module.exports = {
     },
     localOptimism: {
       url: "http://localhost:8545",
-      gasPrice: 0,
       accounts: {
-        mnemonic: mnemonic(),
+        mnemonic: 'test test test test test test test test test test test junk'
+
+,
       },
-      ovm: true,
       companionNetworks: {
         l1: "localOptimismL1",
       },
