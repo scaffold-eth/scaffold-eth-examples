@@ -4,6 +4,15 @@ A simple example of a VDF smart contract verifier, and a simple front end to gen
 
 VDF implementation is shamlessly ripped from [kilic](https://github.com/kilic)'s [evmvdf](https://github.com/kilic/evmvdf) repo. It is strictly intended as a proof of concept and should not be used as anything but an educational resource.
 
+### What is a VDF?
+
+A VDF is a Verifiable Delay Function. Basically it's a type of computation that takes a long time to compute, but can be verified in a fraction of the computation time.
+
+Here are some resources:
+- [A vdf explainer](https://reading.supply/@whyrusleeping/a-vdf-explainer-5S6Ect)
+- [Introduction to VDFs](https://adlrocha.substack.com/p/adlrocha-a-gentle-introduction-to)
+- [VDF intro video](https://www.youtube.com/watch?v=3hg4GM7UQXA)
+
 ### Known Issues
 
 - If `t` is set greater than 7 the VDF proof will not be verified.
