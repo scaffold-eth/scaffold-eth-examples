@@ -17,7 +17,7 @@ Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://class
 > clone/fork 🏗 scaffold-eth:
 
 ```bash
-git clone https://github.com/scaffold-eth/scaffold-eth-examples.git
+git clone -b vdf-verifier-example https://github.com/scaffold-eth/scaffold-eth-examples.git
 ```
 
 > install and start your 👷‍ Hardhat chain:
