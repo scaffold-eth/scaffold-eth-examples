@@ -18,6 +18,8 @@ export { default as Timeline } from "./Timeline";
 export { default as TokenBalance } from "./TokenBalance";
 export { default as Wallet } from "./Wallet";
 export { default as L2Bridge } from "./L2Bridge";
+export { default as NetworkDisplay } from "./NetworkDisplay";
+export { default as FaucetHint } from "./FaucetHint";
 export { default as ZkpInterface } from "./ZkpInterface";
 export { default as EdDSABurner } from "./EdDSABurner";
 export { default as SmtInterface } from "./SmtInterface";
