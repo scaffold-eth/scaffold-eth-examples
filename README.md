@@ -11,7 +11,7 @@ Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://class
 > clone/fork 🏗 scaffold-eth:
 
 ```bash
-git clone https://github.com/scaffold-eth/scaffold-eth.git abi-uploader
+git clone https://github.com/scaffold-eth/scaffold-eth-examples.git abi-uploader
 cd abi-uploader
 git checkout abi-uploader
 ```
