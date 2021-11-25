@@ -1,21 +1,27 @@
-include "../../node_modules/circomlib/circuits/smt/smtprocessor.circom"
+include "../../node_modules/circomlib/circuits/smt/smtprocessor.circom";
+include "../../node_modules/circomlib/circuits/comparators.circom";
 
 template Add2Tree(nLevels) {
-  signal input root; // should be defined in contract
-  signal input key;  // should be defined in contract
-  signal input value;
+  signal input oldRoot; // should be defined in contract
+  signal input newKey;  // should be defined in contract
+  signal input newValue;
+  signal input oldKey;
+  signal input oldValue;
   signal private input siblings[nLevels];
 
   signal output outRoot;
 
+  component rootIsZero = IsZero();
+  rootIsZero.in <== oldRoot;
+
   component tree = SMTProcessor(nLevels);
-  tree.oldRoot <== root;
+  tree.oldRoot <== oldRoot;
   for (var i=0; i<nLevels; i++) tree.siblings[i] <== siblings[i];
-  tree.oldKey <== key;
-  tree.oldValue <== 0;
-  tree.isOld0 <== 1;
-  tree.newKey <== key;
-  tree.newValue <== value;
+  tree.oldKey <== 0;
+  tree.oldValue <== 1;
+  tree.isOld0 <== rootIsZero.out;
+  tree.newKey <== newKey;
+  tree.newValue <== newValue;
   tree.fnc[0] <== 1;
   tree.fnc[1] <== 0;
 

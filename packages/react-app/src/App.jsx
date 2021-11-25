@@ -331,9 +331,11 @@ function App(props) {
             <ZkpInterface
               inputFields={
                 {
-                  root: "0",
-                  key: "0",
-                  value: "0",
+                  oldRoot: "0",
+                  newKey: "0",
+                  newValue: "0",
+                  oldKey: "0",
+                  oldValue: "0",
                   siblings: new Array(3).fill("0")
                 }
               }
