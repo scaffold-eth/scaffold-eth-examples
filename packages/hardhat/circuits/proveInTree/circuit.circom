@@ -10,8 +10,8 @@ template proveInTree(nLevels) {
   tree.enabled <== 1;
   tree.root <== root;
   for (var i=0; i<nLevels; i++) tree.siblings[i] <== siblings[i];
-  tree.oldKey <== key;
-  tree.oldValue <== value;
+  tree.oldKey <== 0;
+  tree.oldValue <== 0;
   tree.isOld0 <== 0;
   tree.key <== key;
   tree.value <== value;
