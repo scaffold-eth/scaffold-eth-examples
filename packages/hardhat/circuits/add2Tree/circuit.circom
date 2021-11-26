@@ -17,8 +17,8 @@ template Add2Tree(nLevels) {
   component tree = SMTProcessor(nLevels);
   tree.oldRoot <== oldRoot;
   for (var i=0; i<nLevels; i++) tree.siblings[i] <== siblings[i];
-  tree.oldKey <== 0;
-  tree.oldValue <== 1;
+  tree.oldKey <== oldKey;
+  tree.oldValue <== oldValue;
   tree.isOld0 <== rootIsZero.out;
   tree.newKey <== newKey;
   tree.newValue <== newValue;
