@@ -26,7 +26,15 @@ export default function SmtInterface() {
     const resKeys = Object.keys(res);
     let newRes= {}
     for (let i = 0; i < resKeys.length; i++) {
-      newRes[resKeys[i]] = res[resKeys[i]].toString();
+      if (!Array.isArray(res[resKeys[i]])) {
+        newRes[resKeys[i]] = res[resKeys[i]].toString();
+      } else {
+        let tempArr = [];
+        for (let j = 0; j < res[resKeys[i]].length; j++) {
+          tempArr.push(res[resKeys[i]][j].toString());
+        }
+        newRes[resKeys[i]] = tempArr;
+      }
     }
     setLastInsert(newRes);
 
@@ -42,7 +50,7 @@ export default function SmtInterface() {
   }
 
   return (
-    <div style={{margin: "auto", width: "52vw"}}>
+    <div style={{margin: "auto", width: "60vw"}}>
       <p>{tree.root ? tree.root.toString() : "undefined"}</p>
       {/*<p>{tree.oldRoot ? tree.oldRoot.toString() : "undefined"}</p>*/}
       <span>
