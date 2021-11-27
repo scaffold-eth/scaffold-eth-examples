@@ -16,6 +16,9 @@ export default function SmtInterface() {
 
   const [lastInsert, setLastInsert] = useState();
 
+  const [selectedKey, setSelectedKey] = useState();
+  const [selectedInclProof, setSelectedInclProof] = useState();
+
   // const proof = tree.createProof(BigInt(0));
   // console.log("smt proof: ", proof);
 
@@ -49,39 +52,87 @@ export default function SmtInterface() {
     setTreeLeaves(newTreeLeaves);
   }
 
+  async function generateInclProof() {
+    const res = await tree.find(selectedKey);
+
+    const resKeys = Object.keys(res);
+    let newRes= {}
+    for (let i = 0; i < resKeys.length; i++) {
+      if (!Array.isArray(res[resKeys[i]])) {
+        newRes[resKeys[i]] = res[resKeys[i]].toString();
+      } else {
+        let tempArr = [];
+        for (let j = 0; j < res[resKeys[i]].length; j++) {
+          tempArr.push(res[resKeys[i]][j].toString());
+        }
+        newRes[resKeys[i]] = tempArr;
+      }
+    }
+    setSelectedInclProof(newRes);
+
+    console.log(res);
+  }
+
   return (
     <div style={{margin: "auto", width: "60vw"}}>
       <p>{tree.root ? tree.root.toString() : "undefined"}</p>
       {/*<p>{tree.oldRoot ? tree.oldRoot.toString() : "undefined"}</p>*/}
-      <span>
-        <InputNumber
-          onChange={(n) => setinsertkey(n)}
-        />
-      </span>
-      <span>
-        <InputNumber
-          onChange={(n) => setInsertValue(n)}
-        />
-      </span>
-      <span>
-        <Button
-          onClick={insertToTree}
-          type="primary"
-        >
-          Insert
-        </Button>
-      </span>
-      <div style={{padding: "3%"}}>
+      <div style={{paddingRight: "8vw", textAlign: "right"}}>
+        <span>
+          <InputNumber
+            defaultValue={0}
+            onChange={(n) => setinsertkey(n)}
+          />
+        </span>
+        <span>
+          <InputNumber
+            defaultValue={0}
+            onChange={(n) => setInsertValue(n)}
+            stringMode
+          />
+        </span>
+        <span>
+          <Button
+            onClick={insertToTree}
+            type="primary"
+          >
+            Insert Data
+          </Button>
+        </span>
+      </div>
+      <div style={{padding: "3%", textAlign: "left"}}>
         <Collapse>
           <Panel header="Last Insert Data">
-            <div style={{textAlign: "left"}}>
               <ReactJson
                 src={lastInsert}
                 style={{fontSize: "0.7em"}}
                 displayArrayKey={false}
                 displayDataTypes={false}
               />
-            </div>
+          </Panel>
+        </Collapse>
+      </div>
+      <div style={{paddingRight: "8vw", textAlign: "right"}}>
+        <InputNumber
+          defaultValue={0}
+          onChange={(n) => setSelectedKey(n)}
+        />
+        <Button
+          onClick={generateInclProof}
+          type="primary"
+        >
+          Generate Proof
+        </Button>
+      </div>
+      <div style={{padding: "3%", textAlign: "left"}}>
+        <Collapse>
+          <Panel header="SMT Proof">
+              <ReactJson
+                src={selectedInclProof}
+                style={{fontSize: "0.7em"}}
+                displayArrayKey={false}
+                displayDataTypes={false}
+              />
           </Panel>
         </Collapse>
       </div>
