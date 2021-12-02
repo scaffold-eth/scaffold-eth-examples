@@ -1,10 +1,18 @@
 include "../../node_modules/circomlib/circuits/smt/smtverifier.circom";
+include "../../node_modules/circomlib/circuits/poseidon.circom";
 
 template proveInTree(nLevels) {
   signal input root;
   signal private input key;
-  signal private input value;
+  signal private input secret;
+  signal private input nullifier;
   signal private input siblings[nLevels];
+
+  signal value;
+  component poseidon = Poseidon(2);
+  poseidon.inputs[0] <== secret;
+  poseidon.inputs[1] <== nullifier;
+  value <== poseidon.out;
 
   component tree = SMTVerifier(nLevels);
   tree.enabled <== 1;
