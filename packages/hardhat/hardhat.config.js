@@ -372,17 +372,17 @@ function debug(text) {
   }
 }
 
-async function circomTemplate({ zkeys }, hre) {
-  const snarkjsTemplate = resolve.sync("snarkjs/templates/verifier_groth16.sol");
-
-  for (const zkey of zkeys) {
-    const verifierSol = await hre.snarkjs.zKey.exportSolidityVerifier(zkey, snarkjsTemplate);
-    const verifierPath = path.join(hre.config.paths.sources, `${zkey.name.charAt(0).toUpperCase() + zkey.name.slice(1)}Verifier.sol`);
-    fs.writeFileSync(verifierPath, verifierSol);
-  }
-}
-
-subtask(TASK_CIRCOM_TEMPLATE, "generate Verifier template shipped by SnarkjS").setAction(circomTemplate);
+// async function circomTemplate({ zkeys }, hre) {
+//   const snarkjsTemplate = resolve.sync("snarkjs/templates/verifier_groth16.sol");
+//
+//   for (const zkey of zkeys) {
+//     const verifierSol = await hre.snarkjs.zKey.exportSolidityVerifier(zkey, snarkjsTemplate);
+//     const verifierPath = path.join(hre.config.paths.sources, `${zkey.name.charAt(0).toUpperCase() + zkey.name.slice(1)}Verifier.sol`);
+//     fs.writeFileSync(verifierPath, verifierSol);
+//   }
+// }
+//
+// subtask(TASK_CIRCOM_TEMPLATE, "generate Verifier template shipped by SnarkjS").setAction(circomTemplate);
 
 task("wallet", "Create a wallet (pk) link", async (_, { ethers }) => {
   const randomWallet = ethers.Wallet.createRandom();
