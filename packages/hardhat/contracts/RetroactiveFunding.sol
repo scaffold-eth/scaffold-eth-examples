@@ -1,11 +1,11 @@
-pragma solidity =0.7.6;
+pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import '@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol';
 import '@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol';
-import '@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol';
+import './interfaces/INonfungiblePositionManager.sol';
 
 contract RetroactiveFunding is ERC20 {
     uint public constant mintAmount = 1000 ether;
@@ -26,15 +26,14 @@ contract RetroactiveFunding is ERC20 {
         return factory.getPool(address(this), weth, fee);
     }
 
-    function sqrt(uint160 x) internal returns (uint160 y) {
-    uint z = (x + 1) / 2;
+    function sqrt(uint160 x) internal pure returns (uint160 y) {
+    uint160 z = (x + 1) / 2;
     y = x;
     while (z < y) {
         y = z;
         z = (x / z + z) / 2;
     }
 }
-
     function fundProject() external payable {
         address pool = getPool();
         if (pool == address(0)) {
