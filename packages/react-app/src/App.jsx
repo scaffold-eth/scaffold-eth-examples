@@ -1,4 +1,4 @@
-import { Alert, Button, Col, Menu, Row } from "antd";
+import { Alert, Button, Col, Collapse, Menu, Row } from "antd";
 import "antd/dist/antd.css";
 import {
   useBalance,
@@ -24,6 +24,7 @@ import {
   FaucetHint,
   SmtInterface,
   ZkpInterface,
+  PoseidonInterface,
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
@@ -35,8 +36,12 @@ import { useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
 
-const wasm = `${process.env.PUBLIC_URL}/circuits/add2Tree.wasm`;
-const zkey = `${process.env.PUBLIC_URL}/circuits/add2Tree.zkey`;
+const { Panel } = Collapse;
+
+const add2TreeWasm = `${process.env.PUBLIC_URL}/circuits/add2Tree.wasm`;
+const add2TreeZkey = `${process.env.PUBLIC_URL}/circuits/add2Tree.zkey`;
+const proveInTreeWasm = `${process.env.PUBLIC_URL}/circuits/proveInTree.wasm`;
+const proveInTreeZkey = `${process.env.PUBLIC_URL}/circuits/proveInTree.zkey`;
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -292,7 +297,7 @@ function App(props) {
               ExampleUI
             </Link>
           </Menu.Item>
-          <Menu.Item key="/mainnetdai">
+          {/*<Menu.Item key="/mainnetdai">
             <Link
               onClick={() => {
                 setRoute("/mainnetdai");
@@ -301,7 +306,7 @@ function App(props) {
             >
               Mainnet DAI
             </Link>
-          </Menu.Item>
+          </Menu.Item>*/}
           <Menu.Item key="/subgraph">
             <Link
               onClick={() => {
@@ -326,23 +331,46 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
+            <PoseidonInterface
+            />
+
             <SmtInterface/>
 
-            <ZkpInterface
-              inputFields={
-                {
-                  oldRoot: "0",
-                  newKey: "0",
-                  newValue: "0",
-                  oldKey: "0",
-                  oldValue: "0",
-                  siblings: new Array(3).fill("0")
-                }
-              }
-              wasm={wasm}
-              zkey={zkey}
-              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProof : null}
-            />
+            <Collapse style={{margin: "auto", width: "60vw"}}>
+              <Panel header="Add2Tree Proof Interface">
+                <ZkpInterface
+                  inputFields={
+                    {
+                      oldRoot: "0",
+                      newKey: "0",
+                      newValue: "0",
+                      oldKey: "0",
+                      oldValue: "0",
+                      siblings: new Array(3).fill("0")
+                    }
+                  }
+                  wasm={add2TreeWasm}
+                  zkey={add2TreeZkey}
+                  scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyAdd2TreeProof : null}
+                />
+              </Panel>
+              <Panel header="ProveInTree Proof Interface">
+                <ZkpInterface
+                  inputFields={
+                    {
+                      root: 0,
+                      key: 0,
+                      secret: 0,
+                      nullifier: 0,
+                      siblings: new Array(3).fill("0")
+                    }
+                  }
+                  wasm={proveInTreeWasm}
+                  zkey={proveInTreeZkey}
+                  scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProveInTreeProof : null}
+                />
+              </Panel>
+            </Collapse>
 
             <Contract
               name="YourContract"
@@ -363,11 +391,11 @@ function App(props) {
             />
           </Route>
           <Route path="/exampleui">
-            <ZkHashUI
+            {/*<ZkHashUI
               wasm={wasm}
               zkey={zkey}
               scVerifyFn={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProof : null}
-            />
+            />*/}
             {/*<ExampleUI
               address={address}
               userSigner={userSigner}
