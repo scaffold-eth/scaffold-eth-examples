@@ -80,13 +80,11 @@ export default function SmtInterface() {
       <div style={{paddingRight: "8vw", textAlign: "right"}}>
         <span>
           <InputNumber
-            defaultValue={0}
             onChange={(n) => setinsertkey(n)}
           />
         </span>
         <span>
           <InputNumber
-            defaultValue={0}
             onChange={(n) => setInsertValue(n)}
             stringMode
           />
@@ -114,7 +112,6 @@ export default function SmtInterface() {
       </div>
       <div style={{paddingRight: "8vw", textAlign: "right"}}>
         <InputNumber
-          defaultValue={0}
           onChange={(n) => setSelectedKey(n)}
         />
         <Button
