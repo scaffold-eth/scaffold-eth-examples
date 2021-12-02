@@ -1,6 +1,10 @@
+import { poseidon } from "circomlibjs";
+
 const { ethers } = require("hardhat");
 const { use, expect } = require("chai");
 const { solidity } = require("ethereum-waffle");
+const newMemEmptyTrie = require("circomlibjs").newMemEmptyTrie;
+const snarkjs = require("snarkjs");
 
 use(solidity);
 
@@ -19,13 +23,22 @@ describe("My Dapp", function () {
       myContract = await YourContract.deploy();
     });
 
-    describe("setPurpose()", function () {
-      it("Should be able to set a new purpose", async function () {
-        const newPurpose = "Test Purpose";
+    describe("addLeaf()", async function () {
+      const tree = await newMemEmptyTrie();
+      let secretPairs = [];
+      let hashes = [];
 
-        await myContract.setPurpose(newPurpose);
-        expect(await myContract.purpose()).to.equal(newPurpose);
+      it("Should add a value to the tree", async function () {
+        secretPairs.push([1, 1]);
+        hashes.push(poseidon([secretPairs[0]]))
       });
+
+      // it("Should be able to set a new purpose", async function () {
+      //   const newPurpose = "Test Purpose";
+      //
+      //   await myContract.setPurpose(newPurpose);
+      //   expect(await myContract.purpose()).to.equal(newPurpose);
+      // });
 
       // Uncomment the event and emit lines in YourContract.sol to make this test pass
 
