@@ -24,7 +24,7 @@ export default function useSMT(leaves) {
       }
     }
     setTree(newTree);
-  }, []);
+  }, [leaves]);
 
   return tree;
 }
