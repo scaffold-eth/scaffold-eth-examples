@@ -23,12 +23,18 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
     log: true,
   });
-  await deploy("APIConsumer", {
+  await deploy("RandomNumberConsumer", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
     log: true,
   });
+  // await deploy("APIConsumer", {
+  //   // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+  //   from: deployer,
+  //   // args: [ "Hello", ethers.utils.parseEther("1.5") ],
+  //   log: true,
+  // });
   await deploy("CoinGeckoConsumer", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
@@ -41,16 +47,10 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
     log: true,
   });
-  await deploy("RandomNumberConsumer", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
 
   // Getting a previously deployed contract
   const YourContract = await ethers.getContract("YourContract", deployer);
-  const APIConsumer = await ethers.getContract("APIConsumer", deployer);
+  // const APIConsumer = await ethers.getContract("APIConsumer", deployer);
   const CoinGeckoConsumer = await ethers.getContract(
     "CoinGeckoConsumer",
     deployer
@@ -112,7 +112,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     // wait a bit for etherscan to be ready to verify the contracts
     await sleep(15000);
     verifyContract("YourContract");
-    verifyContract("APIConsumer");
+    // verifyContract("APIConsumer");
     verifyContract("CoinGeckoConsumer");
     verifyContract("PriceConsumerV3");
     verifyContract("RandomNumberConsumer");
@@ -120,8 +120,8 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 };
 module.exports.tags = [
   "YourContract",
-  "APIConsumer",
+  "RandomNumberConsumer",
+  // "APIConsumer",
   "CoinGeckoConsumer",
   "PriceConsumerV3",
-  "RandomNumberConsumer",
 ];
