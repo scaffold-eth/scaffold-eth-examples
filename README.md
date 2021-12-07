@@ -7,7 +7,7 @@
 ![image](https://user-images.githubusercontent.com/2653167/124158108-c14ca380-da56-11eb-967e-69cde37ca8eb.png)
 
 ```bash
-git clone -b chainlink-tutorial-1 https://github.com/austintgriffith/scaffold-eth.git
+git clone -b chainlink-tutorial-1 https://github.com/austintgriffith/scaffold-eth-examples.git
 
 # 🏄‍♂️ Quick Start
 
@@ -15,16 +15,16 @@ git clone -b chainlink-tutorial-1 https://github.com/austintgriffith/scaffold-et
 
 Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
 
-> clone/fork 🏗 scaffold-eth:
+> clone/fork 🏗 scaffold-eth-examples:
 
 ```bash
-git clone https://github.com/austintgriffith/scaffold-eth.git
+git clone https://github.com/austintgriffith/scaffold-eth-examples.git
 ```
 
 > generate your account to deploy to testnet:
 
 ```bash
-cd scaffold-eth
+cd scaffold-eth-examples
 yarn generate
 ```
 
@@ -54,6 +54,7 @@ yarn deploy
 🔏 Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
 🔏 Edit your smart contract `ApiConsumer.sol` in `packages/hardhat/contracts`
 🔏 Edit your smart contract `CoinGeckoConsumer.sol` in `packages/hardhat/contracts`
+🔏 Edit your smart contract `PriceConsumerV3.sol` in `packages/hardhat/contracts`
 🔏 Edit your smart contract `RandomNumberConsumer.sol` in `packages/hardhat/contracts`
 
 📝 Edit your frontend `App.jsx` in `packages/react-app/src`
@@ -77,9 +78,9 @@ yarn deploy
 Copy the contract address and send it some link. You don't need much, average oracle costs .1 LINK.
 ![image](https://user-images.githubusercontent.com/9419140/106750100-645ad780-65f5-11eb-95c9-ce07ef0ed2e2.png)
 
-To test just put a arbitrary number in the field and click send.
+To test just go to getRandomRoll and click send.
 
-![image](https://user-images.githubusercontent.com/9419140/106750387-c74c6e80-65f5-11eb-9c19-74ead780dc5b.png)
+![Screenshot 2021-12-07 at 13 18 58](https://user-images.githubusercontent.com/32189942/145020057-7ec8fd96-7b03-4669-997f-4cbc235df2b1.png)
 
 After about 30 seconds you can click the refresh icon to get the value.
 
