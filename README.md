@@ -107,9 +107,18 @@ In the Example UI you'll find an example of how to manage UI state when making s
 
 ![Screenshot 2021-12-07 at 22 51 44](https://user-images.githubusercontent.com/32189942/145104318-733d4637-2ff4-42b3-8d91-f1a2b745a50f.png)
 
+> ** Side Quest - How secure is to expose our requestId publicly? 
+> Can we hack 🥷 the system and fulfill the request before the Oracle does? **
+> Since you know the latest requestId, call rawFulfillRandomness() on RandomNumberConsumer, **just like the Oracle would**. 
+> 
+> Use the Debug Contracts tab. Make the rawFulfillRandomness() call and provide any random number you want. See if you can make the contract store your bogus random number.
+> 
+> The transaction reverted. Why didn't it work?
+> Check out the actual code and see what the reason might be. You won't find the function directly in RandomNumberConsumer though...
+
 > **Takeaway:** randomness from Chainlink VRF is a two-step process. 
 > - You trigger the first when you ask for a random number.
-> - The VRF contract triggers the second when it responds with a random number. 
+> - The VRF contract triggers the second step when it responds with a random number. 
 
 > When receiving randomness your contract can do something useful with it.
 > 
