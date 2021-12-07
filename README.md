@@ -1,6 +1,8 @@
 # 🏗 Scaffold-ETH
 
-> is everything you need to get started building decentralized applications powered by smart contracts using Chainlink oracles and vrf
+> is everything you need to get started building decentralized applications powered by smart contracts.
+> This tutorial is part 1 of a series on how to integrate Chainlink technology with Scaffold-ETH.
+> In this tutorial you learn how to use **Chainlink VRF** (verifiable randomness).
 
 🧪 Quickly experiment with Solidity using a frontend that adapts to your smart contract:
 
@@ -20,6 +22,8 @@ Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://class
 ```bash
 git clone https://github.com/austintgriffith/scaffold-eth-examples.git
 ```
+
+We **skip local development** since it would require mock contracts. Going directly to testnet makes the first steps simpler.
 
 > generate your account to deploy to testnet:
 
@@ -51,11 +55,9 @@ yarn deploy
 ![image](https://user-images.githubusercontent.com/9419140/106748708-9b2fee00-65f3-11eb-90c6-3c28c09f7540.png)
 
 
-🔏 Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
-🔏 Edit your smart contract `ApiConsumer.sol` in `packages/hardhat/contracts`
-🔏 Edit your smart contract `CoinGeckoConsumer.sol` in `packages/hardhat/contracts`
-🔏 Edit your smart contract `PriceConsumerV3.sol` in `packages/hardhat/contracts`
 🔏 Edit your smart contract `RandomNumberConsumer.sol` in `packages/hardhat/contracts`
+🔏 Edit your smart contract `DiceRolls.sol` in `packages/hardhat/contracts`
+🔏 Edit your smart contract `MultiDiceRolls.sol` in `packages/hardhat/contracts`
 
 📝 Edit your frontend `App.jsx` in `packages/react-app/src`
 
@@ -67,7 +69,9 @@ yarn deploy
 
 > With everything up your UI should look something like this:
 
-![Screenshot 2021-12-07 at 13 36 53](https://user-images.githubusercontent.com/32189942/145022489-af3b7ea7-aca7-4421-af24-086a220159c3.png)
+![Screenshot 2021-12-07 at 22 02 29](https://user-images.githubusercontent.com/32189942/145098108-029cc108-a0e8-47ad-a6d2-6bee39ccf9e8.png)
+
+## RandomNumberConsumer
 
 > Fund the contract with LINK 
 
@@ -78,17 +82,38 @@ yarn deploy
 Copy the contract address and send it some link. You don't need much, average oracle costs .1 LINK.
 ![image](https://user-images.githubusercontent.com/9419140/106750100-645ad780-65f5-11eb-95c9-ce07ef0ed2e2.png)
 
-To test just go to getRandomRoll and click send.
+> To test just go to requestRandomNumber and click send.
 
-![Screenshot 2021-12-07 at 13 18 58](https://user-images.githubusercontent.com/32189942/145020057-7ec8fd96-7b03-4669-997f-4cbc235df2b1.png)
+![Screenshot 2021-12-07 at 22 45 14](https://user-images.githubusercontent.com/32189942/145103508-00d4688e-536d-466b-b7e8-d129d60e46aa.png)
 
-After about 30 seconds you can click the refresh icon to get the value.
+Once the transaction is mined you will see the requestId updated:
 
-![image](https://user-images.githubusercontent.com/9419140/106750667-1e524380-65f6-11eb-8983-d4fd6a392b1c.png)
+![Screenshot 2021-12-07 at 22 46 01](https://user-images.githubusercontent.com/32189942/145103639-4b1dd89c-e21f-48ab-b001-594d018feec2.png)
 
-> Now, what do we do with it?
+This value identifies the request that your contract just made to the Chainlink VRF contract.
 
-Let's roll some dice... We used an event to record the roll from the VRF contract.
+It takes about 1 minute for the Oracle to call your contract with a response. 
+After waiting for 1 minute you should see the randomResult updated:
+
+![Screenshot 2021-12-07 at 22 49 10](https://user-images.githubusercontent.com/32189942/145103963-2c6afd57-38af-4550-8ab3-00647e14e383.png)
+
+In the Example UI you'll find an example of how to manage UI state when making such requests:
+
+![Screenshot 2021-12-07 at 22 51 37](https://user-images.githubusercontent.com/32189942/145104307-281b1d0c-af95-4c33-bb05-4f198483e4f9.png)
+
+![Screenshot 2021-12-07 at 22 51 44](https://user-images.githubusercontent.com/32189942/145104318-733d4637-2ff4-42b3-8d91-f1a2b745a50f.png)
+
+> **Takeaway:** randomness from Chainlink VRF is a two-step process. 
+> - You trigger the first when you ask for a random number.
+> - The VRF contract triggers the second when it responds with a random number. 
+
+> When receiving randomness your contract can do something useful with it.
+> 
+> Let's see an example!
+
+## DiceRolls
+
+Let's roll some dice... 
 
 ![image](https://user-images.githubusercontent.com/9419140/106751049-afc1b580-65f6-11eb-93c6-69fd9295d0db.png)
 
