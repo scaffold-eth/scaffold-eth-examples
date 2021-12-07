@@ -38,7 +38,7 @@ yarn account
 
 You will need to fund your deployer account with kovan ETH before you can deploy your contracts.
 
-Testnet ETH is available from https://faucet.kovan.network/
+Testnet ETH is available from https://faucets.chain.link/
 
 ![image](https://user-images.githubusercontent.com/9419140/106749192-36c15e80-65f4-11eb-8365-64f66569c899.png)
 
@@ -67,13 +67,13 @@ yarn deploy
 
 > With everything up your UI should look something like this:
 
-![image](https://user-images.githubusercontent.com/9419140/106748778-b0a51800-65f3-11eb-8a57-d6444748ffe9.png)
+![Screenshot 2021-12-07 at 13 36 53](https://user-images.githubusercontent.com/32189942/145022489-af3b7ea7-aca7-4421-af24-086a220159c3.png)
 
 > Fund the contract with LINK 
 
 > ** Side Quest - use deploy.js to fund the contract with LINK after funding deployer account. **
 
-- Testnet LINK is available from https://kovan.chain.link/ 
+- Testnet LINK is available from https://faucets.chain.link/
 
 Copy the contract address and send it some link. You don't need much, average oracle costs .1 LINK.
 ![image](https://user-images.githubusercontent.com/9419140/106750100-645ad780-65f5-11eb-95c9-ce07ef0ed2e2.png)
