@@ -15,8 +15,8 @@ required: [Node](https://nodejs.org/dist/latest-v12.x/) plus [Yarn](https://clas
 
 1. Clone the repo first
 ```sh
-git clone -b nft-retroactive-funding https://github.com/austintgriffith/scaffold-eth.git nft-retroactive-funding
-cd nft-retroactive-funding
+git clone -b Giga-NFT-project https://github.com/scaffold-eth/scaffold-eth-examples.git Giga-NFT-project
+cd Giga-NFT-project
 ```
 
 2. Install dependencies
@@ -28,13 +28,19 @@ yarn install
 ```sh
 yarn chain
 ```
-
-4. Deploy Contracts
+4. Generate account for the mnemonic
 ```sh
-yarn deploy
+yarn run generate
 ```
 
-5. Start React frontend
+5. Deploy Contracts
+```sh
+yarn run watch
+```
+
+Here you go, it's deployed on rinkeby🚀
+
+6. Start React frontend
 ```bash
 yarn start
 ```
