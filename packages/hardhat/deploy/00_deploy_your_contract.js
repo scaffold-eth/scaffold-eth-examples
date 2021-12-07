@@ -50,16 +50,16 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   // Getting a previously deployed contract
   const YourContract = await ethers.getContract("YourContract", deployer);
-  // const APIConsumer = await ethers.getContract("APIConsumer", deployer);
-  // const CoinGeckoConsumer = await ethers.getContract(
-  //   "CoinGeckoConsumer",
-  //   deployer
-  // );
-  // const PriceConsumerV3 = await ethers.getContract("PriceConsumerV3", deployer);
-  // const RandomNumberConsumer = await ethers.getContract(
-  //   "RandomNumberConsumer",
-  //   deployer
-  // );
+  const APIConsumer = await ethers.getContract("APIConsumer", deployer);
+  const CoinGeckoConsumer = await ethers.getContract(
+    "CoinGeckoConsumer",
+    deployer
+  );
+  const PriceConsumerV3 = await ethers.getContract("PriceConsumerV3", deployer);
+  const RandomNumberConsumer = await ethers.getContract(
+    "RandomNumberConsumer",
+    deployer
+  );
   /*  await YourContract.setPurpose("Hello");
   
     To take ownership of yourContract using the ownable library uncomment next line and add the 
