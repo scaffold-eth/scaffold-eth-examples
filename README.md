@@ -4,7 +4,7 @@
 > 
 > This tutorial is part 1 of a series on how to integrate Chainlink technology with Scaffold-ETH.
 > 
-> In this tutorial you learn how to use **Chainlink VRF** (verifiable randomness 🎲).
+> In this tutorial you learn how to use **Chainlink VRF** (verifiable randomness) 🎲
 > 
 > There are 3 example contracts (simple to advanced) for you to ape into! 🦍
 
