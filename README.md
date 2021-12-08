@@ -188,6 +188,7 @@ Make sure your MultiDiceRolls contract is deployed and has some LINK.
 
 Uncomment the MultiDiceRolls code in App.jsx. You should find it in the Debug Contracts Tab.
 
+This contract allows each address to roll once. An attempt to roll again will revert.
 
 ... Work in progress
 
