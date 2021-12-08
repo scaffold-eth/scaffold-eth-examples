@@ -14,7 +14,7 @@ Check it out at [signator.io](https://signator.io)
 required: [Node](https://nodejs.org/dist/latest-v12.x/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
 
 ```bash
-git clone -b signatorio https://github.com/austintgriffith/scaffold-eth.git signatorio
+git clone -b signatorio https://github.com/scaffold-eth/scaffold-eth-examples.git signatorio
 
 cd signatorio
 ```
