@@ -20,6 +20,8 @@ contract YourContract {
     uint256[] public leafValues;
     uint256 public nextKey;
 
+    mapping(address => bool) public isMember;
+
     constructor() public {
     // what should we do on deploy?
     }
@@ -32,6 +34,9 @@ contract YourContract {
     ) external {
         require(input[1] == root, "addLeaf: Invalid Root");
         require(input[2] == nextKey, "addLeaf: Invalid Key");
+
+        // add membership requirements here
+
         require(verifyAdd2TreeProof(a, b, c, input) == true, "addLeaf: Invalid Proof");
 
         leafValues.push(input[3]);
@@ -46,10 +51,13 @@ contract YourContract {
         uint[2][2] memory b,
         uint[2] memory c,
         uint[1] memory input
-    ) external view returns (bool r) {
+    ) external returns (bool r) {
         require(input[0] == root, "proveMembership: Invalid Root");
         r = verifyProveInTreeProof(a, b, c, input);
         require(r == true, "proveMembership: Invalid Proof");
+
+        // this is dumb, do something more cool and intersting here instread!
+        isMember[msg.sender] = true;
     }
 
     function verifyAdd2TreeProof(

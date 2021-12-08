@@ -31,7 +31,7 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, ExampleUI, Hints, Subgraph, ZkHashUI } from "./views";
+import { Home, ExampleUI, Hints, MembershipUI, Subgraph, ZkHashUI } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
@@ -322,7 +322,18 @@ function App(props) {
         <Switch>
           <Route exact path="/">
             {/* pass in any web3 props to this Home component */}
-            <Home />
+            <MembershipUI
+              addWasm={add2TreeWasm}
+              addZkey={add2TreeZkey}
+              proveWasm={proveInTreeWasm}
+              proveZkey={proveInTreeZkey}
+              nLevels={3}
+              address={address}
+              localProvider={localProvider}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+              tx={tx}
+            />
           </Route>
           <Route exact path="/debug">
             {/*
