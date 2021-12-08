@@ -31,8 +31,6 @@ import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
-import { useEventListener } from "eth-hooks/events/useEventListener";
-import { useDeploymentBlockNumber } from "./hooks/useDeploymentBlockNumber";
 
 const { ethers } = require("ethers");
 /*
