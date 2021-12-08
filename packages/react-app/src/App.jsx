@@ -32,6 +32,7 @@ import { Transactor, Web3ModalSetup } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
 import { useEventListener } from "eth-hooks/events/useEventListener";
+import { useDeploymentBlockNumber } from "./hooks/useDeploymentBlockNumber";
 
 const { ethers } = require("ethers");
 /*
@@ -54,7 +55,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.kovan; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const defaultTargetNetwork = NETWORKS.kovan; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -76,8 +77,14 @@ function App(props) {
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
-  const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
+  const selectedNetworkOption = networkOptions.includes(defaultTargetNetwork.name)
+    ? defaultTargetNetwork.name
+    : networkOptions[0];
+  const [selectedNetwork, setSelectedNetwork] = useState(selectedNetworkOption);
   const location = useLocation();
+
+  /// 📡 What chain are your contracts deployed to?
+  const targetNetwork = NETWORKS[selectedNetwork]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
   // 🔭 block explorer URL
   const blockExplorer = targetNetwork.blockExplorer;
@@ -138,8 +145,6 @@ function App(props) {
   // Just plug in different 🛰 providers to get your balance on different chains:
   const yourMainnetBalance = useBalance(mainnetProvider, address);
 
-  // const contractConfig = useContractConfig();
-
   const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
 
   // Load in your local 📝 contract and read a value from it:
@@ -162,12 +167,6 @@ function App(props) {
   const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
     "0x34aA3F359A9D614239015126635CE7732c18fDF3",
   ]);
-
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
-
-  const rollEvents = useEventListener(readContracts, "RandomNumberConsumer", "Roll", localProvider, 1);
-  console.log("🎲 Roll events:", rollEvents);
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -255,12 +254,12 @@ function App(props) {
         <Menu.Item key="/">
           <Link to="/">App Home</Link>
         </Menu.Item>
+        <Menu.Item key="/hints">
+          <Link to="/hints">Hints</Link>
+        </Menu.Item>
         <Menu.Item key="/debug">
           <Link to="/debug">Debug Contracts</Link>
         </Menu.Item>
-        {/* <Menu.Item key="/hints">
-          <Link to="/hints">Hints</Link>
-        </Menu.Item> */}
         <Menu.Item key="/exampleui">
           <Link to="/exampleui">ExampleUI</Link>
         </Menu.Item>
@@ -285,7 +284,27 @@ function App(props) {
             */}
 
           <Contract
-            name="YourContract"
+            name="RandomNumberConsumer"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+
+          <Contract
+            name="DiceRolls"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+
+          {/*<Contract
+            name="MultiDiceRolls"
             price={price}
             signer={userSigner}
             provider={localProvider}
@@ -302,9 +321,9 @@ function App(props) {
             address={address}
             blockExplorer={blockExplorer}
             contractConfig={contractConfig}
-          />
+          /> */}
 
-          <Contract
+          {/* <Contract
             name="ApiConsumer"
             price={price}
             signer={userSigner}
@@ -312,9 +331,9 @@ function App(props) {
             address={address}
             blockExplorer={blockExplorer}
             contractConfig={contractConfig}
-          />
+          /> */}
 
-          <Contract
+          {/* <Contract
             name="CoinGeckoConsumer"
             price={price}
             signer={userSigner}
@@ -322,27 +341,17 @@ function App(props) {
             address={address}
             blockExplorer={blockExplorer}
             contractConfig={contractConfig}
-          />
-
-          <Contract
-            name="RandomNumberConsumer"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          />
-
+          /> */}
         </Route>
-        {/* <Route path="/hints">
+
+        <Route path="/hints">
           <Hints
             address={address}
             yourLocalBalance={yourLocalBalance}
             mainnetProvider={mainnetProvider}
             price={price}
           />
-        </Route> */}
+        </Route>
 
         <Route path="/exampleui">
           <ExampleUI
@@ -355,8 +364,6 @@ function App(props) {
             tx={tx}
             writeContracts={writeContracts}
             readContracts={readContracts}
-            purpose={purpose}
-            rollEvents={rollEvents}
           />
         </Route>
         {/* <Route path="/mainnetdai">
@@ -394,7 +401,19 @@ function App(props) {
       <ThemeSwitch />
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
+      <div
+        style={{
+          position: "fixed",
+          textAlign: "right",
+          right: 0,
+          top: 0,
+          padding: 10,
+          backdropFilter: "blur(2px)",
+          backgroundColor: "hsla(209, 100%, 98%, 0.4)",
+          borderLeft: "1px solid #ddd",
+          borderBottom: "1px solid #ddd",
+        }}
+      >
         <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
           <div style={{ marginRight: 20 }}>
             <NetworkSwitch
@@ -419,7 +438,20 @@ function App(props) {
       </div>
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+      <div
+        style={{
+          position: "fixed",
+          textAlign: "left",
+          left: 0,
+          bottom: 20,
+          padding: 10,
+          backdropFilter: "blur(2px)",
+          backgroundColor: "hsla(209, 100%, 98%, 0.4)",
+          borderTop: "1px solid #ddd",
+          borderRight: "1px solid #ddd",
+          borderBottom: "1px solid #ddd",
+        }}
+      >
         <Row align="middle" gutter={[4, 4]}>
           <Col span={8}>
             <Ramp price={price} address={address} networks={NETWORKS} />

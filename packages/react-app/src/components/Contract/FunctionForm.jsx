@@ -2,7 +2,7 @@ import { Button, Col, Divider, Input, Row, Tooltip } from "antd";
 import React, { useState } from "react";
 import Blockies from "react-blockies";
 import { Transactor } from "../../helpers";
-import tryToDisplay from "./utils";
+import { tryToDisplay } from "./utils";
 
 const { utils, BigNumber } = require("ethers");
 

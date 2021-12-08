@@ -27,17 +27,16 @@ const main = async () => {
   console.log("\n\n 📡 Deploying...\n");
 
   // ** Comment out the contracts you don't need to redeploy when iterating and testing ** //
-  // const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 19 vvvv
   // const apiConsumer = await deploy("APIConsumer"); // <-- Chainlink API Consumer Contract
   // const coinGeckoConsumer = await deploy("CoinGeckoConsumer"); // <-- Chainlink Coin Gecko API contract
   // const randomNumberConsumer = await deploy("RandomNumberConsumer"); // <-- Chainllink VRF random number contract
   const priceConsumer = await deploy("PriceConsumerV3");
 
-  const yourContract = await deploy("YourContract"); // <-- add in constructor args like line 19 vvvv
+  const randomNumberConsumer = await deploy("RandomNumberConsumer"); // <-- add in constructor args like line 19 vvvv
   // use for local token bridging
   // const mockToken = await deploy("MockERC20") // <-- add in constructor args like line 19 vvvv
 
-  // const yourContract = await ethers.getContractAt('YourContract', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
+  // const randomNumberConsumer = await ethers.getContractAt('RandomNumberConsumer', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
   // const secondContract = await deploy("SecondContract")
 
   // const exampleToken = await deploy("ExampleToken")
@@ -55,7 +54,7 @@ const main = async () => {
 
   /*
   //If you want to send some ETH to a contract on deploy (make your constructor payable!)
-  const yourContract = await deploy("YourContract", [], {
+  const randomNumberConsumer = await deploy("RandomNumberConsumer", [], {
   value: ethers.utils.parseEther("0.05")
   });
   */
@@ -63,7 +62,7 @@ const main = async () => {
   /*
   //If you want to link a library into your contract:
   // reference: https://github.com/austintgriffith/scaffold-eth/blob/using-libraries-example/packages/hardhat/scripts/deploy.js#L19
-  const yourContract = await deploy("YourContract", [], {}, {
+  const randomNumberConsumer = await deploy("RandomNumberConsumer", [], {}, {
    LibraryName: **LibraryAddress**
   });
   */
@@ -71,8 +70,8 @@ const main = async () => {
   // If you want to verify your contract on tenderly.co (see setup details in the scaffold-eth README!)
   /*
   await tenderlyVerify(
-    {contractName: "YourContract",
-     contractAddress: yourContract.address
+    {contractName: "RandomNumberConsumer",
+     contractAddress: randomNumberConsumer.address
   })
   */
 

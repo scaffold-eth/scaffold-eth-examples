@@ -113,6 +113,7 @@ module.exports = {
 
       //    url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/eth/kovan", // <---- YOUR MORALIS ID! (not limited to infura)
 
+      gasPrice: 47000000000, // 47 GWEI - sometimes deployment fails with timeout error from hardhat. this solves the problem
       accounts: {
         mnemonic: mnemonic(),
       },
