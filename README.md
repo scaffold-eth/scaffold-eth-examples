@@ -180,7 +180,7 @@ You will see the event data in the console:
 
 
 
-## Multi Dice Rolls
+## Multi Dice Rolls (part2)
 
 What if we wanted to keep track of dice rolls from multiple users at once? Maybe for a game that picks a winner after everyone has rolled?
 
@@ -195,7 +195,7 @@ Uncomment the MultiDiceRolls code in App.jsx. You should find it in the Debug Co
 
 ---
 
-## Request Off-Chain Data
+## Request Off-Chain Data (part3)
 > There are two other Chainlink examples...
 
 APIConsumer.sol
