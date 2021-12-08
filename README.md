@@ -107,8 +107,9 @@ In the Example UI you'll find an example of how to manage UI state when making s
 
 ![Screenshot 2021-12-07 at 22 51 44](https://user-images.githubusercontent.com/32189942/145104318-733d4637-2ff4-42b3-8d91-f1a2b745a50f.png)
 
-> ** Side Quest - How secure is to expose our requestId publicly? 
-> Can we hack 🥷 the system and fulfill the request before the Oracle does? **
+> ** 🧙‍♂️ 🧝‍♀️ 🧞‍♂️ Side Quest 1- **How secure** is it to expose our requestId publicly? **
+> Can we hack 🥷 the system and fulfill the request before the Oracle does? 
+
 > Since you know the latest requestId, call rawFulfillRandomness() on RandomNumberConsumer, **just like the Oracle would**. 
 > 
 > Use the Debug Contracts tab. Make the rawFulfillRandomness() call and provide any random number you want. See if you can make the contract store your bogus random number.
@@ -128,20 +129,68 @@ In the Example UI you'll find an example of how to manage UI state when making s
 
 Let's roll some dice... 
 
-![image](https://user-images.githubusercontent.com/9419140/106751049-afc1b580-65f6-11eb-93c6-69fd9295d0db.png)
+Make sure your DiceRolls contract is deployed and has some LINK.
+
+Make sure to **uncomment** the DiceRolls code in App.jsx, in order to see it in the Debug Contracts Tab
+
+You should find it below the RandomNumberConsumer:
 
 
-![image](https://user-images.githubusercontent.com/9419140/106750992-9ae52200-65f6-11eb-9a35-8a09a31b051c.png)
+![Screenshot 2021-12-08 at 20 05 55](https://user-images.githubusercontent.com/32189942/145260498-ee8bbc4a-a013-4c07-bea3-12159fc04894.png)
 
-As you can see the event emitted our 6 dice roll values and we can now use them in the front-end.
+Go to the Example UI and click on the Roll Dice! button. After 1 minute or so the Oracle should have responded.
+
+You will see a new entry in the events UI:
+
+![Screenshot 2021-12-08 at 20 12 19](https://user-images.githubusercontent.com/32189942/145261552-885afd2b-fd8f-4fe3-a893-1cf6276b2e73.png)
+
+You will see the event data in the console:
+
+![Screenshot 2021-12-08 at 20 12 11](https://user-images.githubusercontent.com/32189942/145261613-a849de83-9aa8-4e32-b93b-50583d76924a.png)
+
+> Check out the code in the Events.jsx component
+
+![Screenshot 2021-12-08 at 20 15 05](https://user-images.githubusercontent.com/32189942/145261779-e6416e41-8c79-490f-aa41-06852d712edd.png)
+
 
 > Here is the solidity code broken down
 
-![image](https://user-images.githubusercontent.com/9419140/106750921-7db05380-65f6-11eb-9b25-1b377a997d43.png)
+![Screenshot 2021-12-08 at 20 17 39](https://user-images.githubusercontent.com/32189942/145262183-3c646529-ed84-4d62-9ba4-7968e9397d52.png)
+
+> This solidity code is far from optimal, it will charge a lot of gas. 
+> It shows you a generic way to create several random numbers from a single one.
+> Our problem is quite simple though: we have a large random number and we need 6 small random numbers (between 1 and 6 each)
+
+> ** 🧙‍♂️ 🧝‍♀️ 🧞‍♂️ Side Quest 2! **Find a cheaper solution** which doesn't use the expand() function. **
+> Check out Utilities.sol, it contains some code to get you started. Keep the original solution.
+
+> ** 🧙‍♂️ 🧝‍♀️ 🧞‍♂️ Side Quest 3! **Compare gas costs** **
+> Find a way to see how much gas was consumed in the transaction which produced the dice roll event (hint: browser console / etherscan)
+> Do this with your cheaper implementation and redeploy with the original one, then compare the results.
+
+> ** 🧙‍♂️ 🧝‍♀️ 🧞‍♂️ Side Quest 4! **Dice Roll UX** **
+> Try to improve the UX in the Example UI. Replicate what the Request Random Number! button does - a spinner should appear while waiting for the Oracle response.
+
+
+--- 
+
+# What follows below should go into parts 2 and 3 of the chainlink tutorial, on different branches, IMO
+
+## Multi Dice Rolls
+
+What if we wanted to keep track of dice rolls from multiple users at once? Maybe for a game that picks a winner after everyone has rolled?
+
+Make sure your MultiDiceRolls contract is deployed and has some LINK.
+
+Uncomment the MultiDiceRolls code in App.jsx. You should find it in the Debug Contracts Tab.
+
+
+
 
 
 ---
 
+## Request Off-Chain Data
 > There are two other Chainlink examples...
 
 APIConsumer.sol
