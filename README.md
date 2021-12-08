@@ -175,7 +175,10 @@ You will see the event data in the console:
 
 --- 
 
+
 # What follows below should go into parts 2 and 3 of the chainlink tutorial, on different branches, IMO
+
+
 
 ## Multi Dice Rolls
 
@@ -186,6 +189,7 @@ Make sure your MultiDiceRolls contract is deployed and has some LINK.
 Uncomment the MultiDiceRolls code in App.jsx. You should find it in the Debug Contracts Tab.
 
 
+... Work in progress
 
 
 
