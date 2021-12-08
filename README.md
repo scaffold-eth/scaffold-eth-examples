@@ -191,6 +191,17 @@ Uncomment the MultiDiceRolls code in App.jsx. You should find it in the Debug Co
 
 ... Work in progress
 
+side quest 1: create a function that picks a winner from all who rolled.
+A winner would be the one who has the maximum total points. Example: (1,2,1,4,1,5) => total of 1+2+1+4+1+5=14.
+If there are several addresses with the maximum total, the first one to have rolled should be the winner.
+
+side quest 2: several rounds?
+Can you reset the state of the smart contract so that it can do several rounds? How would you "clear" the array of rollers?
+
+side quest 3: implement the withdraw link function and test it. You'll need to interact with the LINK token contract on kovan.
+For this you will need the contract address and the contract interface. If this is your first time, consider this quest to be 
+a great challenge. Congrats if you succeed!
+
 
 
 ---
