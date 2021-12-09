@@ -1,70 +1,42 @@
-# 🏗 scaffold-eth - Retroactive Public Goods Funding Starter Kit
+# Giga-NFT 
 
-> Deploy an NFT sale that has a mechanism where whales can yolo ETH to the NFT contract to raise the floor!
-
-
-[![preview_rapgfsk](https://user-images.githubusercontent.com/2653167/141536524-ee17c022-9012-4092-b2fb-db352849ae03.jpg)](https://youtu.be/q0CBVeagpyg)
-
-[https://youtu.be/q0CBVeagpyg](https://youtu.be/q0CBVeagpyg)
-
+### built from a 🏗 scaffold-eth template:
 
 ## 🏃‍♀️ Quick Start
 
 required: [Node](https://nodejs.org/dist/latest-v12.x/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
 
 
-1. Clone the repo first
+Clone the repo first
 ```sh
 git clone -b Giga-NFT-project https://github.com/scaffold-eth/scaffold-eth-examples.git Giga-NFT-project
 cd Giga-NFT-project
 ```
 
-2. Install dependencies
+Install dependencies
 ```bash
 yarn install
 ```
 
-3. Spin up local chain
+Spin up local chain
 ```sh
 yarn chain
 ```
-4. Generate account for the mnemonic
+
+Deploy Contracts
 ```sh
-yarn run generate
+yarn deploy
 ```
 
-5. Deploy Contracts
-```sh
-yarn run watch
-```
-
-Here you go, it's deployed on rinkeby🚀
-
-6. Start React frontend
+Start React frontend
 ```bash
 yarn start
 ```
 
-## Introduction
-
-Mint an NFT with a price curve to raise a small amount of funding to a multisig. 
-
-Then, a whale can yolo ETH to the NFT contract to allow NFT holders to redeem for a floor price.
-
-The floor price is equal to the amount of ETH in the contract divided by the number of NFTs in circulation.
-
-## UI
-
-The first screen allows the user to mint NFTs and burn them. Burning happens at the floor price and user gets some ETH for this.
-
-<img width="472" alt="Screenshot 2021-11-12 at 12 33 24 PM" src="https://user-images.githubusercontent.com/26670962/141425060-5d423763-c509-497a-972b-e409b2040c8b.png">
-
-The second screen is intended for whales who can "raise the floor" by depositing some ETH into the contract.
-
-![](./assets/floor.png)
-
-## Contact
-
-Join the [telegram support chat 💬](https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA) to ask questions and find others building with 🏗 scaffold-eth!
+If you deploy to a public network like Rinkeby you need to generate a deployer account:
+```sh
+yarn run generate
+```
+(You can see this address to fund it by running `yarn account`)
 
 
