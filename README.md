@@ -72,7 +72,7 @@ yarn deploy
 
 📝 Edit your frontend `App.jsx` in `packages/react-app/src`
 
-💼 Edit your deployment script `deploy.js` in `packages/hardhat/scripts`
+💼 Edit your deployment script `00_deploy_your_contract.js` in `packages/hardhat/deploy`
 
 📱 Open http://localhost:3000 to see the app
 
