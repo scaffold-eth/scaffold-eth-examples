@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
 import { Card } from "antd";
-import { useContractLoader, useContractExistsAtAddress } from "../../hooks";
+import React, { useMemo, useState } from "react";
+import { useContractExistsAtAddress, useContractLoader } from "eth-hooks";
 import Account from "../Account";
 import DisplayVariable from "./DisplayVariable";
 import FunctionForm from "./FunctionForm";
@@ -10,11 +10,17 @@ const noContractDisplay = (
     Loading...{" "}
     <div style={{ padding: 32 }}>
       You need to run{" "}
-      <span style={{ marginLeft: 4, backgroundColor: "#f1f1f1", padding: 4, borderRadius: 4, fontWeight: "bolder" }}>
+      <span
+        className="highlight"
+        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
+      >
         yarn run chain
       </span>{" "}
       and{" "}
-      <span style={{ marginLeft: 4, backgroundColor: "#f1f1f1", padding: 4, borderRadius: 4, fontWeight: "bolder" }}>
+      <span
+        className="highlight"
+        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
+      >
         yarn run deploy
       </span>{" "}
       to see your contract here.
@@ -24,7 +30,10 @@ const noContractDisplay = (
         ☢️
       </span>
       Warning: You might need to run
-      <span style={{ marginLeft: 4, backgroundColor: "#f1f1f1", padding: 4, borderRadius: 4, fontWeight: "bolder" }}>
+      <span
+        className="highlight"
+        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
+      >
         yarn run deploy
       </span>{" "}
       <i>again</i> after the frontend comes up!
@@ -34,46 +43,73 @@ const noContractDisplay = (
 
 const isQueryable = fn => (fn.stateMutability === "view" || fn.stateMutability === "pure") && fn.inputs.length === 0;
 
-export default function Contract({ customContract, account, gasPrice, signer, provider, name, show, price, blockExplorer }) {
-
-  const contracts = useContractLoader(provider);
-  let contract
-  if(!customContract){
+export default function Contract({
+  customContract,
+  account,
+  gasPrice,
+  signer,
+  provider,
+  name,
+  show,
+  price,
+  blockExplorer,
+  chainId,
+  contractConfig,
+}) {
+  const contracts = useContractLoader(provider, contractConfig, chainId);
+  let contract;
+  if (!customContract) {
     contract = contracts ? contracts[name] : "";
-  }else{
-    contract = customContract
+  } else {
+    contract = customContract;
   }
 
   const address = contract ? contract.address : "";
   const contractIsDeployed = useContractExistsAtAddress(provider, address);
 
-  const displayedContractFunctions = useMemo(
-    () =>
-      contract
-        ? Object.values(contract.interface.functions).filter(
-            fn => fn.type === "function" && !(show && show.indexOf(fn.name) < 0),
-          )
-        : [],
-    [contract, show],
-  );
+  const displayedContractFunctions = useMemo(() => {
+    const results = contract
+      ? Object.entries(contract.interface.functions).filter(
+          fn => fn[1]["type"] === "function" && !(show && show.indexOf(fn[1]["name"]) < 0),
+        )
+      : [];
+    return results;
+  }, [contract, show]);
 
-  const [refreshRequired, triggerRefresh] = useState(false)
-  const contractDisplay = displayedContractFunctions.map(fn => {
-    if (isQueryable(fn)) {
-      // If there are no inputs, just display return value
-      return <DisplayVariable key={fn.name} contractFunction={contract[fn.name]} functionInfo={fn} refreshRequired={refreshRequired} triggerRefresh={triggerRefresh}/>;
+  const [refreshRequired, triggerRefresh] = useState(false);
+  const contractDisplay = displayedContractFunctions.map(contractFuncInfo => {
+    const contractFunc =
+      contractFuncInfo[1].stateMutability === "view" || contractFuncInfo[1].stateMutability === "pure"
+        ? contract[contractFuncInfo[0]]
+        : contract.connect(signer)[contractFuncInfo[0]];
+
+    if (typeof contractFunc === "function") {
+      if (isQueryable(contractFuncInfo[1])) {
+        // If there are no inputs, just display return value
+        return (
+          <DisplayVariable
+            key={contractFuncInfo[1].name}
+            contractFunction={contractFunc}
+            functionInfo={contractFuncInfo[1]}
+            refreshRequired={refreshRequired}
+            triggerRefresh={triggerRefresh}
+          />
+        );
+      }
+
+      // If there are inputs, display a form to allow users to provide these
+      return (
+        <FunctionForm
+          key={"FF" + contractFuncInfo[0]}
+          contractFunction={contractFunc}
+          functionInfo={contractFuncInfo[1]}
+          provider={provider}
+          gasPrice={gasPrice}
+          triggerRefresh={triggerRefresh}
+        />
+      );
     }
-    // If there are inputs, display a form to allow users to provide these
-    return (
-      <FunctionForm
-        key={"FF" + fn.name}
-        contractFunction={(fn.stateMutability === "view" || fn.stateMutability === "pure")?contract[fn.name]:contract.connect(signer)[fn.name]}
-        functionInfo={fn}
-        provider={provider}
-        gasPrice={gasPrice}
-        triggerRefresh={triggerRefresh}
-      />
-    );
+    return null;
   });
 
   return (
