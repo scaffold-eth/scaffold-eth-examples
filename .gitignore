@@ -1,3 +1,7 @@
+
+packages/hardhat/assets
+packages/react-app/public/revealedassets
+
 packages/subgraph/subgraph.yaml
 packages/subgraph/generated
 packages/subgraph/abis/*

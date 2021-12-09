@@ -51,7 +51,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -461,14 +461,14 @@ function App(props) {
               My NFTs
             </Link>
           </Menu.Item>
-          <Menu.Item key="/whales">
+          <Menu.Item key="/contract">
             <Link
               onClick={() => {
-                setRoute("/whales");
+                setRoute("/contract");
               }}
-              to="/whales"
+              to="/contract"
             >
-              Whales
+              Contract
             </Link>
           </Menu.Item>
         </Menu>
@@ -484,14 +484,15 @@ function App(props) {
               priceToMint={priceToMint}
             />
           </Route>
-          <Route exact path="/whales">
-            <WhalesUI
+          <Route exact path="/contract">
+            <Contract
+              name="GigaNFT"
+              price={price}
+              signer={userSigner}
+              provider={localProvider}
               address={address}
-              tx={tx}
-              userSigner={userSigner}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-              priceToMint={priceToMint}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
             />
           </Route>
         </Switch>

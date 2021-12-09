@@ -6,26 +6,31 @@ import axios from "axios";
 import { formatEther } from "@ethersproject/units";
 import { usePoller } from "eth-hooks";
 
+
+
+const BOOSTPERCENT = 5
+
+
 const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeContracts }) => {
   const [collection, setCollection] = useState({
     loading: true,
     items: [],
   });
-  const [floor, setFloor] = useState("0.0");
-
-  usePoller(async () => {
-    if (readContracts && address) {
-      const floorPrice = await readContracts.GigaNFT.floor();
-      setFloor(formatEther(floorPrice));
-    }
-  }, 1500);
 
   const getTokenURI = async (ownerAddress, index) => {
     const id = await readContracts.GigaNFT.tokenOfOwnerByIndex(ownerAddress, index);
     const tokenURI = await readContracts.GigaNFT.tokenURI(id);
-    const metadata = await axios.get(tokenURI);
-    const approved = await readContracts.GigaNFT.getApproved(id);
-    return { ...metadata.data, id, tokenURI, approved: approved === writeContracts.GigaNFT.address };
+    console.log("tokenURI",tokenURI)
+    try{
+      const metadata = await axios.get(tokenURI);
+      if(metadata){
+        return { ...metadata.data, id, tokenURI /*, approved: approved === writeContracts.GigaNFT.address */ };
+      }
+    }catch(e){console.log(e)}
+
+  //  console.log("metadata",metadata.data)
+    //const approved = await readContracts.GigaNFT.getApproved(id);
+
   };
 
   const loadCollection = async () => {
@@ -46,15 +51,6 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
     });
   };
 
-  const redeem = async id => {
-    try {
-      const redeemTx = await tx(writeContracts.GigaNFT.redeem(id));
-      await redeemTx.wait();
-    } catch (e) {
-      console.log("redeem tx error:", e);
-    }
-    loadCollection();
-  };
 
   const approveForBurn = async id => {
     try {
@@ -80,27 +76,28 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
             {collection.items.length > 0 &&
               collection.items.map(item => (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
-                  <img
-                    style={{ maxWidth: "150px", display: "block", margin: "0 auto", marginBottom: "20px" }}
-                    src={item.image}
-                    alt="GigaNFT"
-                  />
-                  <div style={{ marginLeft: "20px" }}>
-                      <Button style={{ width: "100%", minWidth: 100 }} onClick={() => redeem(item.id)}>
-                        Redeem
-                      </Button>
+                  <div style={{padding:32}}>
+                    {item?<img
+                      style={{ maxWidth: "150px", display: "block", margin: "0 auto", marginBottom: "20px" }}
+                      src={item.image}
+                      alt="GigaNFT"
+                    />:"🎁 Not Revealed Yet"}
                   </div>
                 </div>
               ))}
           </div>
-          <p style={{ textAlign: "center", marginTop: 15 }}>Current floor price = {floor.substr(0, 6)} ETH</p>
+
           <Button
             style={{ marginTop: 15 }}
             type="primary"
             onClick={async () => {
               const priceRightNow = await readContracts.GigaNFT.price();
+
+
+              const boostedPriceToAvoidCollisionsUpTheCurve = priceRightNow.add(priceRightNow.mul(BOOSTPERCENT).div(100))
+
               try {
-                const txCur = await tx(writeContracts.GigaNFT.mintItem(address, { value: priceRightNow }));
+                const txCur = await tx(writeContracts.GigaNFT.mintItem(address, { value: boostedPriceToAvoidCollisionsUpTheCurve }));
                 await txCur.wait();
               } catch (e) {
                 console.log("mint failed", e);
@@ -108,7 +105,7 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
               loadCollection();
             }}
           >
-            MINT for Ξ{priceToMint && (+ethers.utils.formatEther(priceToMint)).toFixed(4)}
+            MINT for Ξ{priceToMint && (+ethers.utils.formatEther(priceToMint.add(priceToMint.mul(BOOSTPERCENT).div(100)))).toFixed(4)}
           </Button>
         </>
       ) : (

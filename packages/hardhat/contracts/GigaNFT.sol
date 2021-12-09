@@ -14,37 +14,31 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract GigaNFT is ERC721Enumerable {
 
     address payable public constant recipient =
-        payable(0x72Dc1B4d61A477782506186339eE7a897ba7d00A);
+        payable(0x01104e244C118F8E63455e49055f0A7034d4Cf3C);
 
-    uint256 public constant limit = 21;
-    uint256 public constant curve = 1050; // price increase 3% with each purchase
-    uint256 public price = 0.0099 ether;
-
+    uint256 public constant limit = 1000;
+    uint256 public constant curve = 1002307;
+    uint256 public price = 0.1 ether;
 
     uint256 public currentSupply = 0;
 
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    string[] private uris;
+    string[] public uris;
 
-    constructor() ERC721("GigaNFT", "GGA") {
-      uris = [
-          "52.json",
-          "184.json",
-          "218.json",
-          "255.json",
-          "612.json",
-          "800.json",
-          "914.json"
-      ];
-  }
+    constructor() ERC721("GigaNFT", "GIGA") {
+      //
+    }
 
     function mintItem(address to) public payable returns (uint256) {
         require(_tokenIds.current() < limit, "DONE MINTING");
-        require(msg.value >= price, "NOT ENOUGH");
 
-        price = (price * curve) / 1000;
+        uint256 currentPrice = price;
+
+        require(msg.value >= currentPrice, "sorry, price has increased");
+
+        price = (price * curve) / 1000000;
         currentSupply++;
 
         _tokenIds.increment();
@@ -52,19 +46,45 @@ contract GigaNFT is ERC721Enumerable {
         uint256 id = _tokenIds.current();
         _mint(to, id);
 
-        (bool success, ) = recipient.call{value: msg.value}("");
+        (bool success, ) = recipient.call{value: currentPrice}("");
         require(success, "could not send");
+
+        uint256 refund = msg.value - currentPrice;
+        if (refund > 0) {
+            (bool refundSent, ) = msg.sender.call{value: refund}("");
+            require(refundSent, "Refund could not be sent");
+        }
 
         return id;
     }
 
     /**
-     * @notice Returns the baseURI
+     * Custom stuff to have a flexible baseURI for ipfs reveal that we can eventually close by changeUriOwner(0)
      */
+
+    string public flexibleBaseURI = "http://localhost:3000/revealedassets/";
+
     function _baseURI() internal view virtual override returns (string memory) {
-        return
-            "https://kag.mypinata.cloud/ipfs/QmYxQCbgu85NsebFLGHGGkCxVejCE4jAVSZhsZ3ebjpAux/json/";
+        return flexibleBaseURI;
     }
+
+    address public baseURIOwner = 0x18fFE4dADcCe63A074Ef9cfe327cAb9AD4Ad9f76;
+
+    function setBaseURI(string memory newURI) public {
+      require(msg.sender==baseURIOwner,"must be baseURIOwner");
+      flexibleBaseURI=newURI;
+    }
+
+    function changeUriOwner(address newOwner) public {
+      require(msg.sender==baseURIOwner,"must be baseURIOwner");
+      baseURIOwner=newOwner;
+    }
+
+    function addURIs(string memory uriButEventutallyMakyArray) public {
+      require(msg.sender==baseURIOwner,"must be baseURIOwner");
+      uris.push(uriButEventutallyMakyArray);
+    }
+
 
     /**
      * @notice Returns the token uri containing the metadata
@@ -86,36 +106,30 @@ contract GigaNFT is ERC721Enumerable {
         string memory baseURI = _baseURI();
         return
             bytes(baseURI).length > 0
-                ? string(abi.encodePacked(baseURI, uris[tokenId-1]))
+                ? string(abi.encodePacked(baseURI, uint2str(tokenId), ".json"))
                 : "";
     }
 
-    /**
-     * @notice Returns current floor value
-     */
-    function floor() public view returns (uint256) {
-        if (currentSupply == 0) {
-            return address(this).balance;
-        }
-        return address(this).balance / currentSupply;
-    }
 
-    /**
-     * @notice Executes a sale and updates the floor price
-     * @param _id nft id
-     */
-    function redeem(uint256 _id) external {
-        require(ownerOf(_id) == msg.sender, "Not Owner");
-        uint256 currentFloor = floor();
-        require(currentFloor > 0, "sale cannot be made until floor is established");
-        currentSupply--;
-        super._burn(_id);
-        (bool success, ) = msg.sender.call{value: currentFloor}("");
-        require(success, "sending floor price failed");
+    function uint2str(uint _i) internal pure returns (string memory _uintAsString) {
+      if (_i == 0) {
+          return "0";
+      }
+      uint j = _i;
+      uint len;
+      while (j != 0) {
+          len++;
+          j /= 10;
+      }
+      bytes memory bstr = new bytes(len);
+      uint k = len;
+      while (_i != 0) {
+          k = k-1;
+          uint8 temp = (48 + uint8(_i - _i / 10 * 10));
+          bytes1 b1 = bytes1(temp);
+          bstr[k] = b1;
+          _i /= 10;
+      }
+      return string(bstr);
     }
-
-    /**
-     * @notice For accepting eth
-     */
-    receive() external payable {}
 }
