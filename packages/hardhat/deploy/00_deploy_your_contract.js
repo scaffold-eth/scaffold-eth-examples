@@ -22,31 +22,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
     log: true,
   });
-  await deploy("DiceRolls", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
-  // await deploy("MultiDiceRolls", {
-  //   // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-  //   from: deployer,
-  //   // args: [ "Hello", ethers.utils.parseEther("1.5") ],
-  //   log: true,
-  // });
-  // // await deploy("APIConsumer", {
-  // //   // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-  // //   from: deployer,
-  // //   // args: [ "Hello", ethers.utils.parseEther("1.5") ],
-  // //   log: true,
-  // // });
-  // await deploy("CoinGeckoConsumer", {
-  //   // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-  //   from: deployer,
-  //   // args: [ "Hello", ethers.utils.parseEther("1.5") ],
-  //   log: true,
-  // });
-  // await deploy("PriceConsumerV3", {
+  // await deploy("DiceRolls", {
   //   // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
   //   from: deployer,
   //   // args: [ "Hello", ethers.utils.parseEther("1.5") ],
@@ -58,14 +34,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     "RandomNumberConsumer",
     deployer
   );
-  const DiceRolls = await ethers.getContract("DiceRolls", deployer);
-  // const MultiDiceRolls = await ethers.getContract("MultiDiceRolls", deployer);
-  // // const APIConsumer = await ethers.getContract("APIConsumer", deployer);
-  // const CoinGeckoConsumer = await ethers.getContract(
-  //   "CoinGeckoConsumer",
-  //   deployer
-  // );
-  // const PriceConsumerV3 = await ethers.getContract("PriceConsumerV3", deployer);
+  // const DiceRolls = await ethers.getContract("DiceRolls", deployer);
 
   /*  await RandomNumberConsumer.setPurpose("Hello");
     
@@ -118,18 +87,10 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   // wait a bit for etherscan to be ready to verify the contracts
   await sleep(15000);
-  // verifyContract("RandomNumberConsumer");
+  verifyContract("RandomNumberConsumer");
   // verifyContract("DiceRolls");
-  // verifyContract("MultiDiceRolls");
-  // // verifyContract("APIConsumer");
-  // verifyContract("CoinGeckoConsumer");
-  // verifyContract("PriceConsumerV3");
 };
 module.exports.tags = [
   "RandomNumberConsumer",
-  "DiceRolls",
-  // "MultiDiceRolls",
-  // // "APIConsumer",
-  // "CoinGeckoConsumer",
-  // "PriceConsumerV3",
+  // "DiceRolls",
 ];

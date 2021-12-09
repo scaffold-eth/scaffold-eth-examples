@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useContractReader } from "eth-hooks";
 import { ethers } from "ethers";
+import { List } from "antd";
 
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
@@ -18,7 +19,7 @@ function Home({ yourLocalBalance, readContracts }) {
     <div>
       <div style={{ margin: 32 }}>
         <span style={{ marginRight: 8 }}>📝</span>
-        This Is Your Chainlink Tutorial Home. You can start editing it in{" "}
+        This Is <strong>Your Chainlink Tutorial PART 1</strong>. You can start editing this page in{" "}
         <span
           className="highlight"
           style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
@@ -28,7 +29,16 @@ function Home({ yourLocalBalance, readContracts }) {
       </div>
       <div style={{ margin: 32 }}>
         <span style={{ marginRight: 8 }}>🤓</span>
-        The "purpose" variable from our contract is{" "}
+        In this tutorial you learn to use <strong>Chainlink VRF</strong> through
+        <br />
+        <List bordered style={{ width: "fit-content", margin: "1rem auto" }}>
+          <List.Item>A Random Number Consumer contract (with a purpose!)</List.Item>
+          <List.Item>A Dice Roll contract</List.Item>
+        </List>
+      </div>
+      <div style={{ margin: 32 }}>
+        <span style={{ marginRight: 8 }}>🤓</span>
+        The current "purpose" of our RandomNumberConsumer is{" "}
         <span
           className="highlight"
           style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}

@@ -3,6 +3,10 @@ pragma solidity ^0.8.4;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
+// import "hardhat/console.sol"
+// import "@openzeppelin/contracts/access/Ownable.sol";
+// https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
+
 /**
  * Demonstrates how to consume a random number by simply storing it.
  *
