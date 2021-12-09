@@ -86,7 +86,7 @@ yarn deploy
 
 > Fund the contract with LINK 
 
-> ** Side Quest - use deploy.js to fund the contract with LINK after funding deployer account. **
+> ** Side Quest - use 00_deploy_your_contract.js to fund the contract with LINK after funding deployer account. **
 
 - Testnet LINK is available from https://faucets.chain.link/
 
