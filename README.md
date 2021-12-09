@@ -1,4 +1,6 @@
-# Giga-NFT built from a 🏗 scaffold-eth template:
+# Giga-NFT 
+
+### built from a 🏗 scaffold-eth template:
 
 ## 🏃‍♀️ Quick Start
 
