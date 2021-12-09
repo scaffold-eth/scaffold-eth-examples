@@ -2,7 +2,7 @@
 
 > is everything you need to get started building decentralized applications powered by smart contracts.
 > 
-> This tutorial is part 1 of a series on how to integrate Chainlink technology with Scaffold-ETH. 
+> This tutorial is **PART 1** of a series on how to integrate Chainlink technology with Scaffold-ETH.
 > 
 > For some more advanced VRF handling, check out [PART 2](https://github.com/scaffold-eth/scaffold-eth-examples/tree/chainlink-tutorial-2).
 > 
@@ -124,7 +124,7 @@ In the Example UI you'll find an example of how to manage UI state when making s
 > The transaction reverted. Why didn't it work?
 > Check out the actual code and see what the reason might be. You won't find the function directly in RandomNumberConsumer though...
 
-> **Takeaway:** randomness from Chainlink VRF is a two-step process. 
+> **📝 Takeaway:** randomness from Chainlink VRF is a two-step process. 
 > - You trigger the first when you ask for a random number.
 > - The VRF contract triggers the second step when it responds with a random number. 
 
@@ -178,10 +178,19 @@ You will see the event data in the console:
 > ** 🧙‍♂️ 🧝‍♀️ 🧞‍♂️ Side Quest 4! **Dice Roll UX** **
 > Try to improve the UX in the Example UI. Replicate what the Request Random Number! button does - a spinner should appear while waiting for the Oracle response.
 
+--- 
 
-> 🔁    You can `yarn deploy` any time and get a fresh new contract in the frontend:
+> 🔁    You can `yarn deploy --reset ` any time and get fresh new contracts in the frontend:
 
 Make sure to edit your 00_deploy_your_contract.js if you don't want to redeploy all of your contracts.
+
+![Screenshot 2021-12-09 at 23 00 10](https://user-images.githubusercontent.com/32189942/145474932-6f2e65ff-6f9c-42ce-9c5f-ee36f47d9f52.png)
+
+--- 
+
+Check out [PART 2](https://github.com/scaffold-eth/scaffold-eth-examples/tree/chainlink-tutorial-2) for a more advanced VRF setup!
+
+Check out [PART 3](https://github.com/scaffold-eth/scaffold-eth-examples/tree/chainlink-tutorial-3) for a tutorial on how to use public APIs and price feeds in your smart contracts!
 
 ---
 
