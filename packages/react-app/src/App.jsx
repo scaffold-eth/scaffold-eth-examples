@@ -57,6 +57,8 @@ const targetNetwork = NETWORKS.localhost; // <------- select your target fronten
 const DEBUG = true;
 const NETWORKCHECK = true;
 
+const USE_BURNER_WALLETS = false;
+
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
@@ -458,7 +460,7 @@ function App(props) {
               }}
               to="/"
             >
-              My NFTs
+              Mint
             </Link>
           </Menu.Item>
           <Menu.Item key="/contract">
@@ -503,6 +505,7 @@ function App(props) {
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
         <Account
+          USE_BURNER_WALLETS={USE_BURNER_WALLETS}
           address={address}
           localProvider={localProvider}
           userSigner={userSigner}

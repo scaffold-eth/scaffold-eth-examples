@@ -31,7 +31,7 @@ const main = async () => {
   const files = await fs.readdirSync( assetDirectory+"/Visuals" )
 
   let count = 0;
-  for (let id=1;id<=5;id++) {
+  for (let id=1;id<=10;id++) {
     //console.log("#",id)
 
 
