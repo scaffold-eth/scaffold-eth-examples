@@ -14,6 +14,7 @@ import Wallet from "./Wallet";
   ~ How can I use? ~
 
   <Account
+    useBurner={boolean}
     address={address}
     localProvider={localProvider}
     userProvider={userProvider}
@@ -23,6 +24,7 @@ import Wallet from "./Wallet";
     loadWeb3Modal={loadWeb3Modal}
     logoutOfWeb3Modal={logoutOfWeb3Modal}
     blockExplorer={blockExplorer}
+    isContract={boolean}
   />
 
   ~ Features ~
@@ -40,6 +42,7 @@ import Wallet from "./Wallet";
 */
 
 export default function Account({
+  useBurner,
   address,
   userSigner,
   localProvider,
@@ -50,32 +53,18 @@ export default function Account({
   loadWeb3Modal,
   logoutOfWeb3Modal,
   blockExplorer,
+  isContract,
 }) {
   const { currentTheme } = useThemeSwitcher();
 
-  return (
-    <div>
-      {minimized ? (
-        ""
-      ) : (
-        <span>
-          {address ? (
-            <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
-          ) : (
-            "Connecting..."
-          )}
-          <Balance address={address} provider={localProvider} price={price} />
-          <Wallet
-            address={address}
-            provider={localProvider}
-            signer={userSigner}
-            ensProvider={mainnetProvider}
-            price={price}
-            color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
-          />
-        </span>
-      )}
-      {web3Modal?.cachedProvider ? (
+  function isValidAddress(address) {
+    return address && address !== "0x0000000000000000000000000000000000000000";
+  }
+
+  const modalButtons = [];
+  if (web3Modal) {
+    if (web3Modal.cachedProvider) {
+      modalButtons.push(
         <Button
           key="logoutbutton"
           style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
@@ -84,8 +73,10 @@ export default function Account({
           onClick={logoutOfWeb3Modal}
         >
           logout
-        </Button>
-      ) : (
+        </Button>,
+      );
+    } else {
+      modalButtons.push(
         <Button
           key="loginbutton"
           style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
@@ -95,8 +86,60 @@ export default function Account({
           onClick={loadWeb3Modal}
         >
           connect
-        </Button>
+        </Button>,
+      );
+    }
+  }
+  const display = minimized ? (
+    ""
+  ) : (
+    <span>
+      {web3Modal && web3Modal.cachedProvider ? (
+        <>
+          <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+          <Balance address={address} provider={localProvider} price={price} />
+          <Wallet
+            address={address}
+            provider={localProvider}
+            signer={userSigner}
+            ensProvider={mainnetProvider}
+            price={price}
+            color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
+          />
+        </>
+      ) : useBurner ? (
+        ""
+      ) : isContract ? (
+        <>
+          <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+          <Balance address={address} provider={localProvider} price={price} />
+        </>
+      ) : (
+        ""
       )}
+      {useBurner ? (
+        <>
+          <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+          <Balance address={address} provider={localProvider} price={price} />
+          <Wallet
+            address={address}
+            provider={localProvider}
+            signer={userSigner}
+            ensProvider={mainnetProvider}
+            price={price}
+            color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
+          />
+        </>
+      ) : (
+        <></>
+      )}
+    </span>
+  );
+
+  return (
+    <div>
+      {display}
+      {modalButtons}
     </div>
   );
 }
