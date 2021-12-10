@@ -291,48 +291,8 @@ function App(props) {
             contractConfig={contractConfig}
           />
 
-          <Contract
+          {/* <Contract
             name="DiceRolls"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          />
-
-          {/*<Contract
-            name="MultiDiceRolls"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          />
-
-          <Contract
-            name="PriceConsumerV3"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          /> */}
-
-          {/* <Contract
-            name="ApiConsumer"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          /> */}
-
-          {/* <Contract
-            name="CoinGeckoConsumer"
             price={price}
             signer={userSigner}
             provider={localProvider}
@@ -364,28 +324,7 @@ function App(props) {
             readContracts={readContracts}
           />
         </Route>
-        {/* <Route path="/mainnetdai">
-          <Contract
-            name="DAI"
-            customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.DAI}
-            signer={userSigner}
-            provider={mainnetProvider}
-            address={address}
-            blockExplorer="https://etherscan.io/"
-            contractConfig={contractConfig}
-            chainId={1}
-          />
-          
-            <Contract
-              name="UNI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.UNI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-            />
-           
-        </Route> */}
+
         <Route path="/subgraph">
           <Subgraph
             subgraphUri={props.subgraphUri}

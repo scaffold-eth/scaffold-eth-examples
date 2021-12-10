@@ -62,8 +62,9 @@ export default function ExampleUI({
 
   return (
     <div>
-      <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
-        <h2>Randomness Consumer</h2>
+      <h2 style={{ width: 400, margin: "4rem auto 0" }}>Chainlink VRF examples</h2>
+      <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "1rem auto" }}>
+        <h2 style={{ backgroundColor: "#ffeeff" }}>Randomness Consumer</h2>
         {/*
           ⚙️ Here is an example UI that displays and sets the purpose in your RandomNumberConsumer:
         */}
@@ -142,7 +143,7 @@ export default function ExampleUI({
           </Button>
         </div>
         <Divider />
-        <h2>Dice Rolls</h2>
+        <h2 style={{ backgroundColor: "#ddeeff" }}>Dice Rolls</h2>
         <h4>
           Last Roll Result: <br />
           {diceRollResult}
@@ -187,7 +188,9 @@ export default function ExampleUI({
           mainnetProvider={mainnetProvider}
           startBlock={eventQueryStartBlock}
         />
-        <Divider />
+      </div>
+      <h2 style={{ width: 400, margin: "1rem auto" }}>More UI examples</h2>
+      <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto" }}>
         Your Address:
         <Address address={address} ensProvider={mainnetProvider} fontSize={16} />
         <Divider />
@@ -215,14 +218,15 @@ export default function ExampleUI({
           fontSize={16}
         />
         <Divider />
+        <h2>Randomness Consumer</h2>
         <div style={{ margin: 8 }}>
           <Button
             onClick={() => {
               /* look how you call setPurpose on your contract: */
-              tx(writeContracts.RandomNumberConsumer.setPurpose("🍻 Cheers"));
+              tx(writeContracts.RandomNumberConsumer.setPurpose("🤞 Save Humanity"));
             }}
           >
-            Set Purpose to &quot;🍻 Cheers&quot;
+            Set purpose to &quot;🤞 Save Humanity&quot;
           </Button>
         </div>
         <div style={{ margin: 8 }}>
@@ -271,39 +275,10 @@ export default function ExampleUI({
               /* this should throw an error about "no fallback nor receive function" until you add it */
             }}
           >
-            Another Example
+            Set purpose another way
           </Button>
         </div>
       </div>
-
-      {/* <div style={{ width:600, margin: "auto", marginTop:32, paddingBottom:32 }}>
-        <h2>Single Roll Events:</h2>
-        <List
-          bordered
-          dataSource={rollEvents}
-          renderItem={(item) => {
-            return (
-              <List.Item key={item.blockNumber}>
-                {`Block::${item.blockNumber}| Roll1 => ${item[0]}| Roll2 => ${item[1]}| Roll3 => ${item[2]}| Roll4  =>${item[3]}| Roll5  =>${item[4]}| Roll6  =>${item[5]}`}
-              </List.Item>
-            )
-          }}
-        />
-      </div>       */}
-
-      {/*
-        📑 Maybe display a list of events?
-          (uncomment the event and emit line in YourContract.sol! )
-      */}
-
-      {/*<Events
-        contracts={readContracts}
-        contractName="RandomNumberConsumer"
-        eventName="SetPurpose"
-        localProvider={localProvider}
-        mainnetProvider={mainnetProvider}
-        startBlock={1}
-      /> */}
 
       <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 256 }}>
         <Card>

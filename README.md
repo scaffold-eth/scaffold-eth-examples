@@ -2,8 +2,14 @@
 
 > is everything you need to get started building decentralized applications powered by smart contracts.
 > 
-> This tutorial is part 1 of a series on how to integrate Chainlink technology with Scaffold-ETH.
+> This tutorial is **PART 1** of a series on how to integrate Chainlink technology with Scaffold-ETH.
 > 
+> For some more advanced VRF handling, check out [PART 2](https://github.com/scaffold-eth/scaffold-eth-examples/tree/chainlink-tutorial-2).
+> 
+> To learn about public APIs / Data feeds, check out [PART 3](https://github.com/scaffold-eth/scaffold-eth-examples/tree/chainlink-tutorial-3).
+
+## Verifiable Randomness
+
 > In this tutorial you learn how to use **Chainlink VRF** (verifiable randomness) 🎲
 > 
 > There are 3 example contracts (simple to advanced) for you to ape into! 🦍
@@ -14,7 +20,7 @@
 ![image](https://user-images.githubusercontent.com/2653167/124158108-c14ca380-da56-11eb-967e-69cde37ca8eb.png)
 
 ```bash
-git clone -b chainlink-tutorial-1 https://github.com/austintgriffith/scaffold-eth-examples.git
+git clone -b chainlink-tutorial-1 https://github.com/scaffold-eth/scaffold-eth-examples.git
 
 # 🏄‍♂️ Quick Start
 
@@ -25,7 +31,7 @@ Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://class
 > clone/fork 🏗 scaffold-eth-examples:
 
 ```bash
-git clone https://github.com/austintgriffith/scaffold-eth-examples.git
+git clone https://github.com/scaffold-eth/scaffold-eth-examples.git
 ```
 
 We **skip local development** since it would require mock contracts. Going directly to testnet makes the first steps simpler.
@@ -66,7 +72,7 @@ yarn deploy
 
 📝 Edit your frontend `App.jsx` in `packages/react-app/src`
 
-💼 Edit your deployment script `deploy.js` in `packages/hardhat/scripts`
+💼 Edit your deployment script `00_deploy_your_contract.js` in `packages/hardhat/deploy`
 
 📱 Open http://localhost:3000 to see the app
 
@@ -80,7 +86,7 @@ yarn deploy
 
 > Fund the contract with LINK 
 
-> ** Side Quest - use deploy.js to fund the contract with LINK after funding deployer account. **
+> ** Side Quest - use 00_deploy_your_contract.js to fund the contract with LINK after funding deployer account. **
 
 - Testnet LINK is available from https://faucets.chain.link/
 
@@ -118,7 +124,7 @@ In the Example UI you'll find an example of how to manage UI state when making s
 > The transaction reverted. Why didn't it work?
 > Check out the actual code and see what the reason might be. You won't find the function directly in RandomNumberConsumer though...
 
-> **Takeaway:** randomness from Chainlink VRF is a two-step process. 
+> **📝 Takeaway:** randomness from Chainlink VRF is a two-step process. 
 > - You trigger the first when you ask for a random number.
 > - The VRF contract triggers the second step when it responds with a random number. 
 
@@ -172,63 +178,19 @@ You will see the event data in the console:
 > ** 🧙‍♂️ 🧝‍♀️ 🧞‍♂️ Side Quest 4! **Dice Roll UX** **
 > Try to improve the UX in the Example UI. Replicate what the Request Random Number! button does - a spinner should appear while waiting for the Oracle response.
 
+--- 
+
+> 🔁    You can `yarn deploy --reset ` any time and get fresh new contracts in the frontend:
+
+Make sure to edit your 00_deploy_your_contract.js if you don't want to redeploy all of your contracts.
+
+![Screenshot 2021-12-09 at 23 00 10](https://user-images.githubusercontent.com/32189942/145474932-6f2e65ff-6f9c-42ce-9c5f-ee36f47d9f52.png)
 
 --- 
 
+Check out [PART 2](https://github.com/scaffold-eth/scaffold-eth-examples/tree/chainlink-tutorial-2) for a more advanced VRF setup!
 
-# What follows below should go into parts 2 and 3 of the chainlink tutorial, on different branches, IMO
-
-
-
-## Multi Dice Rolls (part2)
-
-What if we wanted to keep track of dice rolls from multiple users at once? Maybe for a game that picks a winner after everyone has rolled?
-
-Make sure your MultiDiceRolls contract is deployed and has some LINK.
-
-Uncomment the MultiDiceRolls code in App.jsx. You should find it in the Debug Contracts Tab.
-
-This contract allows each address to roll once. An attempt to roll again will revert.
-
-... Work in progress
-
-side quest 1: create a function that picks a winner from all who rolled.
-A winner would be the one who has the maximum total points. Example: (1,2,1,4,1,5) => total of 1+2+1+4+1+5=14.
-If there are several addresses with the maximum total, the first one to have rolled should be the winner.
-
-side quest 2: several rounds?
-Can you reset the state of the smart contract so that it can do several rounds? How would you "clear" the array of rollers?
-
-side quest 3: implement the withdraw link function and test it. You'll need to interact with the LINK token contract on kovan.
-For this you will need the contract address and the contract interface. If this is your first time, consider this quest to be 
-a great challenge. Congrats if you succeed!
-
-
-
----
-
-## Request Off-Chain Data (part3)
-> There are two other Chainlink examples...
-
-APIConsumer.sol
-
-- This contract shows you how to use any API to make a get request.
-
-![image](https://user-images.githubusercontent.com/9419140/106782214-e52acb00-6617-11eb-9213-b119e1eb94f3.png)
-
-CoinGeckoConsumer.sol
-
-- This contract shows you how to use existing Chainlink jobs.
-
-![image](https://user-images.githubusercontent.com/9419140/106782323-04295d00-6618-11eb-9ff7-4de13698b23f.png)
-
-
-> 🔁    You can `yarn deploy` any time and get a fresh new contract in the frontend:
-
-Make sure to edit your deploy.js if you don't want to redeploy all of your contracts.
-
-![deploy](https://user-images.githubusercontent.com/2653167/93149199-f8fa8280-f6b2-11ea-9da7-3b26413ec8ab.gif)
-
+Check out [PART 3](https://github.com/scaffold-eth/scaffold-eth-examples/tree/chainlink-tutorial-3) for a tutorial on how to use public APIs and price feeds in your smart contracts!
 
 ---
 
@@ -287,49 +249,6 @@ Make sure to edit your deploy.js if you don't want to redeploy all of your contr
 ( You will probably want to take some of the 🔗 [hooks](#-hooks), 🎛 [components](#-components) with you from 🏗 scaffold-eth so we started 🖇 [eth-hooks](https://www.npmjs.com/package/eth-hooks) )
 
 🚀 Good luck!
-
-
----------------------------------------------------
-
-BELOW is the readme from the master branch
-- SEE WHAT TO INCLUDE IN THE ABOVE (do we deploy locally in the tutorial?)
-- See what to change / add in the above (mocks etc.)
-
-
-
-
-----------------------------------------------------
-FROM MASTER 
-
-
-
-yarn install
-yarn chain
-```
-
-> in a second terminal window, start your 📱 frontend:
-
-```bash
-cd scaffold-eth
-yarn start
-```
-
-> in a third terminal window, 🛰 deploy your contract:
-
-```bash
-cd scaffold-eth
-yarn deploy
-```
-
-🌍 You need an RPC key for production deployments/Apps, create an [Alchemy](https://www.alchemy.com/) account and replace the value of `ALCHEMY_KEY = xxx` in `packages/react-app/src/constants.js`
-
-🔏 Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
-
-📝 Edit your frontend `App.jsx` in `packages/react-app/src`
-
-💼 Edit your deployment scripts in `packages/hardhat/deploy`
-
-📱 Open http://localhost:3000 to see the app
 
 ### Automated with Gitpod
 
