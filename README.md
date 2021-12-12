@@ -2,7 +2,7 @@
 
 ![image](https://user-images.githubusercontent.com/2653167/145732157-f95d3808-e2f0-422b-9484-52ef412513b3.png)
 
-#### 1000 randomly revealed NFTs
+#### 1/1000 randomly revealed NFTs
 
 #### 2.307% price curve [designed here](https://docs.google.com/spreadsheets/d/1Hrvp2hUb_jkAXNDD3VBbK6eNOJQqoFeQBVhpuWN9I-g/edit#gid=0)
 
@@ -26,23 +26,28 @@ Install dependencies
 yarn install
 ```
 
-Spin up local chain
-```sh
-yarn chain
-```
-
-Deploy Contracts
-```sh
-yarn deploy
-```
-
 Start React frontend
 ```bash
 yarn start
 ```
 
-If you deploy to a public network like Rinkeby you need to generate a deployer account:
-```sh
-yarn run generate
+(The contracts are deployed to rinkeby: 0x1CBFB6939bfDF1866290696f65680edC55059cdd)
+
+-----
+
+Generate deploy account:
 ```
-(You can see this address to fund it by running `yarn account`)
+yarn generate
+```
+
+Fund deploy account:
+```
+yarn account
+```
+
+Deploy contracts:
+```
+yarn deploy
+```
+
+> (Edit hardhat.config.js to select your default network)
