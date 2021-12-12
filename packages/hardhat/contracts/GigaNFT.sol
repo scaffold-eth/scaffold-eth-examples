@@ -1,7 +1,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
-// giga nft 
+// giga nft
 
 //import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -27,7 +27,7 @@ contract GigaNFT is ERC721Enumerable {
 
     string[] public uris;
 
-    constructor() ERC721("GigaNFT", "GIGA") {
+    constructor() ERC721("PatchworkKingdoms", "GIGANFT") {
       //
     }
 

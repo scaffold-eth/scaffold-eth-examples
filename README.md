@@ -1,6 +1,14 @@
-# Giga-NFT 
+# Patchwork Kingdoms - Giga-NFT
 
-### built from a 🏗 scaffold-eth template:
+![image](https://user-images.githubusercontent.com/2653167/145732157-f95d3808-e2f0-422b-9484-52ef412513b3.png)
+
+#### 1000 randomly revealed NFTs
+
+#### 2.307% price curve [designed here](https://docs.google.com/spreadsheets/d/1Hrvp2hUb_jkAXNDD3VBbK6eNOJQqoFeQBVhpuWN9I-g/edit#gid=0)
+
+#### Starting price 0.1 ETH - Ending price 1 ETH
+
+#### built with 🏗 scaffold-eth ([learn more](https://github.com/scaffold-eth/scaffold-eth))
 
 ## 🏃‍♀️ Quick Start
 
@@ -38,5 +46,3 @@ If you deploy to a public network like Rinkeby you need to generate a deployer a
 yarn run generate
 ```
 (You can see this address to fund it by running `yarn account`)
-
-
