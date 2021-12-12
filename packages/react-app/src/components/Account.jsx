@@ -96,7 +96,7 @@ export default function Account({
     <span>
       {web3Modal && web3Modal.cachedProvider ? (
         <>
-          <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+          {address && <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />}
           <Balance address={address} provider={localProvider} price={price} />
           <Wallet
             address={address}
@@ -111,7 +111,7 @@ export default function Account({
         ""
       ) : isContract ? (
         <>
-          <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+          {address && <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />}
           <Balance address={address} provider={localProvider} price={price} />
         </>
       ) : (
