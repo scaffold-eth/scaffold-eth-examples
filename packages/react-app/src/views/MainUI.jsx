@@ -6,8 +6,6 @@ import axios from "axios";
 import { formatEther } from "@ethersproject/units";
 import { usePoller } from "eth-hooks";
 
-
-
 const BOOSTPERCENT = 5
 
 
@@ -66,8 +64,10 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
     if (readContracts.GigaNFT) loadCollection();
   }, [address, readContracts, writeContracts]);
 
+  console.log("collection.items",collection.items)
+
   return (
-    <div style={{ maxWidth: 768, margin: "20px auto" }}>
+    <div style={{ maxWidth: 768, margin: "20px auto", paddingBottom: 256 }}>
       {address ? (
         <>
           <div style={{ display: "grid", margin: "0 auto" }}>
@@ -105,12 +105,12 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
               loadCollection();
             }}
           >
-            MINT for Ξ{priceToMint && (+ethers.utils.formatEther(priceToMint.add(priceToMint.mul(BOOSTPERCENT).div(100)))).toFixed(4)}
+            Mint for Ξ{priceToMint && (+ethers.utils.formatEther(priceToMint.add(priceToMint.mul(BOOSTPERCENT).div(100)))).toFixed(4)}
           </Button>
         </>
       ) : (
         <Button key="loginbutton" type="primary" onClick={loadWeb3Modal}>
-          Connect to mint
+          Connect Ethereum Wallet To Mint
         </Button>
       )}
     </div>

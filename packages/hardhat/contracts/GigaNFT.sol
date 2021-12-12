@@ -1,7 +1,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
-// https://github.com/austintgriffith/scaffold-eth/tree/moonshot-bots-with-curve
+// giga nft 
 
 //import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -16,14 +16,14 @@ contract GigaNFT is ERC721Enumerable {
     address payable public constant recipient =
         payable(0x01104e244C118F8E63455e49055f0A7034d4Cf3C);
 
-    uint256 public constant limit = 1000;
+    uint256 public constant limit = 15;
     uint256 public constant curve = 1002307;
     uint256 public price = 0.1 ether;
 
     uint256 public currentSupply = 0;
 
     using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+    Counters.Counter public _tokenIds;
 
     string[] public uris;
 
@@ -62,13 +62,13 @@ contract GigaNFT is ERC721Enumerable {
      * Custom stuff to have a flexible baseURI for ipfs reveal that we can eventually close by changeUriOwner(0)
      */
 
-    string public flexibleBaseURI = "http://localhost:3000/revealedassets/";
+    string public flexibleBaseURI = "https://giganftassetreveal.s3.amazonaws.com/";
 
     function _baseURI() internal view virtual override returns (string memory) {
         return flexibleBaseURI;
     }
 
-    address public baseURIOwner = 0x18fFE4dADcCe63A074Ef9cfe327cAb9AD4Ad9f76;
+    address public baseURIOwner = 0x34aA3F359A9D614239015126635CE7732c18fDF3;
 
     function setBaseURI(string memory newURI) public {
       require(msg.sender==baseURIOwner,"must be baseURIOwner");
@@ -131,5 +131,9 @@ contract GigaNFT is ERC721Enumerable {
           _i /= 10;
       }
       return string(bstr);
+    }
+
+    function contractURI() public pure returns (string memory) {
+       return "https://ipfs.io/ipfs/QmRhxN2hoxyCbvbwVQqAVWRJCBeZxeTXxVtEJPLvGVQNTs";
     }
 }
