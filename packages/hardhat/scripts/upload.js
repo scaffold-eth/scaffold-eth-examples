@@ -9,34 +9,16 @@ const path = require('path');
 const s3FolderUpload = require("s3-folder-upload");
 
 
-
 const USE_INFURA = false;
 
 const delayMS = 60;
-
 
 const TOKEN_LIMIT = 15;
 
 const HARD_REVEAL_LIMIT = 10;
 
-let ipfs
-if(USE_INFURA){
-  ipfs = ipfsAPI({
-    host: "ipfs.infura.io",
-    port: "5001",
-    protocol: "https",
-  });
-}else{
-  ipfs = ipfsAPI({
-    host: "localhost",
-    port: "5001",
-    protocol: "http",
-  });
-}
-
 
 const main = async () => {
-
 
   const GigaNFT = await ethers.getContractFactory("GigaNFT");
   const GigaAddress = JSON.parse(fs.readFileSync("./deployments/rinkeby/GigaNFT.json")).address
@@ -47,6 +29,21 @@ const main = async () => {
   const currentSupply = (await gigaContract.totalSupply()).toNumber()
 
   console.log("gigaNFT currentSupply",currentSupply)
+
+  let ipfs
+  if(USE_INFURA){
+    ipfs = ipfsAPI({
+      host: "ipfs.infura.io",
+      port: "5001",
+      protocol: "https",
+    });
+  }else{
+    ipfs = ipfsAPI({
+      host: "localhost",
+      port: "5001",
+      protocol: "http",
+    });
+  }
 
   const titleImageHashResult = await ipfs.add(fs.readFileSync("./title.png"))
 

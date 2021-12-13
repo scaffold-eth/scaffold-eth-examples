@@ -31,9 +31,9 @@ Start React frontend
 yarn start
 ```
 
-(The contracts are deployed to rinkeby: 0x1CBFB6939bfDF1866290696f65680edC55059cdd)
+# 🛰 Deploying
 
------
+> Edit `hardhat.config.js` to select your default network
 
 Generate deploy account:
 ```
@@ -50,4 +50,16 @@ Deploy contracts:
 yarn deploy
 ```
 
-> (Edit hardhat.config.js to select your default network)
+> Edit `targetNetwork` to point the frontend at the network you deployed to.
+
+Build frontend:
+```
+yarn build
+```
+
+> Deploy the static site from the '/build' directory
+
+Using Surge:
+```
+yarn surge --domain giga-nft-external.surge.sh
+```

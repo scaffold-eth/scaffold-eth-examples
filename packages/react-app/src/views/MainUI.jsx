@@ -8,7 +8,6 @@ import { usePoller } from "eth-hooks";
 
 const BOOSTPERCENT = 5
 
-
 const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeContracts }) => {
   const [collection, setCollection] = useState({
     loading: true,
