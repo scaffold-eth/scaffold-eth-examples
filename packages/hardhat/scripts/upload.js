@@ -8,6 +8,7 @@ const ipfsAPI = require("ipfs-http-client");
 const path = require('path');
 const s3FolderUpload = require("s3-folder-upload");
 
+const TARGETNETWORK = "rinkeby"
 
 const USE_INFURA = false;
 
@@ -17,11 +18,10 @@ const TOKEN_LIMIT = 15;
 
 const HARD_REVEAL_LIMIT = 10;
 
-
 const main = async () => {
 
   const GigaNFT = await ethers.getContractFactory("GigaNFT");
-  const GigaAddress = JSON.parse(fs.readFileSync("./deployments/rinkeby/GigaNFT.json")).address
+  const GigaAddress = JSON.parse(fs.readFileSync("./deployments/"+TARGETNETWORK+"/GigaNFT.json")).address
   console.log("connecting to gigaNFT at",GigaAddress)
   const gigaContract = await GigaNFT.attach(
     GigaAddress
@@ -29,6 +29,8 @@ const main = async () => {
   const currentSupply = (await gigaContract.totalSupply()).toNumber()
 
   console.log("gigaNFT currentSupply",currentSupply)
+
+  await sleep(3000);
 
   let ipfs
   if(USE_INFURA){
@@ -45,6 +47,7 @@ const main = async () => {
     });
   }
 
+  console.log("Uploading contract level metadata...")
   const titleImageHashResult = await ipfs.add(fs.readFileSync("./title.png"))
 
   const contractURI = {
@@ -53,7 +56,7 @@ const main = async () => {
     "image": "https://ipfs.io/ipfs/"+titleImageHashResult,
     "external_link": "https://www.patchwork-kingdoms.com/",
     "seller_fee_basis_points": 100, // 100 Indicates a 1% seller fee.
-    "fee_recipient": "0xc1470707Ed388697A15B9B9f1f5f4cC882E28a45" // Where seller fees will be paid to.
+    "fee_recipient": "0x34aA3F359A9D614239015126635CE7732c18fDF3" // Where seller fees will be paid to.
   }
 
   const contractURIHashResult = await ipfs.add(JSON.stringify(contractURI))
@@ -74,7 +77,6 @@ const main = async () => {
   for (let id=1;id<=TOKEN_LIMIT;id++) {
     //console.log("#",id)
 
-
     const imageLocation = assetDirectory+"/Visuals/Patchwork Kingdoms #"+id+".png"
     //console.log("READING",imageLocation)
 
@@ -84,15 +86,12 @@ const main = async () => {
       content: imageContent
     };
 
-    //EVENTUALLY WE ADD A CHECK HERE FOR MAIN NET SUPPLY AND REVEAL AS THEY ARE MINTED://////////////////////////////////
-    const imageHashResult = await ipfs.add(imageContent,{onlyHash: true})
+    // learning how to add to IPFS without actually adding... just getting the hash...
+    //const imageHashResult = await ipfs.add(imageContent,{onlyHash: true})
 
-
+    //read the metadata...
     const osMetaDataFile = assetDirectory+"/Metadata/Patchwork Kingdoms #"+id+" - metadata.json"
     //console.log("osMetaDataFile",osMetaDataFile)
-
-
-
     const metadataContent = await fs.readFileSync(osMetaDataFile)
     let metadataObject = JSON.parse(metadataContent.toString())
 
@@ -101,14 +100,12 @@ const main = async () => {
     //metadataObject.image = "http://localhost:3000/revealedassets/"+id+".png"
     metadataObject.image = "https://giganftassetreveal.s3.amazonaws.com/"+id+".png"
 
-
     metadataObject.external_url = "http://giga-nft-external.surge.sh/"+id
 
     //console.log("metadataObject",metadataObject)
     //const manifestHashResult = await ipfs.add(JSON.stringify(metadataObject),{onlyHash: true})
 
     //console.log("\""+manifestHashResult.path+"\",")
-
     if(id<=HARD_REVEAL_LIMIT && id<=currentSupply){
       const revealFolder = "../react-app/public/revealedassets"
 
@@ -147,85 +144,82 @@ const main = async () => {
     await sleep(delayMS);
   }
 
-
-    console.log("uploading into an ipfs folder..."/*,imageArray*/)
-    let added = await ipfs.add(imageArray, { wrapWithDirectory: true, onlyHash: true })
-    console.log("added:",added)
-
+  console.log("uploading into an ipfs folder..."/*,imageArray*/)
+  let added = await ipfs.add(imageArray, { wrapWithDirectory: true, onlyHash: true })
+  console.log("added:",added)
 
 
-    console.log("Syncing with S3...")
-    const BUCKETNAME = "giganftassetreveal";
+  console.log("Syncing with S3...")
+  const BUCKETNAME = "giganftassetreveal";
 
-    let credentials = {};
-    try {
-      credentials = JSON.parse(fs.readFileSync("aws.json"));
-    } catch (e) {
-      console.log(e);
-      console.log(
-        '☢️   Create an aws.json credentials file in packages/react-app/ like { "accessKeyId": "xxx", "secretAccessKey": "xxx", "region": "xxx" } ',
-      );
-      process.exit(1);
+  let credentials = {};
+  try {
+    credentials = JSON.parse(fs.readFileSync("aws.json"));
+  } catch (e) {
+    console.log(e);
+    console.log(
+      '☢️   Create an aws.json credentials file in packages/react-app/ like { "accessKeyId": "xxx", "secretAccessKey": "xxx", "region": "xxx" } ',
+    );
+    process.exit(1);
+  }
+
+  credentials.bucket = BUCKETNAME;
+
+  const options = {
+    useFoldersForFileTypes: false,
+    useIAMRoleCredentials: false,
+  };
+
+
+  var AWS = require('aws-sdk');
+  // Load credentials and set Region from JSON file
+  AWS.config.loadFromPath('./aws.json');
+
+  // Create S3 service object
+  s3 = new AWS.S3({apiVersion: '2006-03-01'});
+
+  // Create params JSON for S3.createBucket
+  var bucketParams = {
+    Bucket : BUCKETNAME,
+    ACL : 'public-read'
+  };
+
+  // Create params JSON for S3.setBucketWebsite
+  var staticHostParams = {
+    Bucket: BUCKETNAME,
+    WebsiteConfiguration: {
+    ErrorDocument: {
+      Key: 'index.html'
+    },
+    IndexDocument: {
+      Suffix: 'index.html'
+    },
     }
+  };
 
-    credentials.bucket = BUCKETNAME;
+  // Call S3 to create the bucket
+  s3.createBucket(bucketParams, function(err, data) {
+    if (err) {
+      console.log("Error", err);
+    } else {
+      console.log("Bucket URL is ", data.Location);
+      // Set the new policy on the newly created bucket
+      s3.putBucketWebsite(staticHostParams, function(err, data) {
+        if (err) {
+          // Display error message
+          console.log("Error", err);
+        } else {
+          // Update the displayed policy for the selected bucket
+          console.log("Success... UPLOADING!", data);
 
-    const options = {
-      useFoldersForFileTypes: false,
-      useIAMRoleCredentials: false,
-    };
-
-
-    var AWS = require('aws-sdk');
-    // Load credentials and set Region from JSON file
-    AWS.config.loadFromPath('./aws.json');
-
-    // Create S3 service object
-    s3 = new AWS.S3({apiVersion: '2006-03-01'});
-
-    // Create params JSON for S3.createBucket
-    var bucketParams = {
-      Bucket : BUCKETNAME,
-      ACL : 'public-read'
-    };
-
-    // Create params JSON for S3.setBucketWebsite
-    var staticHostParams = {
-      Bucket: BUCKETNAME,
-      WebsiteConfiguration: {
-      ErrorDocument: {
-        Key: 'index.html'
-      },
-      IndexDocument: {
-        Suffix: 'index.html'
-      },
-      }
-    };
-
-    // Call S3 to create the bucket
-    s3.createBucket(bucketParams, function(err, data) {
-      if (err) {
-        console.log("Error", err);
-      } else {
-        console.log("Bucket URL is ", data.Location);
-        // Set the new policy on the newly created bucket
-        s3.putBucketWebsite(staticHostParams, function(err, data) {
-          if (err) {
-            // Display error message
-            console.log("Error", err);
-          } else {
-            // Update the displayed policy for the selected bucket
-            console.log("Success... UPLOADING!", data);
-
-            ///
-            /// After the bucket is created, we upload to it:
-            ///
-            s3FolderUpload(revealFolder, credentials, options /* , invalidation */);
-          }
-        });
-      }
-    });
-
+          ///
+          /// After the bucket is created, we upload to it:
+          ///
+          s3FolderUpload(revealFolder, credentials, options /* , invalidation */);
+        }
+      });
+    }
+  });
 
   //const { deployer } = await getNamedAccounts();
   //const yourCollectible = await ethers.getContract("YourCollectible", deployer);

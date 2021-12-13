@@ -19,7 +19,7 @@ import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import WalletLink from "walletlink";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
+import { Address, Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
 import { ALCHEMY_KEY, INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
@@ -485,6 +485,11 @@ function App(props) {
             />
           </Route>
           <Route exact path="/contract">
+
+            <div style={{padding:32, width:400, margin: "auto"}}>
+              <div>Smart Contract:</div><Address blockExplorer={blockExplorer} value={readContracts && readContracts.GigaNFT && readContracts.GigaNFT.address} />
+            </div>
+
             <Contract
               name="GigaNFT"
               price={price}

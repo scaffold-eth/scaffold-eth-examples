@@ -1,22 +1,21 @@
 pragma solidity >=0.8.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
-// giga nft
+// giga nft "PatchworkKingdoms" - https://github.com/scaffold-eth/scaffold-eth-examples/tree/Giga-NFT-project
 
 //import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 //learn more: https://docs.openzeppelin.com/contracts/3.x/erc721
-
 // GET LISTED ON OPENSEA: https://testnets.opensea.io/get-listed/step-two
 
 contract GigaNFT is ERC721Enumerable {
 
     address payable public constant recipient =
-        payable(0x01104e244C118F8E63455e49055f0A7034d4Cf3C);
+        payable(0x34aA3F359A9D614239015126635CE7732c18fDF3); // we still need to edit this // it needs to be a multisig where funds stream
 
-    uint256 public constant limit = 15;
+    uint256 public constant limit = 15; // this also goes to 1000 for mainnet
     uint256 public constant curve = 1002307;
     uint256 public price = 0.1 ether;
 
@@ -24,8 +23,6 @@ contract GigaNFT is ERC721Enumerable {
 
     using Counters for Counters.Counter;
     Counters.Counter public _tokenIds;
-
-    string[] public uris;
 
     constructor() ERC721("PatchworkKingdoms", "GIGANFT") {
       //
@@ -52,15 +49,34 @@ contract GigaNFT is ERC721Enumerable {
         uint256 refund = msg.value - currentPrice;
         if (refund > 0) {
             (bool refundSent, ) = msg.sender.call{value: refund}("");
-            require(refundSent, "Refund could not be sent");
+            require(refundSent, "could not refund");
         }
 
         return id;
     }
 
-    /**
-     * Custom stuff to have a flexible baseURI for ipfs reveal that we can eventually close by changeUriOwner(0)
-     */
+    /*
+    // 🧪 tinkering with putting all the URIs on chain...
+    // 🧫 with gas at ⛽️ 85 gwei I think it costs about $10 per entry "QmRhxN2hoxyCbvbwVQqAVWRJCBeZxeTXxVtEJPLvGVQNTs"
+
+    string[] public uris;
+
+    function addURIs(string memory uriButEventutallyMakyArray) public {
+      require(msg.sender==baseURIOwner,"must be baseURIOwner");
+      uris.push(uriButEventutallyMakyArray);
+    }
+
+    function addURIBatch(string[] memory uriArray) public {
+      require(msg.sender==baseURIOwner,"must be baseURIOwner");
+      for(uint i=0;i<uriArray.length;i++){
+        uris.push(uriArray[i]);
+      }
+    }
+
+    // 🚙 switching gears to using an IPFS "folder"
+    // 🏷 it's content addressable (immutable) and we'll track a flexibleBaseURI:
+
+    */
 
     string public flexibleBaseURI = "https://giganftassetreveal.s3.amazonaws.com/";
 
@@ -68,22 +84,24 @@ contract GigaNFT is ERC721Enumerable {
         return flexibleBaseURI;
     }
 
-    address public baseURIOwner = 0x34aA3F359A9D614239015126635CE7732c18fDF3;
+    // 👮‍♀️ a single account can update the flexibleBaseURI
+
+    address public baseURIOwner = 0x34aA3F359A9D614239015126635CE7732c18fDF3; //austingriffith.eth
 
     function setBaseURI(string memory newURI) public {
       require(msg.sender==baseURIOwner,"must be baseURIOwner");
       flexibleBaseURI=newURI;
     }
 
+    // 🔥 after you setBaseURI() to the IPFS folder, changeUriOwner() to the 0 address to lock
+
     function changeUriOwner(address newOwner) public {
       require(msg.sender==baseURIOwner,"must be baseURIOwner");
       baseURIOwner=newOwner;
     }
 
-    function addURIs(string memory uriButEventutallyMakyArray) public {
-      require(msg.sender==baseURIOwner,"must be baseURIOwner");
-      uris.push(uriButEventutallyMakyArray);
-    }
+    // 🖼 so all the pictures have to go up to get the final address
+    // 🧑‍🏭 instead we will use S3 and a script to reveal them...
 
 
     /**
@@ -134,6 +152,6 @@ contract GigaNFT is ERC721Enumerable {
     }
 
     function contractURI() public pure returns (string memory) {
-       return "https://ipfs.io/ipfs/QmRhxN2hoxyCbvbwVQqAVWRJCBeZxeTXxVtEJPLvGVQNTs";
+       return "https://ipfs.io/ipfs/QmSX2sMh9DyqvoEEJVKDAGoyaheT7B5RpEFg1NCkwVBSb9";
     }
 }

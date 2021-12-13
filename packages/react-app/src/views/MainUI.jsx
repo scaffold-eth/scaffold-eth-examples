@@ -8,6 +8,17 @@ import { usePoller } from "eth-hooks";
 
 const BOOSTPERCENT = 5
 
+/*
+
+  BOOSTPERCENT: 5%
+
+  This adds a percentage to the mint price in the frontend.
+  This helps avoid "collisions" as multiple users are minting
+    at the same time and the price moves on a curve.
+  There is a refund at the very end of the transaction to
+    send back whatever value wasn't needed in minting the NFT.
+*/
+
 const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeContracts }) => {
   const [collection, setCollection] = useState({
     loading: true,
@@ -25,7 +36,7 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
       }
     }catch(e){console.log(e)}
 
-  //  console.log("metadata",metadata.data)
+    //console.log("metadata",metadata.data)
     //const approved = await readContracts.GigaNFT.getApproved(id);
 
   };
@@ -46,17 +57,6 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
       loading: false,
       items: tokens,
     });
-  };
-
-
-  const approveForBurn = async id => {
-    try {
-      const approveTx = await tx(writeContracts.GigaNFT.approve(writeContracts.GigaNFT.address, id));
-      await approveTx.wait();
-    } catch (e) {
-      console.log("Approve tx error:", e);
-    }
-    loadCollection();
   };
 
   useEffect(() => {
@@ -91,7 +91,6 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
             type="primary"
             onClick={async () => {
               const priceRightNow = await readContracts.GigaNFT.price();
-
 
               const boostedPriceToAvoidCollisionsUpTheCurve = priceRightNow.add(priceRightNow.mul(BOOSTPERCENT).div(100))
 

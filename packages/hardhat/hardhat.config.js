@@ -101,7 +101,7 @@ module.exports = {
     // },
 
     rinkeby: {
-      url: "https://rinkeby.infura.io/v3/e3ae1f281704426b952b9907d2c5fa73", // <---- YOUR INFURA ID! (or it won't work)
+      url: "https://rinkeby.infura.io/v3/f0c9f4449331457db6be5fcef7db0208", // <---- YOUR INFURA ID! (or it won't work)
 
       //    url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/eth/rinkeby", // <---- YOUR MORALIS ID! (not limited to infura)
 
@@ -119,7 +119,7 @@ module.exports = {
       },
     },
     mainnet: {
-      url: "https://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
+      url: "https://mainnet.infura.io/v3/f0c9f4449331457db6be5fcef7db0208", // <---- YOUR INFURA ID! (or it won't work)
 
       //      url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXXXX/eth/mainnet", // <---- YOUR MORALIS ID! (not limited to infura)
 
