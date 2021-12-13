@@ -143,14 +143,3 @@ yarn watch
 ```
 
 This will check the tokenSupply every 15 seconds and run the reveal if needed.
-
-
----
-
-# 📄 Smart Contract
-
-## vars
-
-## BaseURI Mechanism
-
-## Refund Mechanism
