@@ -1,5 +1,4 @@
 pragma solidity >=0.8.0 <0.9.0;
-//SPDX-License-Identifier: MIT
 
 // giga nft "PatchworkKingdoms" - https://github.com/scaffold-eth/scaffold-eth-examples/tree/Giga-NFT-project
 
@@ -152,6 +151,6 @@ contract GigaNFT is ERC721Enumerable {
     }
 
     function contractURI() public pure returns (string memory) {
-       return "https://ipfs.io/ipfs/QmSX2sMh9DyqvoEEJVKDAGoyaheT7B5RpEFg1NCkwVBSb9";
+       return "https://ipfs.io/ipfs/QmU5WVx6q3znEqYXecBKUpHFJPayL4EPHA7LX8MiTby2Hg";
     }
 }

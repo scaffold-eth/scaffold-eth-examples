@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "GigaNFT": {
-          "address": "0x30f6C4f9c2a8b972a63E0183c99FF2Cb1f74D4ed",
+          "address": "0xe7c808d38cE0B920EbdEf56ec9787075Fd179696",
           "abi": [
             {
               "inputs": [],

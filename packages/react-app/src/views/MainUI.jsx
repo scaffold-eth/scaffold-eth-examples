@@ -19,6 +19,8 @@ const BOOSTPERCENT = 5
     send back whatever value wasn't needed in minting the NFT.
 */
 
+const OPENSEA_LINK = "https://testnets.opensea.io/assets/"
+
 const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeContracts }) => {
   const [collection, setCollection] = useState({
     loading: true,
@@ -76,11 +78,11 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
               collection.items.map(item => (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
                   <div style={{padding:32}}>
-                    {item?<img
+                    {item?<a href={OPENSEA_LINK+(readContracts&&readContracts.GigaNFT&&readContracts.GigaNFT.address)+"/"+item.id} target="_blank"><img
                       style={{ maxWidth: "150px", display: "block", margin: "0 auto", marginBottom: "20px" }}
                       src={item.image}
                       alt="GigaNFT"
-                    />:"🎁 Not Revealed Yet"}
+                    /></a>:"🎁 Not Revealed Yet"}
                   </div>
                 </div>
               ))}

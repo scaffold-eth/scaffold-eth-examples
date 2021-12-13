@@ -20,18 +20,6 @@ const HARD_REVEAL_LIMIT = 10;
 
 const main = async () => {
 
-  const GigaNFT = await ethers.getContractFactory("GigaNFT");
-  const GigaAddress = JSON.parse(fs.readFileSync("./deployments/"+TARGETNETWORK+"/GigaNFT.json")).address
-  console.log("connecting to gigaNFT at",GigaAddress)
-  const gigaContract = await GigaNFT.attach(
-    GigaAddress
-  );
-  const currentSupply = (await gigaContract.totalSupply()).toNumber()
-
-  console.log("gigaNFT currentSupply",currentSupply)
-
-  await sleep(3000);
-
   let ipfs
   if(USE_INFURA){
     ipfs = ipfsAPI({
@@ -53,7 +41,7 @@ const main = async () => {
   const contractURI = {
     "name": "Patchwork Kingdoms",
     "description": "Using data about the digital connectivity of schools, collected by the UNICEF Giga project, each Patchwork Kingdom brings together hundreds of unique schools, each transformed into a square. Brought together they form a kingdom ‘above’ representing connected schools and a kingdom ‘below’ representing unconnected schools, showing how many children are still in need of like-changing connectivity.",
-    "image": "https://ipfs.io/ipfs/"+titleImageHashResult,
+    "image": "https://ipfs.io/ipfs/"+titleImageHashResult.path,
     "external_link": "https://www.patchwork-kingdoms.com/",
     "seller_fee_basis_points": 100, // 100 Indicates a 1% seller fee.
     "fee_recipient": "0x34aA3F359A9D614239015126635CE7732c18fDF3" // Where seller fees will be paid to.
@@ -62,7 +50,19 @@ const main = async () => {
   const contractURIHashResult = await ipfs.add(JSON.stringify(contractURI))
   console.log("contractURIHashResult:",contractURIHashResult.path)
 
-  await sleep(delayMS);
+  await sleep(3000);
+
+  const GigaNFT = await ethers.getContractFactory("GigaNFT");
+  const GigaAddress = JSON.parse(fs.readFileSync("./deployments/"+TARGETNETWORK+"/GigaNFT.json")).address
+  console.log("connecting to gigaNFT at",GigaAddress)
+  const gigaContract = await GigaNFT.attach(
+    GigaAddress
+  );
+  const currentSupply = (await gigaContract.totalSupply()).toNumber()
+
+  console.log("gigaNFT currentSupply",currentSupply)
+
+  await sleep(3000);
 
   // // // // // // // // // // // // // // // // // //
   const assetDirectory = "./assets";

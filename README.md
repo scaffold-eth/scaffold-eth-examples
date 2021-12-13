@@ -12,12 +12,17 @@
 
 ---
 
+## Live on [Rinkeby]
+
 A 1/15 (instead of 1/1000) test contract is deployed to `Rinkeby` so we can test the reveal mechanics.
 
-The contract on `Rinkeby` is **0x30f6C4f9c2a8b972a63E0183c99FF2Cb1f74D4ed**.
+The prototype contract on `Rinkeby` is https://rinkeby.etherscan.io/address/0xe7c808d38cE0B920EbdEf56ec9787075Fd179696#code
 
 This will also allow us to dial in the last bits of metadata.
 
+Here is token #1 on Rinkeby OpenSea: https://testnets.opensea.io/assets/0xe7c808d38cE0B920EbdEf56ec9787075Fd179696/1
+
+Use the frontend to mint 1 of the 15 testnet NFTs: https://giga-nft-external.surge.sh
 
 ---
 
@@ -130,6 +135,15 @@ yarn sync
 ```
 
 > This will make the assets available at https://giganftassetreveal.s3.amazonaws.com/
+
+To automate the reveal:
+
+```
+yarn watch
+```
+
+This will check the tokenSupply every 15 seconds and run the reveal if needed.
+
 
 ---
 
