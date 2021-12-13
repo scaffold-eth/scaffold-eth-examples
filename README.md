@@ -1,6 +1,6 @@
 # Patchwork Kingdoms - Giga-NFT
 
-![image](https://user-images.githubusercontent.com/2653167/145732157-f95d3808-e2f0-422b-9484-52ef412513b3.png)
+![title](https://user-images.githubusercontent.com/2653167/145846485-e052b92a-5253-4cd1-8b8f-1d07c42effea.png)
 
 #### 1/1000 randomly revealed NFTs
 
