@@ -5,7 +5,7 @@ import React from "react";
 
 export default function Header() {
   return (
-    <a href="https://github.com/scaffold-eth" target="_blank" rel="noopener noreferrer">
+    <a href="/">
       <PageHeader
         title="Your Page Title Here"
         subTitle={
