@@ -2,35 +2,50 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
-import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "./interfaces/INonfungiblePositionManager.sol";
 import '@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol';
 import '@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol';
 
+interface IUniswapV3Pool {
+    function initialize(uint160 sqrtPriceX96) external;
+}
+
+interface IUniswapV3Factory {
+    function createPool(
+        address tokenA,
+        address tokenB,
+        uint24 fee
+    ) external returns (address pool);
+
+    function getPool(
+        address tokenA,
+        address tokenB,
+        uint24 fee
+    ) external view returns (address pool);
+}
+
 contract RetroactiveFunding is ERC20 {
     uint256 public constant mintAmount = 100 ether;
     uint256 public tokenId;
-    address public constant weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
+    address public constant weth = 0xDf032Bc4B9dC2782Bb09352007D4C57B75160B15;
     // 1% fee
     uint24 public constant fee = 10000;
     // initial price used to initialize pool is project token / eth
     uint160 public constant initialPrice = 64;
-    IUniswapV3Factory public immutable factory;
-    INonfungiblePositionManager public immutable positionManager;
-    ISwapRouter public immutable swapRouter;
+    IUniswapV3Factory constant factory = IUniswapV3Factory(0x1F98431c8aD98523631AE4a59f267346ea31F984);
+    INonfungiblePositionManager constant positionManager = INonfungiblePositionManager(0xC36442b4a4522E871399CD717aBDD847Ab11FE88);
+    ISwapRouter constant swapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
     constructor(
         string memory name,
-        string memory symbol,
-        IUniswapV3Factory _factory,
-        INonfungiblePositionManager _positionManager,
-        ISwapRouter _swapRouter
+        string memory symbol
     ) ERC20(name, symbol) {
         _mint(msg.sender, mintAmount);
-        factory = _factory;
-        positionManager = _positionManager;
-        swapRouter = _swapRouter;
+        address pool = factory.createPool(address(this), weth, fee);
+        // initialize pool
+        uint160 sqrtPriceX96 = (sqrt(initialPrice) * 2)**96;
+        IUniswapV3Pool(pool).initialize(sqrtPriceX96);
     }
 
     /**
@@ -57,15 +72,6 @@ contract RetroactiveFunding is ERC20 {
      * @notice Called by a whale who adds liquidity, the same amount of lp tokens are minted to the contract & added tot he pool
      */
     function fundProject() external payable {
-        address pool = getPool();
-        // create & initialize the pool if it doesn not exist
-        if (pool == address(0)) {
-            // create new pool
-            pool = factory.createPool(address(this), weth, fee);
-            // initialize pool
-            uint160 sqrtPriceX96 = (sqrt(initialPrice) * 2)**96;
-            IUniswapV3Pool(pool).initialize(sqrtPriceX96);
-        }
         _mint(address(this), msg.value);
         TransferHelper.safeApprove(address(this), address(positionManager),  msg.value);
 
