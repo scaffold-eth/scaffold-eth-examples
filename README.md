@@ -4,7 +4,7 @@
 
 #### 1/1000 randomly revealed NFTs from artist [Nadieh Bremer](https://linktr.ee/nadiehbremer).
 
-#### 2.307% price curve [designed here](https://docs.google.com/spreadsheets/d/1Hrvp2hUb_jkAXNDD3VBbK6eNOJQqoFeQBVhpuWN9I-g/edit#gid=0)
+#### 0.002307 price curve [designed here](https://docs.google.com/spreadsheets/d/1Hrvp2hUb_jkAXNDD3VBbK6eNOJQqoFeQBVhpuWN9I-g/edit#gid=0)
 
 #### Starting price 0.1 ETH - Ending price 1 ETH
 
