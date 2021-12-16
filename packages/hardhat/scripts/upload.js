@@ -48,9 +48,9 @@ const main = async () => {
   }
 
   const contractURIHashResult = await ipfs.add(JSON.stringify(contractURI))
-  console.log("contractURIHashResult:",contractURIHashResult.path)
+  console.log("Put this in the contract for the contractURI ---->",contractURIHashResult.path)
 
-  await sleep(3000);
+  await sleep(30);
 
   const GigaNFT = await ethers.getContractFactory("GigaNFT");
   const GigaAddress = JSON.parse(fs.readFileSync("./deployments/"+TARGETNETWORK+"/GigaNFT.json")).address

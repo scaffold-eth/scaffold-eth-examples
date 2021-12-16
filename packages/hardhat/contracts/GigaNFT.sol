@@ -15,8 +15,8 @@ contract GigaNFT is ERC721Enumerable {
         payable(0x34aA3F359A9D614239015126635CE7732c18fDF3); // we still need to edit this // it needs to be a multisig where funds stream
 
     uint256 public constant limit = 15; // this also goes to 1000 for mainnet
-    uint256 public constant curve = 1002307;
-    uint256 public price = 0.1 ether;
+    //uint256 public constant curve = 1002307;
+    uint256 public price = 0.175 ether;
 
     uint256 public currentSupply = 0;
 
@@ -34,7 +34,7 @@ contract GigaNFT is ERC721Enumerable {
 
         require(msg.value >= currentPrice, "sorry, price has increased");
 
-        price = (price * curve) / 1000000;
+        //price = (price * curve) / 1000000;
         currentSupply++;
 
         _tokenIds.increment();

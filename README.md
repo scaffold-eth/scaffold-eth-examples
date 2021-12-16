@@ -4,9 +4,7 @@
 
 #### 1/1000 randomly revealed NFTs from artist [Nadieh Bremer](https://linktr.ee/nadiehbremer).
 
-#### 0.002307 price curve [designed here](https://docs.google.com/spreadsheets/d/1Hrvp2hUb_jkAXNDD3VBbK6eNOJQqoFeQBVhpuWN9I-g/edit#gid=0)
-
-#### Starting price 0.1 ETH - Ending price 1 ETH
+#### 0.175 ether flat price -- (scrapped price curve [designed here](https://docs.google.com/spreadsheets/d/1Hrvp2hUb_jkAXNDD3VBbK6eNOJQqoFeQBVhpuWN9I-g/edit#gid=0))
 
 #### built with 🏗 scaffold-eth ([learn more](https://github.com/scaffold-eth/scaffold-eth))
 
@@ -156,6 +154,8 @@ That file comes in like this to generate a merkle root: https://github.com/scaff
 (Here is where the root is outputted: https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/hardhat/test/bufficorn-test.ts#L66)
 
 The smart contract will take a proof from the frontend and verify it: https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/hardhat/contracts/Bufficorn.sol#L246
+
+The smart contract will contain an extra mapping to only allow each allowlisted address to mint once.
 
 In his implementation he even had the root upgradeable: https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/hardhat/contracts/Bufficorn.sol#L125
 

@@ -6,7 +6,7 @@ import axios from "axios";
 import { formatEther } from "@ethersproject/units";
 import { usePoller } from "eth-hooks";
 
-const BOOSTPERCENT = 5
+const BOOSTPERCENT = 0
 
 /*
 

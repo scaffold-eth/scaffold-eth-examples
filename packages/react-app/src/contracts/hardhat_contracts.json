@@ -5,7 +5,7 @@
       "chainId": "4",
       "contracts": {
         "GigaNFT": {
-          "address": "0xe7c808d38cE0B920EbdEf56ec9787075Fd179696",
+          "address": "0xEF758ae759028B1F31f6C5e159514C0008e2Fd3b",
           "abi": [
             {
               "inputs": [],
@@ -179,19 +179,6 @@
             {
               "inputs": [],
               "name": "currentSupply",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "curve",
               "outputs": [
                 {
                   "internalType": "uint256",
