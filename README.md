@@ -143,3 +143,24 @@ yarn watch
 ```
 
 This will check the tokenSupply every 15 seconds and run the reveal if needed.
+
+---
+
+# 🌳 Merkle Tree Allowlist
+
+Steps from Isaac for implementation:
+
+We'll assemble a json file full of addresses for the allowlist...
+
+That file comes in like this to generate a merkle root: https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/hardhat/test/bufficorn-test.ts#L6
+(Here is where the root is outputted: https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/hardhat/test/bufficorn-test.ts#L66)
+
+The smart contract will take a proof from the frontend and verify it: https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/hardhat/contracts/Bufficorn.sol#L246
+
+In his implementation he even had the root upgradeable: https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/hardhat/contracts/Bufficorn.sol#L125
+
+The allowlist will be included in the frontend like [this example](https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/react-app/src/mint/util.js#L5).
+
+In the frontend there is a getProof that is called before minting https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/react-app/src/App.jsx#L268
+
+Here is how to get the proof in the frontend: https://github.com/scaffold-eth/scaffold-eth/blob/bufficorn-buidl-brigade/packages/react-app/src/mint/util.js#L18
