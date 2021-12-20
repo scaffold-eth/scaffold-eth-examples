@@ -27,6 +27,7 @@ import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
 // import Hints from "./Hints";
 import { ExampleUI, Hints, Subgraph } from "./views";
+import Funding from "./views/Funding";
 
 const { ethers } = require("ethers");
 /*
@@ -49,7 +50,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -67,8 +68,8 @@ const scaffoldEthProvider = navigator.onLine
   : null;
 const poktMainnetProvider = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider(
-      "https://eth-mainnet.gateway.pokt.network/v1/lb/61853c567335c80036054a2b",
-    )
+    "https://eth-mainnet.gateway.pokt.network/v1/lb/61853c567335c80036054a2b",
+  )
   : null;
 const mainnetInfura = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider(`https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`)
@@ -166,8 +167,8 @@ function App(props) {
     poktMainnetProvider && poktMainnetProvider._isProvider
       ? poktMainnetProvider
       : scaffoldEthProvider && scaffoldEthProvider._network
-      ? scaffoldEthProvider
-      : mainnetInfura;
+        ? scaffoldEthProvider
+        : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
@@ -452,7 +453,7 @@ function App(props) {
               }}
               to="/"
             >
-              YourContract
+              Funding
             </Link>
           </Menu.Item>
           <Menu.Item key="/hints">
@@ -505,14 +506,19 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
-            <Contract
-              name="YourContract"
+            <Funding
+              name="RetroactiveFunding"
               price={price}
               signer={userSigner}
               provider={localProvider}
               address={address}
               blockExplorer={blockExplorer}
               contractConfig={contractConfig}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+              localProvider={localProvider}
+              injectedProvider={injectedProvider}
+              tx={tx}
             />
           </Route>
           <Route path="/hints">

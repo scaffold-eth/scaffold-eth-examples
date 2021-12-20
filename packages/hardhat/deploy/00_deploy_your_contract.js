@@ -3,18 +3,11 @@
 const { ethers } = require("hardhat");
 
 const localChainId = "31337";
+const targetAddress = "0x1e2Ce012b27d0c0d3e717e943EF6e62717CEc4ea";
 
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  const chainId = await getChainId();
-
-  await deploy("YourContract", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
 
   await deploy("RetroactiveFunding", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
@@ -23,9 +16,14 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     log: true,
   });
 
+  const TokenAsOwner = await ethers.getContract("RetroactiveFunding", deployer);
+  console.log("tokenAsOwner", TokenAsOwner);
+  await TokenAsOwner.transfer(targetAddress, ethers.utils.parseEther("100"));
+
+  console.log("transfered tokens");
 
   // Getting a previously deployed contract
-  const YourContract = await ethers.getContract("YourContract", deployer);
+  // const YourContract = await ethers.getContract("YourContract", deployer);
   /*  await YourContract.setPurpose("Hello");
   
     To take ownership of yourContract using the ownable library uncomment next line and add the 
@@ -61,12 +59,12 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   // Verify your contracts with Etherscan
   // You don't want to verify on localhost
-  if (chainId !== localChainId) {
-    await run("verify:verify", {
-      address: YourContract.address,
-      contract: "contracts/YourContract.sol:YourContract",
-      contractArguments: [],
-    });
-  }
+  // if (chainId !== localChainId) {
+  //   await run("verify:verify", {
+  //     address: YourContract.address,
+  //     contract: "contracts/YourContract.sol:YourContract",
+  //     contractArguments: [],
+  //   });
+  // }
 };
 module.exports.tags = ["YourContract", "RetroactiveFunding"];
