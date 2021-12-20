@@ -5,11 +5,12 @@ pragma solidity >=0.8.0 <0.9.0;
 //import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 //learn more: https://docs.openzeppelin.com/contracts/3.x/erc721
 // GET LISTED ON OPENSEA: https://testnets.opensea.io/get-listed/step-two
 
-contract GigaNFT is ERC721Enumerable {
+contract GigaNFT is Ownable, ERC721Enumerable  {
 
     address payable public constant recipient =
         payable(0x34aA3F359A9D614239015126635CE7732c18fDF3); // we still need to edit this // it needs to be a multisig where funds stream
@@ -84,20 +85,19 @@ contract GigaNFT is ERC721Enumerable {
     }
 
     // 👮‍♀️ a single account can update the flexibleBaseURI
+    //address public baseURIOwner = 0x34aA3F359A9D614239015126635CE7732c18fDF3; //austingriffith.eth
 
-    address public baseURIOwner = 0x34aA3F359A9D614239015126635CE7732c18fDF3; //austingriffith.eth
-
-    function setBaseURI(string memory newURI) public {
-      require(msg.sender==baseURIOwner,"must be baseURIOwner");
+    function setBaseURI(string memory newURI) public onlyOwner {
+      //require(msg.sender==baseURIOwner,"must be baseURIOwner");
       flexibleBaseURI=newURI;
     }
 
     // 🔥 after you setBaseURI() to the IPFS folder, changeUriOwner() to the 0 address to lock
 
-    function changeUriOwner(address newOwner) public {
-      require(msg.sender==baseURIOwner,"must be baseURIOwner");
-      baseURIOwner=newOwner;
-    }
+    //function changeUriOwner(address newOwner) public {
+    //  require(msg.sender==baseURIOwner,"must be baseURIOwner");
+    //  baseURIOwner=newOwner;
+    //}
 
     // 🖼 so all the pictures have to go up to get the final address
     // 🧑‍🏭 instead we will use S3 and a script to reveal them...

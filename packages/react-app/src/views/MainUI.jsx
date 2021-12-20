@@ -50,6 +50,7 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
       items: [],
     });
     const balance = (await readContracts.GigaNFT.balanceOf(address)).toNumber();
+    console.log("YOUR BALANCE:",balance)
     const tokensPromises = [];
     for (let i = 0; i < balance; i += 1) {
       tokensPromises.push(getTokenURI(address, i));

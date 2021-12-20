@@ -14,13 +14,15 @@ const TARGETBUCKET = "giganftassetrevealtwo"
 
 const EXTERNAL_URL = "https://giga-nft-external-second.surge.sh"
 
+const UPLOAD_ASSETS_TO_IPFS = true; //make sure all the metadata is right!!! (like external urls etc!!!!)
+
 const USE_INFURA = false;
 
 const delayMS = 60;
 
 const TOKEN_LIMIT = 15;
 
-const HARD_REVEAL_LIMIT = 10;
+const HARD_REVEAL_LIMIT = 15;
 
 const main = async () => {
 
@@ -77,6 +79,7 @@ const main = async () => {
   let count = 0;
 
   let imageArray = []
+  let jsonArray = []
 
   for (let id=1;id<=TOKEN_LIMIT;id++) {
     //console.log("#",id)
@@ -89,6 +92,8 @@ const main = async () => {
       path: id+'.png',
       content: imageContent
     };
+
+
 
     // learning how to add to IPFS without actually adding... just getting the hash...
     //const imageHashResult = await ipfs.add(imageContent,{onlyHash: true})
@@ -123,6 +128,7 @@ const main = async () => {
     }
 
 
+
     /*
     const osMetaDataFile = assetDirectory+"/"+files[f].replace(".png"," - OS metadata.json")
     //console.log("osMetaDataFile",osMetaDataFile)
@@ -148,10 +154,34 @@ const main = async () => {
     await sleep(delayMS);
   }
 
-  console.log("uploading into an ipfs folder..."/*,imageArray*/)
-  let added = await ipfs.add(imageArray, { wrapWithDirectory: true, onlyHash: true })
-  console.log("added:",added)
 
+  if(UPLOAD_ASSETS_TO_IPFS){
+    console.log("uploading images into an ipfs folder..."/*,imageArray*/)
+    let added = await ipfs.add(imageArray, { wrapWithDirectory: true, onlyHash: !UPLOAD_ASSETS_TO_IPFS })
+    console.log("Here is the final IPFS folder for IMAGES:",added)
+
+    const imageIPFSfolder = added.cid.toString()
+
+    for (let id=1;id<=TOKEN_LIMIT;id++) {
+      const osMetaDataFile = assetDirectory+"/Metadata/Patchwork Kingdoms #"+id+" - metadata.json"
+      const metadataContent = await fs.readFileSync(osMetaDataFile)
+      let metadataObject = JSON.parse(metadataContent.toString())
+      metadataObject.image = "https://ipfs.io/ipfs/"+imageIPFSfolder+"/"+id+".png"
+      metadataObject.external_url = EXTERNAL_URL+"/"+id
+      //console.log("metadataObject",metadataObject)
+
+      jsonArray[id-1] = {
+        path: id+'.json',
+        content: JSON.stringify(metadataObject)
+      };
+    }
+
+    console.log("uploading metadata into an ipfs folder..."/*,imageArray*/)
+    let metadataAdded = await ipfs.add(jsonArray, { wrapWithDirectory: true, onlyHash: !UPLOAD_ASSETS_TO_IPFS })
+    console.log("Here is the final IPFS folder for METADATA:",metadataAdded)
+
+    console.log("You want to call setBaseUri to https://ipfs.io/ipfs/"+metadataAdded.cid.toString()+"/")
+  }
 
   console.log("Syncing with S3...")
   const BUCKETNAME = TARGETBUCKET;

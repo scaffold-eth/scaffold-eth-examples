@@ -140,6 +140,20 @@ This will check the tokenSupply every 15 seconds and run the reveal if needed.
 
 ---
 
+Once all tokens are minted, the upload script will also output the "final IPFS folder" hash.
+
+(There is a folder hash for all the images first, then a folder hash for the metadata.)
+
+For example: CID(Qmd8rNQp5eyHMTpJDykQh3Z8U9QvQKsKe5HAoHqLARUWMi)
+
+We will take this and call `setBaseUri()` with the value `https://ipfs.io/ipfs/Qmd8rNQp5eyHMTpJDykQh3Z8U9QvQKsKe5HAoHqLARUWMi/`
+
+(To go from https://giganftassetrevealtwo.s3.amazonaws.com/ to https://ipfs.io/ipfs/Qmd8rNQp5eyHMTpJDykQh3Z8U9QvQKsKe5HAoHqLARUWMi/)
+
+> Finally, you call changeUriOwner(0x00) to revoke the ownership and lock the baseURI. 
+
+---
+
 # 🌳 Merkle Tree Allowlist
 
 Steps from Isaac for implementation:
