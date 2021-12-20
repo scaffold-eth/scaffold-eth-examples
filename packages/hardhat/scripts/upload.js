@@ -10,6 +10,10 @@ const s3FolderUpload = require("s3-folder-upload");
 
 const TARGETNETWORK = "rinkeby"
 
+const TARGETBUCKET = "giganftassetrevealtwo"
+
+const EXTERNAL_URL = "https://giga-nft-external-second.surge.sh"
+
 const USE_INFURA = false;
 
 const delayMS = 60;
@@ -98,9 +102,9 @@ const main = async () => {
     //console.log("METADATA LOADED",metadataObject)
     //metadataObject.image = "https://ipfs.io/ipfs/"+imageHashResult.path
     //metadataObject.image = "http://localhost:3000/revealedassets/"+id+".png"
-    metadataObject.image = "https://giganftassetreveal.s3.amazonaws.com/"+id+".png"
+    metadataObject.image = "https://"+TARGETBUCKET+".s3.amazonaws.com/"+id+".png"
 
-    metadataObject.external_url = "http://giga-nft-external.surge.sh/"+id
+    metadataObject.external_url = EXTERNAL_URL+"/"+id
 
     //console.log("metadataObject",metadataObject)
     //const manifestHashResult = await ipfs.add(JSON.stringify(metadataObject),{onlyHash: true})
@@ -150,7 +154,7 @@ const main = async () => {
 
 
   console.log("Syncing with S3...")
-  const BUCKETNAME = "giganftassetreveal";
+  const BUCKETNAME = TARGETBUCKET;
 
   let credentials = {};
   try {
@@ -197,8 +201,10 @@ const main = async () => {
     }
   };
 
+  console.log("bucketParams",bucketParams)
   // Call S3 to create the bucket
   s3.createBucket(bucketParams, function(err, data) {
+    console.log("RESULT",err,data)
     if (err) {
       console.log("Error", err);
     } else {
@@ -220,6 +226,7 @@ const main = async () => {
       });
     }
   });
+
 
   //const { deployer } = await getNamedAccounts();
   //const yourCollectible = await ethers.getContract("YourCollectible", deployer);

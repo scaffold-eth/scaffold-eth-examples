@@ -75,17 +75,20 @@ const MainUI = ({ loadWeb3Modal, address, tx, priceToMint, readContracts, writeC
             <h3 style={{ marginBottom: 25 }}>My collection: </h3>
             {collection.items.length === 0 && <p>Your collection is empty</p>}
             {collection.items.length > 0 &&
-              collection.items.map(item => (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
-                  <div style={{padding:32}}>
-                    {item?<a href={OPENSEA_LINK+(readContracts&&readContracts.GigaNFT&&readContracts.GigaNFT.address)+"/"+item.id} target="_blank"><img
-                      style={{ maxWidth: "150px", display: "block", margin: "0 auto", marginBottom: "20px" }}
-                      src={item.image}
-                      alt="GigaNFT"
-                    /></a>:"🎁 Not Revealed Yet"}
+              collection.items.map(item => {
+                console.log("ITEM",item)
+                return (
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
+                    <div style={{padding:32}}>
+                      {item?<a href={OPENSEA_LINK+(readContracts&&readContracts.GigaNFT&&readContracts.GigaNFT.address)+"/"+item.id} target="_blank"><img
+                        style={{ maxWidth: "150px", display: "block", margin: "0 auto", marginBottom: "20px" }}
+                        src={item.image}
+                        alt="GigaNFT"
+                      /></a>:"🎁 Not Revealed Yet"}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
           </div>
 
           <Button

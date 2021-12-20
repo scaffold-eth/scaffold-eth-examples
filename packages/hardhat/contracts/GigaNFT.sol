@@ -77,7 +77,7 @@ contract GigaNFT is ERC721Enumerable {
 
     */
 
-    string public flexibleBaseURI = "https://giganftassetreveal.s3.amazonaws.com/";
+    string public flexibleBaseURI = "https://giganftassetrevealtwo.s3.amazonaws.com/";
 
     function _baseURI() internal view virtual override returns (string memory) {
         return flexibleBaseURI;

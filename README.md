@@ -10,17 +10,13 @@
 
 ---
 
-## Live on [Rinkeby]
+## Live on [Rinkeby] (second iteration of metadata)
 
 A 1/15 (instead of 1/1000) test contract is deployed to `Rinkeby` so we can test the reveal mechanics.
 
-The prototype contract on `Rinkeby` is https://rinkeby.etherscan.io/address/0xe7c808d38cE0B920EbdEf56ec9787075Fd179696#code
+The second `Rinkeby` contract is https://rinkeby.etherscan.io/address/0xE4dC3B031E5Bc74ff9477A20137A950b684A0e94#code
 
-This will also allow us to dial in the last bits of metadata.
-
-Here is token #1 on Rinkeby OpenSea: https://testnets.opensea.io/assets/0xe7c808d38cE0B920EbdEf56ec9787075Fd179696/1
-
-Use the frontend to mint 1 of the 15 testnet NFTs: https://giga-nft-external.surge.sh
+Use the frontend to mint 1 of the 15 testnet NFTs: https://giga-nft-external-second.surge.sh/
 
 ---
 

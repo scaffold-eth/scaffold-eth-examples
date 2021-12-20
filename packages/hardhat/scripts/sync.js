@@ -13,7 +13,7 @@ const revealFolder = "../react-app/public/revealedassets"
 
 
     console.log("Syncing with S3...")
-    const BUCKETNAME = "giganftassetreveal";
+    const TARGETBUCKET = "giganftassetrevealtwo"
 
     let credentials = {};
     try {
@@ -25,6 +25,9 @@ const revealFolder = "../react-app/public/revealedassets"
       );
       process.exit(1);
     }
+
+
+    const BUCKETNAME = TARGETBUCKET;
 
     credentials.bucket = BUCKETNAME;
 
