@@ -814,6 +814,14 @@ contract RetroactiveFunding is ERC20 {
         return uint(sqrtPriceX96) * (uint(sqrtPriceX96)) * (1e18) >> (96 * 2);
     }
 
+    function getToken0() external view returns (address) {
+        return IUniswapV3Pool(pool).token0();
+    }
+
+    function getToken1() external view returns (address) {
+        return IUniswapV3Pool(pool).token1();
+    }
+
 
 
     /**
