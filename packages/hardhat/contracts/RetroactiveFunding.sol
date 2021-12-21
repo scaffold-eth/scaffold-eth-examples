@@ -734,6 +734,21 @@ interface IUniswapV3Pool {
     function token0() external view returns(address);
 
     function token1() external view returns(address);
+
+    function liquidity() external view returns(uint128);
+
+    function slot0()
+        external
+        view
+        returns (
+            uint160 sqrtPriceX96,
+            int24 tick,
+            uint16 observationIndex,
+            uint16 observationCardinality,
+            uint16 observationCardinalityNext,
+            uint8 feeProtocol,
+            bool unlocked
+        );
 }
 
 interface IUniswapV3Factory {
@@ -781,6 +796,27 @@ contract RetroactiveFunding is ERC20 {
     }
 
     /**
+     * @notice Gets pool liquidity
+     */
+    function getLiquidity() public view returns (uint128) {
+        return IUniswapV3Pool(pool).liquidity();
+    }
+
+    /**
+     * @notice Gets pool price as token 0 / token 1 i.e defines how many token0 you get per token 1
+     */
+    function getPrice()
+        external
+        view
+        returns (uint256 price)
+    {
+        (uint160 sqrtPriceX96,,,,,,) =  IUniswapV3Pool(pool).slot0();
+        return uint(sqrtPriceX96) * (uint(sqrtPriceX96)) * (1e18) >> (96 * 2);
+    }
+
+
+
+    /**
      * @notice Gets sq root of a number
      * @param x no to get the sq root of
      */
@@ -797,18 +833,28 @@ contract RetroactiveFunding is ERC20 {
      * @notice Called by a whale who adds liquidity, the same amount of lp tokens are minted to the contract & added tot he pool
      */
     function fundProject() external payable {
-        _mint(address(this), msg.value);
-        TransferHelper.safeApprove(address(this), address(positionManager),  msg.value);
+        _mint(address(this), msg.value / 2);
+        TransferHelper.safeApprove(address(this), address(positionManager),  msg.value / 2);
 
         // add eth liquidity from whale and token liquidity from contract
         // checks if the position has been minted, if not mint it else adds more liquidity
+        uint amount0;
+        uint amount1;
+        if (IUniswapV3Pool(pool).token0() == address(this)) {
+            amount0 = msg.value / 2;
+            amount1 = msg.value;
+        } else {
+            amount1 = msg.value / 2;
+            amount0 = msg.value;
+        }
+
         if (positionManager.balanceOf(address(this)) > 0) {
             // increase liquidity
             INonfungiblePositionManager.IncreaseLiquidityParams memory params =
             INonfungiblePositionManager.IncreaseLiquidityParams({
                     tokenId: tokenId,
-                    amount0Desired: msg.value,
-                    amount1Desired: msg.value,
+                    amount0Desired: amount0,
+                    amount1Desired: amount1,
                     amount0Min: 0,
                     amount1Min: 0,
                     deadline: block.timestamp + 1000
@@ -824,8 +870,8 @@ contract RetroactiveFunding is ERC20 {
                     // full range of ticks is considered currently
                     tickLower: -887200,
                     tickUpper: 887200,
-                    amount0Desired: msg.value,
-                    amount1Desired: msg.value,
+                    amount0Desired: amount0,
+                    amount1Desired: amount1,
                     amount0Min: 0,
                     amount1Min: 0,
                     recipient: address(this),
@@ -863,3 +909,4 @@ contract RetroactiveFunding is ERC20 {
         require(success, "sending eth failed");
     }
 }
+
