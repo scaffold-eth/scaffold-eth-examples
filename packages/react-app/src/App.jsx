@@ -519,6 +519,7 @@ function App(props) {
               localProvider={localProvider}
               injectedProvider={injectedProvider}
               tx={tx}
+              targetNetwork={targetNetwork}
             />
           </Route>
           <Route path="/hints">
