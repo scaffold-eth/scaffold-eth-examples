@@ -31,7 +31,7 @@ git clone https://github.com/austintgriffith/scaffold-eth.git simple-proposal-DA
 
 cd simple-proposal-DAO-re-entrancy-ex
 
-git checkout simple-proposal-DAO-re-entrancy-ex
+git checkout simple-DAO-proposals
 ```
 
 > install and start your 👷‍ Hardhat chain:
