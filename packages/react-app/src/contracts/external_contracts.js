@@ -786,6 +786,7 @@ const DAIABI = [
 
 // Mainnet DAI, Optimism and Arbitrium Rollup Contracts with local addresses
 module.exports = {
+  erc20: ERC20ABI,
   1: {
     contracts: {
       DAI: {
@@ -794,6 +795,14 @@ module.exports = {
       },
       UNI: {
         address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        abi: ERC20ABI,
+      },
+    },
+  },
+  4: {
+    contracts: {
+      WETH: {
+        address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
         abi: ERC20ABI,
       },
     },
