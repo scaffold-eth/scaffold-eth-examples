@@ -799,4 +799,12 @@ module.exports = {
       },
     },
   },
+  4: {
+    contracts: {
+      WETH: {
+        address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+        abi: ERC20ABI,
+      },
+    },
+  },
 };

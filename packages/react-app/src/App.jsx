@@ -27,7 +27,8 @@ import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
 // import Hints from "./Hints";
 import { ExampleUI, Hints, Subgraph } from "./views";
-import Funding from "./views/Funding";
+import WhaleUI from "./views/WhaleUI";
+import ProjectOwnerUI from "./views/ProjectOwnerUI";
 
 const { ethers } = require("ethers");
 /*
@@ -453,10 +454,20 @@ function App(props) {
               }}
               to="/"
             >
-              Funding
+              Whales UI
             </Link>
           </Menu.Item>
-          <Menu.Item key="/hints">
+          <Menu.Item key="/owner">
+            <Link
+              onClick={() => {
+                setRoute("/owner");
+              }}
+              to="/owner"
+            >
+              Project Owner
+            </Link>
+          </Menu.Item>
+          {/* <Menu.Item key="/hints">
             <Link
               onClick={() => {
                 setRoute("/hints");
@@ -495,7 +506,7 @@ function App(props) {
             >
               Subgraph
             </Link>
-          </Menu.Item>
+          </Menu.Item> */}
         </Menu>
 
         <Switch>
@@ -506,7 +517,30 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
-            <Funding
+            <WhaleUI
+              name="RetroactiveFunding"
+              price={price}
+              signer={userSigner}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+              localProvider={localProvider}
+              injectedProvider={injectedProvider}
+              tx={tx}
+              targetNetwork={targetNetwork}
+            />
+          </Route>
+          <Route exact path="/owner">
+            {/*
+                🎛 this scaffolding is full of commonly used components
+                this <Contract/> component will automatically parse your ABI
+                and give you a form to interact with it locally
+            */}
+
+            <ProjectOwnerUI
               name="RetroactiveFunding"
               price={price}
               signer={userSigner}
