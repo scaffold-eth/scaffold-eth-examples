@@ -1,96 +1,60 @@
-# 🏗 Scaffold-ETH
+# 🏗 scaffold-eth - Retroactive Funding for ERC20's
 
-> everything you need to build on Ethereum! 🚀
+> Fund different ERC20 based public goods with help of Uniswap V3 by providing liquidity to the token-weth pool
 
-🧪 Quickly experiment with Solidity using a frontend that adapts to your smart contract:
+## 🏃‍♀️ Quick Start
 
-![image](https://user-images.githubusercontent.com/2653167/124158108-c14ca380-da56-11eb-967e-69cde37ca8eb.png)
+required: [Node](https://nodejs.org/dist/latest-v12.x/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
 
 
-# 🏄‍♂️ Quick Start
-
-Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
-
-> clone/fork 🏗 scaffold-eth:
-
-```bash
-git clone https://github.com/austintgriffith/scaffold-eth.git
+1. Clone the repo first
+```sh
+git clone -b erc20-retroactive-funding https://github.com/scaffold-eth/scaffold-eth-examples.git erc20-retroactive-funding
+cd erc20-retroactive-funding
 ```
 
-> install and start your 👷‍ Hardhat chain:
-
+2. Install dependencies
 ```bash
-cd scaffold-eth
 yarn install
-yarn chain
 ```
 
-> in a second terminal window, start your 📱 frontend:
 
+3. Deploy Contracts
+```sh
+yarn deploy (default deployment network is rinkeby)
+```
+
+4. Start React frontend
 ```bash
-cd scaffold-eth
 yarn start
 ```
 
-> in a third terminal window, 🛰 deploy your contract:
+## Introduction
 
-```bash
-cd scaffold-eth
-yarn deploy
-```
+There are two types of entities involved to start with the **Whales/Funders** for public goods and the **Holders** of the public goods which are **ERC20's.**
 
-🔏 Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
+- Since the build works with Uniswap V3 Integration so each project holder will have to deploy their own contract.
 
-📝 Edit your frontend `App.jsx` in `packages/react-app/src`
+- When the project holder deploys the contract they are minted some project tokens along and the pool is created on uniswap in the [constructor](https://github.com/scaffold-eth/scaffold-eth-examples/blob/erc20-retroactive-funding/packages/hardhat/contracts/RetroactiveFunding.sol#L783).
 
-💼 Edit your deployment scripts in `packages/hardhat/deploy`
+- Once the pool is created any Whale/Non-Whale can send a specific ETH amount to the contract and the same amount of project tokens are minted and based on whether the [pool position has been minted or not](https://github.com/scaffold-eth/scaffold-eth-examples/blob/erc20-retroactive-funding/packages/hardhat/contracts/RetroactiveFunding.sol#L854), liquidity is increased or a new liquidity position is minted.
 
-📱 Open http://localhost:3000 to see the app
+- As liquidity keeps getting added the project holder can monitor the price on the UI and if they feel it beneficial to swap their tokens they can easily do so and get weth in exchange.
 
-# 📚 Documentation
+So that's the overall architecture currently for this build and this process keeps continuing.
 
-Documentation, tutorials, challenges, and many more resources, visit: [docs.scaffoldeth.io](https://docs.scaffoldeth.io)
+## UI
 
-# 🔭 Learning Solidity
+The first screen allows the whales to fund the project with any amount of ETH they choose to
 
-📕 Read the docs: https://docs.soliditylang.org
+<img width="1159" alt="Screenshot 2021-12-24 at 10 16 20 AM" src="https://user-images.githubusercontent.com/26670962/147322282-063337f6-699e-4b66-a03b-26b298f135ce.png">
 
-📚 Go through each topic from [solidity by example](https://solidity-by-example.org) editing `YourContract.sol` in **🏗 scaffold-eth**
+The second screen is intended for the project token holders to sell their tokens for WETH.
 
-- [Primitive Data Types](https://solidity-by-example.org/primitives/)
-- [Mappings](https://solidity-by-example.org/mapping/)
-- [Structs](https://solidity-by-example.org/structs/)
-- [Modifiers](https://solidity-by-example.org/function-modifier/)
-- [Events](https://solidity-by-example.org/events/)
-- [Inheritance](https://solidity-by-example.org/inheritance/)
-- [Payable](https://solidity-by-example.org/payable/)
-- [Fallback](https://solidity-by-example.org/fallback/)
+<img width="1208" alt="Screenshot 2021-12-24 at 10 16 15 AM" src="https://user-images.githubusercontent.com/26670962/147322554-82377a3c-0429-492c-8078-4d35ec3cbb7e.png">
 
-📧 Learn the [Solidity globals and units](https://solidity.readthedocs.io/en/v0.6.6/units-and-global-variables.html)
+## Contact
 
-# 🛠 Buidl
-
-Check out all the [active branches](https://github.com/austintgriffith/scaffold-eth/branches/active), [open issues](https://github.com/austintgriffith/scaffold-eth/issues), and join/fund the 🏰 [BuidlGuidl](https://BuidlGuidl.com)!
-
-  
- - 🚤  [Follow the full Ethereum Speed Run](https://medium.com/@austin_48503/%EF%B8%8Fethereum-dev-speed-run-bd72bcba6a4c)
+Join the [telegram support chat 💬](https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA) to ask questions and find others building with 🏗 scaffold-eth!
 
 
- - 🎟  [Create your first NFT](https://github.com/austintgriffith/scaffold-eth/tree/simple-nft-example)
- - 🥩  [Build a staking smart contract](https://github.com/austintgriffith/scaffold-eth/tree/challenge-1-decentralized-staking)
- - 🏵  [Deploy a token and vendor](https://github.com/austintgriffith/scaffold-eth/tree/challenge-2-token-vendor)
- - 🎫  [Extend the NFT example to make a "buyer mints" marketplace](https://github.com/austintgriffith/scaffold-eth/tree/buyer-mints-nft)
- - 🎲  [Learn about commit/reveal](https://github.com/austintgriffith/scaffold-eth/tree/commit-reveal-with-frontend)
- - ✍️  [Learn how ecrecover works](https://github.com/austintgriffith/scaffold-eth/tree/signature-recover)
- - 👩‍👩‍👧‍👧  [Build a multi-sig that uses off-chain signatures](https://github.com/austintgriffith/scaffold-eth/tree/meta-multi-sig)
- - ⏳  [Extend the multi-sig to stream ETH](https://github.com/austintgriffith/scaffold-eth/tree/streaming-meta-multi-sig)
- - ⚖️  [Learn how a simple DEX works](https://medium.com/@austin_48503/%EF%B8%8F-minimum-viable-exchange-d84f30bd0c90)
- - 🦍  [Ape into learning!](https://github.com/austintgriffith/scaffold-eth/tree/aave-ape)
-
-# 💬 Support Chat
-
-Join the telegram [support chat 💬](https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA) to ask questions and find others building with 🏗 scaffold-eth!
-
----
-
-🙏 Please check out our [Gitcoin grant](https://gitcoin.co/grants/2851/scaffold-eth) too!
