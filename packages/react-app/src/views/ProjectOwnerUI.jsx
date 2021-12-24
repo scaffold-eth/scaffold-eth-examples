@@ -68,11 +68,11 @@ const ProjectOwnerUI = ({ readContracts, writeContracts, localProvider, targetNe
         </a>
       </p>
       <p style={{ margin: 0 }}>
-        <b>Liquidity:</b> {liquidityFormatted.substring(0, 7)} ETH
+        <b>Pool Liquidity:</b> {liquidityFormatted.substring(0, 7)}
       </p>
       <p style={{ margin: 0 }}>
         <b>
-          {tokens[0]}/{tokens[1]}:
+          {tokens[0]} / {tokens[1]}:
         </b>{" "}
         {liquidity && liquidity.gt(0) ? uniswapPriceFormatted.substring(0, 12) : "No liquidity in the pool"}
       </p>
@@ -95,7 +95,7 @@ const ProjectOwnerUI = ({ readContracts, writeContracts, localProvider, targetNe
       </p>
       <div style={{ paddingTop: 10, paddingBottom: 20 }}>
         <p>
-          <b>Project owner form</b>
+          <b>Sell Token</b>
         </p>
         <Input
           type="number"

@@ -3,7 +3,7 @@
 const { ethers } = require("hardhat");
 
 const localChainId = "31337";
-const targetAddress = "0x1e2Ce012b27d0c0d3e717e943EF6e62717CEc4ea";
+const targetAddress = "0xf88b0247e611eE5af8Cf98f5303769Cba8e7177C";
 
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deploy } = deployments;

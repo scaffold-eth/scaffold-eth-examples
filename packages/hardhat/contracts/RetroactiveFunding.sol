@@ -780,7 +780,7 @@ contract RetroactiveFunding is ERC20 {
     INonfungiblePositionManager constant positionManager = INonfungiblePositionManager(0xC36442b4a4522E871399CD717aBDD847Ab11FE88);
     ISwapRouter constant swapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
 
-    constructor() ERC20("my", "my") {
+    constructor() ERC20("RetroPGF", "RetroPGF") {
         _mint(msg.sender, mintAmount);
         pool = factory.createPool(address(this), weth, fee);
         // initialize pool
@@ -814,10 +814,16 @@ contract RetroactiveFunding is ERC20 {
         return uint(sqrtPriceX96) * (uint(sqrtPriceX96)) * (1e18) >> (96 * 2);
     }
 
+    /**
+     * @notice Returns Token 0 Address
+     */
     function getToken0() external view returns (address) {
         return IUniswapV3Pool(pool).token0();
     }
 
+    /**
+     * @notice Returns Token 1 Address
+     */
     function getToken1() external view returns (address) {
         return IUniswapV3Pool(pool).token1();
     }
@@ -839,30 +845,19 @@ contract RetroactiveFunding is ERC20 {
 
     /**
      * @notice Called by a whale who adds liquidity, the same amount of lp tokens are minted to the contract & added tot he pool
+     * currently equal propotions of token and eth are added to the pool
      */
     function fundProject() external payable {
-        _mint(address(this), msg.value / 2);
-        TransferHelper.safeApprove(address(this), address(positionManager),  msg.value / 2);
-
-        // add eth liquidity from whale and token liquidity from contract
-        // checks if the position has been minted, if not mint it else adds more liquidity
-        uint amount0;
-        uint amount1;
-        if (IUniswapV3Pool(pool).token0() == address(this)) {
-            amount0 = msg.value / 2;
-            amount1 = msg.value;
-        } else {
-            amount1 = msg.value / 2;
-            amount0 = msg.value;
-        }
+        _mint(address(this), msg.value);
+        TransferHelper.safeApprove(address(this), address(positionManager),  msg.value);
 
         if (positionManager.balanceOf(address(this)) > 0) {
             // increase liquidity
             INonfungiblePositionManager.IncreaseLiquidityParams memory params =
             INonfungiblePositionManager.IncreaseLiquidityParams({
                     tokenId: tokenId,
-                    amount0Desired: amount0,
-                    amount1Desired: amount1,
+                    amount0Desired: msg.value,
+                    amount1Desired: msg.value,
                     amount0Min: 0,
                     amount1Min: 0,
                     deadline: block.timestamp + 1000
@@ -878,8 +873,8 @@ contract RetroactiveFunding is ERC20 {
                     // full range of ticks is considered currently
                     tickLower: -887200,
                     tickUpper: 887200,
-                    amount0Desired: amount0,
-                    amount1Desired: amount1,
+                    amount0Desired: msg.value,
+                    amount1Desired: msg.value,
                     amount0Min: 0,
                     amount1Min: 0,
                     recipient: address(this),

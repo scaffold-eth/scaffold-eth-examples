@@ -59,11 +59,11 @@ const WhaleUI = ({ readContracts, writeContracts, localProvider, targetNetwork, 
         </a>
       </p>
       <p style={{ margin: 0 }}>
-        <b>Liquidity:</b> {liquidityFormatted.substring(0, 7)} ETH
+        <b>Pool Liquidity:</b> {liquidityFormatted.substring(0, 7)}
       </p>
       <p style={{ margin: 0 }}>
         <b>
-          {tokens[0]}/{tokens[1]}:
+          {tokens[0]} / {tokens[1]}:
         </b>{" "}
         {liquidity && liquidity.gt(0) ? uniswapPriceFormatted.substring(0, 12) : "No liquidity in the pool"}
       </p>
@@ -86,7 +86,7 @@ const WhaleUI = ({ readContracts, writeContracts, localProvider, targetNetwork, 
       </p>
       <div style={{ paddingTop: 15, paddingBottom: 15 }}>
         <p>
-          <b>Whale Form</b>
+          <b>Fund Project</b>
         </p>
         <Input
           type="number"
