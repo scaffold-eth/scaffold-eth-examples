@@ -26,4 +26,4 @@ template proveInTree(nLevels) {
   tree.fnc <== 0;
 }
 
-component main = proveInTree(3);
+component main = proveInTree(4);

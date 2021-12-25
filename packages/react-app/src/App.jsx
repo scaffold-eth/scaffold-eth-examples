@@ -373,7 +373,7 @@ function App(props) {
                       key: 0,
                       secret: 0,
                       nullifier: 0,
-                      siblings: new Array(3).fill("0")
+                      siblings: new Array(4).fill("0")
                     }
                   }
                   wasm={proveInTreeWasm}

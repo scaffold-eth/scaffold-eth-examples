@@ -110,7 +110,7 @@ export default function MembershipUI({
       key: memberKey,
       secret: memberSecret,
       nullifier: memberNullifier,
-      siblings: new Array(nLevels).fill(BigInt(0))
+      siblings: new Array(nLevels + 1).fill(BigInt(0))
     };
 
     const res = await calcedSMT.find(memberKey);
