@@ -71,6 +71,14 @@ The frontend is powered by the `ZkpInterface` component. It needs to be fed a fe
 - `vkey`: (optional) A verification key used to verify the the generated proof. If this is not provided the interface will generate one for you.
 - `scVerifyFunc`: The verification function from our smart contract verifier.
 
+# 💌 P.S.
+
+🌍 You need an RPC key for production deployments/Apps, create an [Alchemy](https://www.alchemy.com/) account and replace the value of `ALCHEMY_KEY = xxx` in `packages/react-app/src/constants.js`
+
+### Automated with Gitpod
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/scaffold-eth/scaffold-eth)****
+
 # 💬 Support Chat
 
 Join the telegram [support chat 💬](https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA) to ask questions and find others building with 🏗 scaffold-eth!

@@ -31,7 +31,7 @@ import { useLookupAddress } from "eth-hooks/dapps/ens";
 
 const { Text } = Typography;
 
-const blockExplorerLink = (address, blockExplorer) => blockExplorer || `https://etherscan.io/address/${address}`;
+const blockExplorerLink = (address, blockExplorer) => `${blockExplorer || "https://etherscan.io/"}address/${address}`;
 
 export default function Address(props) {
   const { currentTheme } = useThemeSwitcher();
@@ -40,7 +40,7 @@ export default function Address(props) {
   const ensSplit = ens && ens.split(".");
   const validEnsCheck = ensSplit && ensSplit[ensSplit.length - 1] === "eth";
   const etherscanLink = blockExplorerLink(address, props.blockExplorer);
-  let displayAddress = address?.substr(0, 6);
+  let displayAddress = address?.substr(0, 5) + "..." + address?.substr(-4);
 
   if (validEnsCheck) {
     displayAddress = ens;

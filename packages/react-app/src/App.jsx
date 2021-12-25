@@ -10,7 +10,7 @@ import {
 } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import React, { useCallback, useEffect, useState } from "react";
-import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
+import { Link, Route, Switch, useLocation } from "react-router-dom";
 import "./App.css";
 import {
   Account,
@@ -22,6 +22,7 @@ import {
   ThemeSwitch,
   NetworkDisplay,
   FaucetHint,
+  NetworkSwitch,
   SmtInterface,
   ZkpInterface,
   PoseidonInterface,
@@ -53,7 +54,7 @@ const proveInTreeZkey = `${process.env.PUBLIC_URL}/circuits/proveInTree.zkey`;
     https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA
     or DM @austingriffith on twitter or telegram
 
-    You should get your own Infura.io ID and put it in `constants.js`
+    You should get your own Alchemy.com & Infura.io ID and put it in `constants.js`
     (this is your connection to the main Ethereum network for ENS etc.)
 
 
@@ -63,17 +64,13 @@ const proveInTreeZkey = `${process.env.PUBLIC_URL}/circuits/proveInTree.zkey`;
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
 const NETWORKCHECK = true;
-
-// 🛰 providers
-if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
-
-// 🔭 block explorer URL
-const blockExplorer = targetNetwork.blockExplorer;
+const USE_BURNER_WALLET = true; // toggle burner wallet feature
+const USE_NETWORK_SELECTOR = false;
 
 const web3Modal = Web3ModalSetup();
 
@@ -85,16 +82,30 @@ const providers = [
 ];
 
 function App(props) {
+  // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
+  // reference './constants.js' for other networks
+  const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
+
   const [injectedProvider, setInjectedProvider] = useState();
-  const [faucetClicked, setFaucetClicked] = useState(false);
-  const [route, setRoute] = useState();
   const [address, setAddress] = useState();
+  const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
+  const location = useLocation();
+
+  const targetNetwork = NETWORKS[selectedNetwork];
+
+  // 🔭 block explorer URL
+  const blockExplorer = targetNetwork.blockExplorer;
 
   // load all your providers
   const localProvider = useStaticJsonRPC([
     process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : targetNetwork.rpcUrl,
   ]);
   const mainnetProvider = useStaticJsonRPC(providers);
+
+  if (DEBUG) console.log(`Using ${selectedNetwork} network`);
+
+  // 🛰 providers
+  if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -112,7 +123,7 @@ function App(props) {
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice(targetNetwork, "fast");
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
-  const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider);
+  const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider, USE_BURNER_WALLET);
   const userSigner = userProviderAndSigner.signer;
 
   useEffect(() => {
@@ -239,10 +250,6 @@ function App(props) {
     }
   }, [loadWeb3Modal]);
 
-  useEffect(() => {
-    setRoute(window.location.pathname);
-  }, [setRoute]);
-
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
   return (
@@ -254,70 +261,29 @@ function App(props) {
         localChainId={localChainId}
         selectedChainId={selectedChainId}
         targetNetwork={targetNetwork}
+        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
       />
-      <BrowserRouter>
-        <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
-          <Menu.Item key="/">
-            <Link
-              onClick={() => {
-                setRoute("/");
-              }}
-              to="/"
-            >
-              App Home
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/debug">
-            <Link
-              onClick={() => {
-                setRoute("/debug");
-              }}
-              to="/debug"
-            >
-              Debug Contracts
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/hints">
-            <Link
-              onClick={() => {
-                setRoute("/hints");
-              }}
-              to="/hints"
-            >
-              Hints
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/exampleui">
-            <Link
-              onClick={() => {
-                setRoute("/exampleui");
-              }}
-              to="/exampleui"
-            >
-              ExampleUI
-            </Link>
-          </Menu.Item>
-          {/*<Menu.Item key="/mainnetdai">
-            <Link
-              onClick={() => {
-                setRoute("/mainnetdai");
-              }}
-              to="/mainnetdai"
-            >
-              Mainnet DAI
-            </Link>
-          </Menu.Item>*/}
-          <Menu.Item key="/subgraph">
-            <Link
-              onClick={() => {
-                setRoute("/subgraph");
-              }}
-              to="/subgraph"
-            >
-              Subgraph
-            </Link>
-          </Menu.Item>
-        </Menu>
+      <Menu style={{ textAlign: "center", marginTop: 40 }} selectedKeys={[location.pathname]} mode="horizontal">
+        <Menu.Item key="/">
+          <Link to="/">App Home</Link>
+        </Menu.Item>
+        <Menu.Item key="/debug">
+          <Link to="/debug">Debug Contracts</Link>
+        </Menu.Item>
+        <Menu.Item key="/hints">
+          <Link to="/hints">Hints</Link>
+        </Menu.Item>
+        <Menu.Item key="/exampleui">
+          <Link to="/exampleui">ExampleUI</Link>
+        </Menu.Item>
+        <Menu.Item key="/mainnetdai">
+          <Link to="/mainnetdai">Mainnet DAI</Link>
+        </Menu.Item>
+        <Menu.Item key="/subgraph">
+          <Link to="/subgraph">Subgraph</Link>
+        </Menu.Item>
+      </Menu>
 
         <Switch>
           <Route exact path="/">
@@ -442,34 +408,47 @@ function App(props) {
               config={contractsConfig}
             />
             */}
-          </Route>
-          <Route path="/subgraph">
-            <Subgraph
-              subgraphUri={props.subgraphUri}
-              tx={tx}
-              writeContracts={writeContracts}
-              mainnetProvider={mainnetProvider}
-            />
-          </Route>
-        </Switch>
-      </BrowserRouter>
+        </Route>
+        <Route path="/subgraph">
+          <Subgraph
+            subgraphUri={props.subgraphUri}
+            tx={tx}
+            writeContracts={writeContracts}
+            mainnetProvider={mainnetProvider}
+          />
+        </Route>
+      </Switch>
 
       <ThemeSwitch />
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
-        <Account
-          address={address}
-          localProvider={localProvider}
-          userSigner={userSigner}
-          mainnetProvider={mainnetProvider}
-          price={price}
-          web3Modal={web3Modal}
-          loadWeb3Modal={loadWeb3Modal}
-          logoutOfWeb3Modal={logoutOfWeb3Modal}
-          blockExplorer={blockExplorer}
-        />
-        <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
+        <div style={{ display: "flex", flex: 1, alignItems: "center" }}>
+          {USE_NETWORK_SELECTOR && (
+            <div style={{ marginRight: 20 }}>
+              <NetworkSwitch
+                networkOptions={networkOptions}
+                selectedNetwork={selectedNetwork}
+                setSelectedNetwork={setSelectedNetwork}
+              />
+            </div>
+          )}
+          <Account
+            useBurner={USE_BURNER_WALLET}
+            address={address}
+            localProvider={localProvider}
+            userSigner={userSigner}
+            mainnetProvider={mainnetProvider}
+            price={price}
+            web3Modal={web3Modal}
+            loadWeb3Modal={loadWeb3Modal}
+            logoutOfWeb3Modal={logoutOfWeb3Modal}
+            blockExplorer={blockExplorer}
+          />
+        </div>
+        {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
+          <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
+        )}
       </div>
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
