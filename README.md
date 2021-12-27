@@ -1,30 +1,30 @@
-# 🏗 Scaffold-ETH - Circom Starter Kit
+# 🏗 Scaffold-ETH - Prove Membership with Circom and Zero Knowledge
 
 > everything you need to build on Ethereum! 🚀
 
-🧪 Quickly experiment with Circom and Solidity using a frontend that adapts to your circuits and smart contracts!
+If you haven't taken a look at the [circom starter kit](https://github.com/scaffold-eth/scaffold-eth-examples/tree/circom-starter-kit) or the [circom contract tutorial](https://github.com/scaffold-eth/scaffold-eth-examples/tree/circom-contract-tutorial) it would be a good idea to check those out before getting to deep into this branch!
+
+This repo aims to be a foundation to rapidly prototype any contract that needs addresses to anonymously prove that a secret they know is contained within a list. How are we going to do this? With merkle trees and zero knowledge of course!
+
+There are two main things we will want this contract to do:
+- Add secrets to the merkle tree
+- Prove anonymously the knowledge of a secret in the merkle tree
+
+We'll do this with two circuits.
 
 # Circuits
 
-Check out `packages/hardhat/circuits/init` to see the example circuit! inside `circuit.circom` you'll see some code that probably looks a little unfamiliar. This is circom! A language used to describe zero knowledge circuits.
-
-Read through the [circom docs](https://docs.circom.io/) and [github repo](https://github.com/iden3/circom) to learn more about it!
-
-Our `init` circuit takes a private input signal `x` and a public input signal `hash`. The circuit will verify that `x` hashes into `hash` using the mimic hash function (a snark friendly hashing function) without revealing the true value of `x`!
-
-`input.json` contains our input signals and will be used to test the circuit when we compile it.
-
-When we create a new circuit we will keep this same file structure:
+Our two circuits will appropriately be called `add2Tree` and `proveInTree` and located in the project as seen below.
 
 ```
 packages
 ├── hardhat
 │   ├── circuits
-|   │   ├── init
-|   |   |   ├── circuit.circom
+|   │   ├── add2Tree
+|   |   |   ├── add2Tree.circom
 |   |   |   └── input.json
-|   │   └── <NEW_CIRCUIT>
-|   |       ├── circuit.circom
+|   │   └── proveInTree
+|   |       ├── proveInTree.circom
 |   |       └── input.json
 |   └── powersOfTau28_hez_final_15.ptau
 ├── react-app
@@ -32,44 +32,100 @@ packages
 └── subgraph
 ```
 
-You've probably noticed `powersOfTau28_hez_final_15.ptau`, this file is needed to compile out circuits. See [hardhat-circom](https://github.com/projectsophon/hardhat-circom) and [snarkjs](https://github.com/iden3/snarkjs) for more details. You may need to replace this file if you will be compiling fairly large circuits.
+### `add2Tree.circom`
 
-# Compile
+We will use this circuit to add a secret to our merkle tree. This circuit is basically a nice wrapper around the [`smtprocessor.circom`](https://github.com/iden3/circomlib/blob/master/circuits/smt/smtprocessor.circom) found in [circomlib](https://github.com/iden3/circomlib).
 
-We'll use the `yarn circom` command to compile our circuits.
+This circuit has 6 input signals and one output signal.
 
-A smart contract verifier will be created and published into our `packages/hardhat/contracts` directory.
+```
+  signal input oldRoot; // should be defined in contract
+  signal input newKey;  // should be defined in contract
+  signal input newValue;
+  signal input oldKey;
+  signal input oldValue;
+  signal private input siblings[nLevels];
 
+  signal output outRoot;
+```
 
-Everything else we will need to generate our zero knowledge proofs will then be published into `packages/react-app/public/circuits` after `yarn deploy`ing, these are our `r1cs`, `wasm`, and `zkey` files (another copy of these files will remain in `packages/hardhat/client`, but we want to use them in the frontend).
+#### Inputs
 
-# Frontend
+`oldRoot` is the previous root of the merkle tree we will be updating. The root of our tree will be recorded within our smart contract.
 
-After `yarn deploy`ing and `yarn start`ing we should have our frontend up and running!
+`newKey` is the index at which we will be adding a secret to the merkle tree. The next key will be enforced by our smart contract.
 
-You should see a few input fields, a "prove" button, and a "verify" button. Looking pretty sparse. Let's change that and click the "prove" button.
+`newValue` is the value that will be recorded at the index defined above. It should be a hash of a secret and a nullifier. Our smart contract will record this value so others can reconstruct the merkle tree.
 
-You may need to scroll down but you should see something interesting. That's our zero knowledge proof!
+`oldKey` is the other index needed to reconstruct the merkle tree.
 
-Right now you're in the "Proof Data" tab, click over into the "Solidity Calldata" tab and you will see an array of inputs that will be passed to our smart contract when we call the verify function. Click on the "Verify with smart contract" button to do just that!
+`oldValue` is the value that has been recorded at the index defined above.
 
-If everything went right you will see a big ol' green check mark. Our proof has been verified!
+`siblings` is an array of the intermediate hashes up to the root of the merkle tree. This input is private to save space, not out of necessity.
 
-We can do this in the "Proof Data" tab as well, but this will verify inside the browser instead of using our fancy smart contract.
+#### Output
 
-Try playing with the input fields to generate an invalid proof!
+`outRoot` is the new root of the merkle tree calculated using the new values.
 
-You may also want to scroll down to see the contract's verify function. It takes 4 arguments. To get a better feel for how the function works try copy pasting each element from the solidity calldata array into the argument fields.
+We take all of these input signals and pass them to an `SMTProcessor` component.
 
-# `ZkpInterface` component
+```
+  component rootIsZero = IsZero();
+  rootIsZero.in <== oldRoot;
 
-The frontend is powered by the `ZkpInterface` component. It needs to be fed a few properties in order to function properly.
+  component tree = SMTProcessor(nLevels);
+  tree.oldRoot <== oldRoot;
+  for (var i=0; i<nLevels; i++) tree.siblings[i] <== siblings[i];
+  tree.oldKey <== oldKey;
+  tree.oldValue <== oldValue;
+  tree.isOld0 <== rootIsZero.out;
+  tree.newKey <== newKey;
+  tree.newValue <== newValue;
+  tree.fnc[0] <== 1;
+  tree.fnc[1] <== 0;
 
-- `inputFields`: An object containing the circuit's default input signals, you can reuse the `input.json` from earlier.
-- `zkey`: The circuit's zkey file.
-- `wasm`: The circuit's wasm file.
-- `vkey`: (optional) A verification key used to verify the the generated proof. If this is not provided the interface will generate one for you.
-- `scVerifyFunc`: The verification function from our smart contract verifier.
+  outRoot <== tree.newRoot;
+```
+
+Then we assign the root generated by our `SMTProcessor` component to our output signal `outRoot`.
+
+But wait! What are the two lines at the top of that code block?
+
+We need to determine if the tree we're trying to add our secret to is empty or not. To do this we pass the `oldRoot` signal to an `isZero` circuit, and that circuit's output to the `SMTProcessor`.
+
+This circuit takes a parameter called `nLevels`. Setting this param determines how many values our merkle tree may hold (`2^nLevels`). In this example `nLevels` is set to 3 Feel free to modify it in the circuit file, but be sure to also change `nLevels` in `proveInTree.circom`, just add one to your `nLevels` in that file.
+
+### `proveInTree.circom`
+
+Our second will allow us to prove that we know a secret that is contained within the merkle tree, without revealing which secret we know.
+
+Again, this circuit is basically a nice wrapper for another circuit. In this case the [`smtverifier.circom`](https://github.com/iden3/circomlib/blob/master/circuits/smt/smtverifier.circom) from [circomlib](https://github.com/iden3/circomlib). We also use [`poseidon.circom`](https://github.com/iden3/circomlib/blob/master/circuits/poseidon.circom) (also found in circomlib) to verify our secret and nullifier are a leaf on our merkle tree.
+
+This circuit will take 5 input signals, and no output signals.
+
+```
+  signal input root;
+  signal private input key;
+  signal private input secret;
+  signal private input nullifier;
+  signal private input siblings[nLevels];
+```
+
+`root` is the current root of the merkle tree. This is our only public signal in this circuit and will be enforced with our smart contract.
+
+`key` is the index at which we will prove our secret resides.
+
+`secret` is our secret number that we do not want to reveal.
+
+`nullifier` is another secret number we use to hash our secret against. We include this signal to make this circuit more extensible if we decide to modify it in the future.
+
+`siblings` is an array of the intermediate hashes up to the root of the merkle tree. This input is private as we do not want to reveal the path to our secret, that would give away our identity.
+
+# Smart Contract
+
+### Verifier
+
+[`hardhat-circom`](https://github.com/projectsophon/hardhat-circom) has generated us a library with verification functions for our circuits above.
 
 # 💌 P.S.
 
