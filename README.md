@@ -43,6 +43,10 @@ There are two types of entities involved to start with the **Whales/Funders** fo
 
 So that's the overall architecture currently for this build and this process keeps continuing.
 
+**NOTE**
+<br>
+There was being research done in parallel to get the **pool rebalancing** right i.e add pool liquidity in such a way that price increases and on swap it should decrease slightly, but currently since liquidity is added in equal proportions, the price increases slightly or does not increase at all but on swaps it decreases sharply, the same behaviour was observed when the project token amount added in the pool was double than eth amount.
+
 ## UI
 
 The first screen allows the whales to fund the project with any amount of ETH they choose to
