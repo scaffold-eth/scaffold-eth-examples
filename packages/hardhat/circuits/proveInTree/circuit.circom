@@ -6,7 +6,7 @@ template proveInTree(nLevels) {
   signal private input key;
   signal private input secret;
   signal private input nullifier;
-  signal private input siblings[nLevels];
+  signal private input siblings[nLevels + 1];
 
   signal value;
   component poseidon = Poseidon(2);
@@ -14,10 +14,10 @@ template proveInTree(nLevels) {
   poseidon.inputs[1] <== nullifier;
   value <== poseidon.out;
 
-  component tree = SMTVerifier(nLevels);
+  component tree = SMTVerifier(nLevels + 1);
   tree.enabled <== 1;
   tree.root <== root;
-  for (var i=0; i<nLevels; i++) tree.siblings[i] <== siblings[i];
+  for (var i=0; i<nLevels + 1; i++) tree.siblings[i] <== siblings[i];
   tree.oldKey <== 0;
   tree.oldValue <== 0;
   tree.isOld0 <== 0;
@@ -26,4 +26,4 @@ template proveInTree(nLevels) {
   tree.fnc <== 0;
 }
 
-component main = proveInTree(4);
+component main = proveInTree(3);
