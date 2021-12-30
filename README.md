@@ -265,11 +265,11 @@ These are just a few thing to think about while building off of this branch.
 
 # 💌 P.S.
 
-🌍 You need an RPC key for production deployments/Apps, create an [Alchemy](https://www.alchemy.com/) account and replace the value of `ALCHEMY_KEY = xxx` in `packages/react-app/src/constants.js`
+🌍 You need an RPC key for testnets and production deployments, create an [Alchemy](https://www.alchemy.com/) account and replace the value of `ALCHEMY_KEY = xxx` in `packages/react-app/src/constants.js` with your new key.
 
-### Automated with Gitpod
+# 🏃💨 Speedrun Ethereum
+Register as a builder [here](https://speedrunethereum.com) and start on some of the challenges and build a portfolio.
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/scaffold-eth/scaffold-eth)****
 
 # 💬 Support Chat
 
