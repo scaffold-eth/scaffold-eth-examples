@@ -19,10 +19,18 @@ contract YourContract {
     uint256[] public leafValues;
     uint256 public nextKey;
 
-    mapping(address => bool) public isMember;
+    mapping(uint256 => bool) public voteLogged;
+    mapping(uint256 => int256) public voteResult;
+    mapping(uint256 => uint256) public voteDeadline;
 
     constructor() public {
     // what should we do on deploy?
+    }
+
+    function createVote(uint256 voteId, uint256 deadline) external {
+        require(voteDeadline[voteId] != 0);
+        require(deadline != 0);
+        voteDeadline[voteId] = deadline;
     }
 
     function addLeaf(
@@ -49,14 +57,18 @@ contract YourContract {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[1] memory input
+        uint[3] memory input,
+        bool slant
     ) external returns (bool r) {
-        require(input[0] == root, "proveMembership: Invalid Root");
+        require(voteLogged[input[0]] != true, "proveMembership: Vote Logged");
+        require(voteDeadline[input[2]] > block.timestamp, "proveMembership: Deadline Passed");
+        require(input[1] == root, "proveMembership: Invalid Root");
+
         r = verifyProveInTreeProof(a, b, c, input);
         require(r == true, "proveMembership: Invalid Proof");
 
-        // this is dumb, do something more cool and interesting here instead!
-        isMember[msg.sender] = true;
+        voteLogged[input[0]] = true;
+        slant == true ? voteResult[input[0]]++ : voteResult[input[0]]--;
     }
 
     function verifyAdd2TreeProof(
@@ -72,7 +84,7 @@ contract YourContract {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[1] memory input
+        uint[3] memory input
     ) public view returns (bool) {
         return Verifier.verifyProveInTreeProof(a, b, c, input);
     }

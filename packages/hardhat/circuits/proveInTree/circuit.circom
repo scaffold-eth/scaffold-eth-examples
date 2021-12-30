@@ -3,16 +3,27 @@ include "../../node_modules/circomlib/circuits/poseidon.circom";
 
 template proveInTree(nLevels) {
   signal input root;
+  signal input voteId;
   signal private input key;
   signal private input secret;
   signal private input nullifier;
   signal private input siblings[nLevels + 1];
 
+  signal output voterHash;
+
   signal value;
-  component poseidon = Poseidon(2);
-  poseidon.inputs[0] <== secret;
-  poseidon.inputs[1] <== nullifier;
-  value <== poseidon.out;
+
+  component poseidon[2];
+
+  poseidon[0] = Poseidon(2);
+  poseidon[0].inputs[0] <== secret;
+  poseidon[0].inputs[1] <== nullifier;
+  value <== poseidon[0].out;
+
+  poseidon[1] = Poseidon(2);
+  poseidon[1].inputs[0] <== voteId;
+  poseidon[1].inputs[1] <== nullifier;
+  voterHash <== poseidon[1].out;
 
   component tree = SMTVerifier(nLevels + 1);
   tree.enabled <== 1;
