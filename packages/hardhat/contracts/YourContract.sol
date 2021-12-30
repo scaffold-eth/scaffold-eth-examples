@@ -7,7 +7,6 @@ import "./Verifier.sol";
 // import "./ProveInTreeVerifier.sol";
 
 contract YourContract {
-    using Verifier for *;
 
   //event SetPurpose(address sender, string purpose);
     event AddLeaf(
@@ -56,7 +55,7 @@ contract YourContract {
         r = verifyProveInTreeProof(a, b, c, input);
         require(r == true, "proveMembership: Invalid Proof");
 
-        // this is dumb, do something more cool and intersting here instread!
+        // this is dumb, do something more cool and interesting here instead!
         isMember[msg.sender] = true;
     }
 

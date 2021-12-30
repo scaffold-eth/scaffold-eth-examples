@@ -2,7 +2,7 @@
 
 > everything you need to build on Ethereum! 🚀
 
-If you haven't taken a look at the [circom starter kit](https://github.com/scaffold-eth/scaffold-eth-examples/tree/circom-starter-kit) or the [circom contract tutorial](https://github.com/scaffold-eth/scaffold-eth-examples/tree/circom-contract-tutorial) it would be a good idea to check those out before getting to deep into this branch!
+If you haven't taken a look at the [circom starter kit](https://github.com/scaffold-eth/scaffold-eth-examples/tree/circom-starter-kit) or the [circom contract tutorial](https://github.com/scaffold-eth/scaffold-eth-examples/tree/circom-contract-tutorial) it would be a good idea to check those out before getting too deep into this branch!
 
 This repo aims to be a foundation to rapidly prototype any contract that needs addresses to anonymously prove that a secret they know is contained within a list. How are we going to do this? With merkle trees and zero knowledge of course!
 
@@ -32,7 +32,7 @@ packages
 └── subgraph
 ```
 
-### `add2Tree.circom`
+### `add2Tree.circom` Overview
 
 We will use this circuit to add a secret to our merkle tree. This circuit is basically a nice wrapper around the [`smtprocessor.circom`](https://github.com/iden3/circomlib/blob/master/circuits/smt/smtprocessor.circom) found in [circomlib](https://github.com/iden3/circomlib).
 
@@ -51,21 +51,21 @@ This circuit has 6 input signals and one output signal.
 
 #### Inputs
 
-`oldRoot` is the previous root of the merkle tree we will be updating. The root of our tree will be recorded within our smart contract.
+`oldRoot`: the previous root of the merkle tree we will be updating. The root of our tree will be recorded within our smart contract.
 
-`newKey` is the index at which we will be adding a secret to the merkle tree. The next key will be enforced by our smart contract.
+`newKey`: the index at which we will be adding a secret to the merkle tree. The next key will be enforced by our smart contract.
 
-`newValue` is the value that will be recorded at the index defined above. It should be a hash of a secret and a nullifier. Our smart contract will record this value so others can reconstruct the merkle tree.
+`newValue`: the value that will be recorded at the index defined above. It should be a hash of a secret and a nullifier. Our smart contract will record this value so others can reconstruct the merkle tree.
 
-`oldKey` is the other index needed to reconstruct the merkle tree.
+`oldKey`: the other index needed to reconstruct the merkle tree.
 
-`oldValue` is the value that has been recorded at the index defined above.
+`oldValue`: the value that has been recorded at the index defined above.
 
-`siblings` is an array of the intermediate hashes up to the root of the merkle tree. This input is private to save space, not out of necessity.
+`siblings`: an array of the intermediate hashes up to the root of the merkle tree. This input is private to save space, not out of necessity.
 
 #### Output
 
-`outRoot` is the new root of the merkle tree calculated using the new values.
+`outRoot` : the new root of the merkle tree calculated using the new values.
 
 We take all of these input signals and pass them to an `SMTProcessor` component.
 
@@ -93,11 +93,11 @@ But wait! What are the two lines at the top of that code block?
 
 We need to determine if the tree we're trying to add our secret to is empty or not. To do this we pass the `oldRoot` signal to an `isZero` circuit, and that circuit's output to the `SMTProcessor`.
 
-This circuit takes a parameter called `nLevels`. Setting this param determines how many values our merkle tree may hold (`2^nLevels`). In this example `nLevels` is set to 3 Feel free to modify it in the circuit file, but be sure to also change `nLevels` in `proveInTree.circom`, just add one to your `nLevels` in that file.
+This circuit takes a parameter called `nLevels`. Setting this param determines how many values our merkle tree may hold (`2^nLevels`). In this example `nLevels` is set to 3 Feel free to modify it in the circuit file, but be sure to also set `nLevels` in `proveInTree.circom` to be the same.
 
-### `proveInTree.circom`
+### `proveInTree.circom` Overview
 
-Our second will allow us to prove that we know a secret that is contained within the merkle tree, without revealing which secret we know.
+Our second circuit will allow us to prove that we know a secret that is contained within the merkle tree, without revealing which secret we know.
 
 Again, this circuit is basically a nice wrapper for another circuit. In this case the [`smtverifier.circom`](https://github.com/iden3/circomlib/blob/master/circuits/smt/smtverifier.circom) from [circomlib](https://github.com/iden3/circomlib). We also use [`poseidon.circom`](https://github.com/iden3/circomlib/blob/master/circuits/poseidon.circom) (also found in circomlib) to verify our secret and nullifier are a leaf on our merkle tree.
 
@@ -111,21 +111,155 @@ This circuit will take 5 input signals, and no output signals.
   signal private input siblings[nLevels];
 ```
 
-`root` is the current root of the merkle tree. This is our only public signal in this circuit and will be enforced with our smart contract.
+`root`: the current root of the merkle tree. This is our only public signal in this circuit and will be enforced with our smart contract.
 
-`key` is the index at which we will prove our secret resides.
+`key`: the index at which we will prove our secret resides.
 
-`secret` is our secret number that we do not want to reveal.
+`secret`: our secret number that we do not want to reveal.
 
-`nullifier` is another secret number we use to hash our secret against. We include this signal to make this circuit more extensible if we decide to modify it in the future.
+`nullifier`: another secret number we use to hash our secret against. We include this signal to make this circuit more extensible if we decide to modify it in the future.
 
-`siblings` is an array of the intermediate hashes up to the root of the merkle tree. This input is private as we do not want to reveal the path to our secret, that would give away our identity.
+`siblings`: an array of the intermediate hashes up to the root of the merkle tree. This input is private as we do not want to reveal the path to our secret, that would give away our identity.
+
+Our first task is to hash our `secret` and `nullifier` signals. We pass them to a `poseidon` component and assign the output to an intermediate signal.
+
+```
+  signal value;
+  component poseidon = Poseidon(2);
+  poseidon.inputs[0] <== secret;
+  poseidon.inputs[1] <== nullifier;
+  value <== poseidon.out;
+```
+
+Then we pass everything to an instance of an `SMTVerifier`circuit component.
+
+```
+  component tree = SMTVerifier(nLevels + 1);
+  tree.enabled <== 1;
+  tree.root <== root;
+  for (var i=0; i<nLevels + 1; i++) tree.siblings[i] <== siblings[i];
+  tree.oldKey <== 0;
+  tree.oldValue <== 0;
+  tree.isOld0 <== 0;
+  tree.key <== key;
+  tree.value <== value;
+  tree.fnc <== 0;
+```
+
+This circuit does not need an output signal, The circuit templates used within are making sure everything is following our rules, if it does not, the generated proof will fail to verify in the smart contract.
+
+Like the circuit above this circuit takes an `nlevels` parameter. We want to make sure that the `nLevels` for this circuit is set identically to whatever is set in `add2Tree.circom`.
 
 # Smart Contract
 
 ### Verifier
 
 [`hardhat-circom`](https://github.com/projectsophon/hardhat-circom) has generated us a library with verification functions for our circuits above.
+
+- `verifyAdd2TreeProof`
+- `verifyProveInTreeProof`
+
+### `YourContract.sol`
+
+We import the above functions into `YourContract.sol`.
+
+```
+import "./Verifier.sol";
+```
+
+We use 4 state variables in the contract to keep track of the merkle tree.
+
+```
+  uint256 public root;
+  uint256[] public leafValues;
+  uint256 public nextKey;
+
+  mapping(address => bool) public isMember;
+```
+
+`root`: the current root of the merkle tree.
+
+`leafValues`: an array of the tree's leaves, so anybody can reconstruct the merkle tree and generate proofs.
+
+`nextKey`: the index in the merkle tree where the next registrant will be placed.
+
+`isMember`: a mapping to log whether an address knows a secret held withing the merkle tree.
+
+Then we have our functions that accomplish our goals stated at the top of this article!
+
+#### Functions!
+
+```
+    function addLeaf(
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint[6] memory input
+    ) external {
+        require(input[1] == root, "addLeaf: Invalid Root");
+        require(input[2] == nextKey, "addLeaf: Invalid Key");
+
+        // add membership requirements here
+
+        require(verifyAdd2TreeProof(a, b, c, input) == true, "addLeaf: Invalid Proof");
+
+        leafValues.push(input[3]);
+        nextKey = leafValues.length;
+        root = input[0];
+
+        emit AddLeaf(input[2], input[3], input[1]);
+    }
+```
+
+You can see right at the top of the function we have two require statements. The first is to make sure the proof was generated with the current merkle tree root stored by the smart contract. The second ensures that the user's secret is being stored at the correct index in the merkle tree.
+
+Then we have a section where you can add any addition requirements for potential registrants. Give it a try! Maybe charge some ETH?
+
+One more require statement that checks the proof provided is actually valid. (note: If you look in `YourContract.sol` this require statement actually calls a wrapper function of the one generated by hardhat-circom, I just thought this was prettier to look at in code)
+
+And then we update our state variables to reflect the changes to the merkle tree calculated in the proof (and emit an event!).
+
+```
+    function proveMembership(
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint[1] memory input
+    ) external returns (bool r) {
+        require(input[0] == root, "proveMembership: Invalid Root");
+        r = verifyProveInTreeProof(a, b, c, input);
+        require(r == true, "proveMembership: Invalid Proof");
+
+        // this is dumb, do something more cool and interesting here instead!
+        isMember[msg.sender] = true;
+    }
+```
+
+Right at the top of the function, again, we have a require statement to ensure the proof uses the correct root hash of our merkle tree.
+
+And, again, we ensure that the proof is actually valid.
+
+Then we mark the address as a member, as they have just proven they know a secret within the merkle tree! Admittedly this is kind of a boring application, try to make something more interesting!
+
+# The Frontend
+
+The front end is very basic. It is there only to show what it is like to interact with the example. I recommend making your own, it will be much better than this!
+
+Nonetheless, it might be a good idea for you to check out what is happening under the hood. The whole frontend can be found in `packages/react-app/src/views/MembershipUI.jsx`.
+
+The `MembershipUI` component makes use of the `useSMT` hook found in `packages/react-app/src/hooks`, take a look at that to see how it works as well!
+
+# Flaws
+
+This is a pretty simple example, and as such it has some issues.
+
+- If no additional requirements are added to the `addLeaf` function, there is a front running problem. I leave the potential solutions to you, the reader, to think about.
+- In its current form one secret holder can prove membership for an infinite amount of addresses.
+- Addresses can be linked by ETH and token transfers, as well as other contract interactions. Anonymity will be hard to preserve without additional measures outside of the contract.
+- When an address proves its membership, its anonymity is limited to the secrets held in the tree at the time of proving. The more registered secrets, the better the anonymity will be.
+- The front end is just bad, maybe try to make something better!
+
+These are just a few thing to think about while building off of this branch.
 
 # 💌 P.S.
 
