@@ -243,6 +243,8 @@ Then we mark the address as a member, as they have just proven they know a secre
 
 # The Frontend
 
+![zk-prove-membership-ui](https://user-images.githubusercontent.com/47094796/147712680-53f18f9b-cde7-4141-bdaa-d032664d9792.gif)
+
 The front end is very basic. It is there only to show what it is like to interact with the example. I recommend making your own, it will be much better than this!
 
 Nonetheless, it might be a good idea for you to check out what is happening under the hood. The whole frontend can be found in `packages/react-app/src/views/MembershipUI.jsx`.
