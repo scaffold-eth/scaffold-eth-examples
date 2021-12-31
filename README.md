@@ -12,6 +12,29 @@ There are two main things we will want this contract to do:
 
 We'll do this with two circuits.
 
+### Getting Started
+
+```
+git clone -b zk-prove-membership https://github.com/scaffold-eth/scaffold-eth-examples.git zk-prove-membership
+
+yarn install
+
+yarn chain
+```
+
+In a second terminal:
+
+```
+yarn deploy
+```
+
+In a third terminal"
+
+```
+yarn start
+```
+
+
 # Circuits
 
 Our two circuits will appropriately be called `add2Tree` and `proveInTree` and located in the project as seen below.
