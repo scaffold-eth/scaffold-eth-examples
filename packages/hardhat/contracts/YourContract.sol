@@ -15,6 +15,13 @@ contract YourContract {
         uint256 indexed oldRoot
     );
 
+    event CreateVote(
+        uint256 indexed voteId,
+        uint256 indexed deadline
+    );
+
+    uint256 public voteNonce;
+
     uint256 public root;
     uint256[] public leafValues;
     uint256 public nextKey;
@@ -27,10 +34,14 @@ contract YourContract {
     // what should we do on deploy?
     }
 
-    function createVote(uint256 voteId, uint256 deadline) external {
-        require(voteDeadline[voteId] != 0);
-        require(deadline != 0);
+    function createVote(uint256 deadline) external {
+        require(deadline > block.timestamp, "createVote: Invalid Deadline");
+
+        uint256 voteId = voteNonce;
+        voteNonce++;
         voteDeadline[voteId] = deadline;
+
+        emit CreateVote(voteId, deadline);
     }
 
     function addLeaf(
@@ -68,7 +79,11 @@ contract YourContract {
         require(r == true, "proveMembership: Invalid Proof");
 
         voteLogged[input[0]] = true;
-        slant == true ? voteResult[input[0]]++ : voteResult[input[0]]--;
+        if (slant == true) {
+            voteResult[input[2]] += 1;
+        } else {
+            voteResult[input[2]] -= 1;
+        }
     }
 
     function verifyAdd2TreeProof(
