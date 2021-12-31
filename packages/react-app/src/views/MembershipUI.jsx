@@ -221,12 +221,13 @@ export default function MembershipUI({
         </div>
         <div style={{ padding: "3%" }}>
           <Button
+            type="primary"
             onClick={() => genProveMemberTx()}
           >
             Generate Member Calldata
           </Button>
           <Button
-            type="primary"
+            danger
             onClick={() => tx( writeContracts.YourContract.proveMembership(...proveMemCalldata) )}
           >
             Prove
