@@ -22,7 +22,7 @@ In a second terminal:
 yarn deploy
 ```
 
-In a third terminal"
+In a third terminal:
 
 ```
 yarn start
