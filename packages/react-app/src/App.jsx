@@ -336,6 +336,7 @@ function App(props) {
                   inputFields={
                     {
                       root: 0,
+                      voteId: 0,
                       key: 0,
                       secret: 0,
                       nullifier: 0,

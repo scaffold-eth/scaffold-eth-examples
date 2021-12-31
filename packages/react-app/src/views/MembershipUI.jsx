@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Card, Collapse, Input, InputNumber, Button, Tabs, Divider, Result, Typography, message, Row, Statistic, Col } from "antd";
+import {
+  Card,
+  Collapse,
+  Input,
+  InputNumber,
+  Button,
+  Tabs,
+  Divider,
+  Result,
+  Typography,
+  message, Row,
+  Statistic,
+  Col,
+  List,
+} from "antd";
 import {
   useContractReader,
 } from "eth-hooks";
@@ -32,7 +46,7 @@ export default function MembershipUI({
 
   const addLeafEvents = useEventListener(readContracts, "YourContract", "AddLeaf", localProvider, 0);
 
-  const isMember = useContractReader(readContracts, "YourContract", "isMember", [address]);
+  const voteEvents = useEventListener(readContracts, "YourContract", "CreateVote", localProvider, 0);
 
   const [leaves, setLeaves] = useState({});
   useEffect(() => {
@@ -55,6 +69,12 @@ export default function MembershipUI({
   const [memberKey, setMemberKey] = useState();
   const [memberSecret, setMemberSecret] = useState(0);
   const [memberNullifier, setMemberNullifier] = useState(0);
+
+  const [voteState, setVoteState] = useState(false);
+
+  const [activeVoteId, setActiveVoteId] = useState(0);
+
+  const voteCount = useContractReader(readContracts, "YourContract", "voteResult", [activeVoteId]);
 
   function parseSolidityCalldata(prf, sgn) {
 
@@ -107,6 +127,7 @@ export default function MembershipUI({
   async function genProveMemberTx() {
     let proveMemberInputs = {
       root: BigInt(root.toString()),
+      voteId: activeVoteId,
       key: memberKey,
       secret: memberSecret,
       nullifier: memberNullifier,
@@ -186,10 +207,42 @@ export default function MembershipUI({
       </div>
 
       <div style={{ width: "60vw", margin: "auto" }}>
+        <div style={{ width: "20vw", margin: "auto", textAlign: "left" }}>
+          <List
+            dataSource={voteEvents}
+            renderItem={item => (
+              <List.Item>
+                <List.Item.Meta
+                  title={`Vote ID: ${item.args.voteId.toString()}`}
+                />
+                <Button
+                  type={activeVoteId == item.args.voteId ? "text" : "default"}
+                  onClick={() => setActiveVoteId(item.args.voteId)}
+                >
+                  Select
+                </Button>
+              </List.Item>
+            )}
+          />
+        </div>
+
+        <div style={{ padding: "3%" }}>
+          <Button
+            onClick={() => tx( writeContracts.YourContract.createVote(Math.floor(Date.now() / 1000) + 1020) )}
+          >
+            Create a New Vote
+          </Button>
+        </div>
         <div>
-          <Result
-            status={isMember ? "success" : "warning"}
-            title={isMember ? "Membership Confirmed" : "Membership Unconfirmed"}
+          <Statistic
+          title="Selected Vote ID"
+            value={activeVoteId}
+          />
+        </div>
+        <div>
+          <Statistic
+            title="Vote Count"
+            value={voteCount}
           />
         </div>
         <div style={{ padding: "1%" }}>
@@ -221,13 +274,35 @@ export default function MembershipUI({
         </div>
         <div style={{ padding: "3%" }}>
           <Button
-            onClick={() => genProveMemberTx()}
+            type={voteState ? "primary" : undefined}
+            // disabled={voteState}
+            onClick={() => setVoteState(true)}
           >
-            Generate Member Calldata
+            Vote Yay
           </Button>
           <Button
+            type={!voteState ? "primary" : undefined}
+            // disabled={!voteState}
+            onClick={() => setVoteState(false)}
+          >
+            Vote Nay
+          </Button>
+        </div>
+        <div style={{ padding: "3%" }}>
+          <Button
             type="primary"
-            onClick={() => tx( writeContracts.YourContract.proveMembership(...proveMemCalldata) )}
+            onClick={() => {
+              genProveMemberTx()
+            }}
+          >
+            Confirm
+          </Button>
+          <Button
+            // type="primary"
+            danger
+            onClick={() => {
+              tx( writeContracts.YourContract.proveMembership(...proveMemCalldata, voteState) )
+            }}
           >
             Prove
           </Button>
