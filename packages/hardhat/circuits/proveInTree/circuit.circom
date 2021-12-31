@@ -20,9 +20,10 @@ template proveInTree(nLevels) {
   poseidon[0].inputs[1] <== nullifier;
   value <== poseidon[0].out;
 
-  poseidon[1] = Poseidon(2);
+  poseidon[1] = Poseidon(3);
   poseidon[1].inputs[0] <== voteId;
-  poseidon[1].inputs[1] <== nullifier;
+  poseidon[1].inputs[1] <== key;
+  poseidon[1].inputs[2] <== nullifier;
   voterHash <== poseidon[1].out;
 
   component tree = SMTVerifier(nLevels + 1);
