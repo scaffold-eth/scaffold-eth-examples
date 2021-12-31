@@ -6,6 +6,28 @@ A simple zk voting example.
 
 Please go through the [zk-prove-membership](https://github.com/scaffold-eth/scaffold-eth-examples/tree/zk-prove-membership) branch before getting too deep into this one!
 
+### Getting Started
+
+```
+git clone -b zk-voting-example https://github.com/scaffold-eth/scaffold-eth-examples.git zk-voting-example
+
+yarn install
+
+yarn chain
+```
+
+In a second terminal:
+
+```
+yarn deploy
+```
+
+In a third terminal"
+
+```
+yarn start
+```
+
 # Circuits
 
 ```
