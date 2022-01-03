@@ -4,6 +4,25 @@
 
 🧪 Quickly experiment with Circom and Solidity using a frontend that adapts to your circuits and smart contracts!
 
+```bash
+git clone -b circom-starter-kit https://github.com/scaffold-eth/scaffold-eth-examples.git circom-starter-kit
+cd circom-starter-kit
+yarn install
+yarn chain
+```
+
+in a second terminal window, start your 📱 frontend:
+```bash
+cd scaffold-eth
+yarn start
+```
+
+in a third terminal window, 🛰 deploy your contract:
+```bash
+cd scaffold-eth
+yarn deploy
+```
+
 # Circuits
 
 Check out `packages/hardhat/circuits/init` to see the example circuit! inside `circuit.circom` you'll see some code that probably looks a little unfamiliar. This is circom! A language used to describe zero knowledge circuits.
@@ -78,3 +97,7 @@ Join the telegram [support chat 💬](https://t.me/joinchat/KByvmRe5wkR-8F_zz6Aj
 ---
 
 🙏 Please check out our [Gitcoin grant](https://gitcoin.co/grants/2851/scaffold-eth) too!
+
+### Automated with Gitpod
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/scaffold-eth/scaffold-eth)

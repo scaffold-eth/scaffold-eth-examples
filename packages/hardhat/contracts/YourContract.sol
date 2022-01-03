@@ -5,7 +5,7 @@ import "hardhat/console.sol";
 //import "@openzeppelin/contracts/access/Ownable.sol"; //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
 import "./Verifier.sol";
 
-contract YourContract is Verifier {
+contract YourContract {
 
   // event SetPurpose(address sender, string purpose);
 
@@ -26,7 +26,7 @@ contract YourContract is Verifier {
       uint256[2][2] memory b,
       uint256[2] memory c,
       uint256[2] memory input
-  ) public returns (bool) {
+  ) public view returns (bool) {
       return Verifier.verifyInitProof(a, b, c, input);
   }
 }
