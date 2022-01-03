@@ -12,6 +12,8 @@ There are two main things we will want this contract to do:
 
 We'll do this with two circuits.
 
+Note: we will be using a special kind of merkle tree called a sparse merkle tree (or SMT), you can read up on them [here](https://medium.com/@kelvinfichter/whats-a-sparse-merkle-tree-acda70aeb837) Basically every leaf in the tree is tracked at an index, this makes it easier to use in zk proof systems, and also allows for inclusion and exclusion proofs.
+
 ### Getting Started
 
 ```
