@@ -518,7 +518,7 @@ function App(props) {
               }
               wasm={wasm}
               zkey={zkey}
-              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProof : null}
+              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyInitProof : null}
             />
 
             <Contract
