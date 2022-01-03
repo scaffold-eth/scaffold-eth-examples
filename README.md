@@ -45,7 +45,7 @@ So that's the overall architecture currently for this build and this process kee
 
 **NOTE**
 <br>
-There was being research done in parallel to get the **pool rebalancing** right i.e add pool liquidity in such a way that price increases and on swap it should decrease slightly, but currently since liquidity is added in equal proportions, the price increases slightly or does not increase at all but on swaps it decreases sharply, the same behaviour was observed when the project token amount added in the pool was double than eth amount.
+There was research done in parallel to get the **pool rebalancing** right i.e add pool liquidity in such a way that price increases and on swap it should decrease slightly, but currently since liquidity is added in equal proportions, the price increases slightly or does not increase at all but on swaps it decreases sharply, the same behaviour was observed when the project token amount added in the pool was double than eth amount.
 
 ## UI
 
