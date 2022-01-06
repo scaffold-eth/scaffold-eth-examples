@@ -24,6 +24,7 @@ import {
   FaucetHint,
   NetworkSwitch,
   ZkpInterface,
+  PoseidonInterface,
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
@@ -35,8 +36,10 @@ import { useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
 
-const wasm = `${process.env.PUBLIC_URL}/circuits/init.wasm`;
-const zkey = `${process.env.PUBLIC_URL}/circuits/init.zkey`;
+const concealMoveWasm = `${process.env.PUBLIC_URL}/circuits/concealMove.wasm`;
+const concealMoveZkey = `${process.env.PUBLIC_URL}/circuits/concealMove.zkey`;
+const hiddenMoveWasm = `${process.env.PUBLIC_URL}/circuits/hiddenMove.wasm`;
+const hiddenMoveZkey = `${process.env.PUBLIC_URL}/circuits/hiddenMove.zkey`;
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -290,16 +293,33 @@ function App(props) {
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
+            <PoseidonInterface/>
 
             <ZkpInterface
               inputFields={
                 {
-                  x: "1764",
-                  hash: "15893827533473716138720882070731822975159228540693753428689375377280130954696"
+                  x1: "0",
+                  y1: "0",
+                  x2: "2",
+                  y2: "2"
                 }
               }
-              wasm={wasm}
-              zkey={zkey}
+              wasm={concealMoveWasm}
+              zkey={concealMoveZkey}
+              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyInitProof : null}
+            />
+            <ZkpInterface
+              inputFields={
+                {
+                  posHash: "217234377348884654691879377518794323857294947151490278790710809376325639809",
+                  x1: "1",
+                  y1: "1",
+                  x2: "2",
+                  y2: "2"
+                }
+              }
+              wasm={hiddenMoveWasm}
+              zkey={hiddenMoveZkey}
               scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyInitProof : null}
             />
 
@@ -322,11 +342,11 @@ function App(props) {
             />
           </Route>
           <Route path="/exampleui">
-            <ZkHashUI
+            {/*<ZkHashUI
               wasm={wasm}
               zkey={zkey}
               scVerifyFn={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProof : null}
-            />
+            />*/}
             {/*<ExampleUI
               address={address}
               userSigner={userSigner}

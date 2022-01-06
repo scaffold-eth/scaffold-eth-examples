@@ -21,12 +21,30 @@ contract YourContract {
       // emit SetPurpose(msg.sender, purpose);
   }
 
-  function verifyInitProof(
+  function verifyConcealMoveProof(
+      uint256[2] memory a,
+      uint256[2][2] memory b,
+      uint256[2] memory c,
+      uint256[3] memory input
+  ) public view returns (bool) {
+      return Verifier.verifyConcealMoveProof(a, b, c, input);
+  }
+
+  function verifyHiddenMoveProof(
       uint256[2] memory a,
       uint256[2][2] memory b,
       uint256[2] memory c,
       uint256[2] memory input
   ) public view returns (bool) {
-      return Verifier.verifyInitProof(a, b, c, input);
+      return Verifier.verifyHiddenMoveProof(a, b, c, input);
+  }
+
+  function verifyRevealMoveProof(
+      uint256[2] memory a,
+      uint256[2][2] memory b,
+      uint256[2] memory c,
+      uint256[2] memory input
+  ) public view returns (bool) {
+      return Verifier.verifyRevealMoveProof(a, b, c, input);
   }
 }
