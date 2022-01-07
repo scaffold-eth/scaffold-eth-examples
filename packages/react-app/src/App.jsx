@@ -175,7 +175,7 @@ function App(props) {
   ]);
 
   // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+  const purpose = useContractReader(readContracts, "TheBoard", "purpose");
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -306,7 +306,7 @@ function App(props) {
               }
               wasm={concealMoveWasm}
               zkey={concealMoveZkey}
-              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyInitProof : null}
+              scVerifyFunc={readContracts && readContracts.TheBoard ? readContracts.TheBoard.verifyConcealMoveProof : null}
             />
             <ZkpInterface
               inputFields={
@@ -320,11 +320,25 @@ function App(props) {
               }
               wasm={hiddenMoveWasm}
               zkey={hiddenMoveZkey}
-              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyInitProof : null}
+              scVerifyFunc={readContracts && readContracts.TheBoard ? readContracts.TheBoard.verifyHiddenMoveProof : null}
+            />
+            <ZkpInterface
+              inputFields={
+                {
+                  posHash: "19737891185821398423122727024481455568885557614279576187520860235304682142740",
+                  x1: "4",
+                  y1: "4",
+                  x2: "2",
+                  y2: "2"
+                }
+              }
+              wasm={hiddenMoveWasm}
+              zkey={hiddenMoveZkey}
+              scVerifyFunc={readContracts && readContracts.TheBoard ? readContracts.TheBoard.verifyRevealMoveProof : null}
             />
 
             <Contract
-              name="YourContract"
+              name="TheBoard"
               price={price}
               signer={userSigner}
               provider={localProvider}
@@ -345,7 +359,7 @@ function App(props) {
             {/*<ZkHashUI
               wasm={wasm}
               zkey={zkey}
-              scVerifyFn={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProof : null}
+              scVerifyFn={readContracts && readContracts.TheBoard ? readContracts.TheBoard.verifyProof : null}
             />*/}
             {/*<ExampleUI
               address={address}
