@@ -1,34 +1,69 @@
-# See https://help.github.com/ignore-files/ for more about ignoring files.
+packages/subgraph/subgraph.yaml
+packages/subgraph/generated
+packages/subgraph/abis/*
+packages/hardhat/*.txt
+**/aws.json
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+**/node_modules
+
+packages/hardhat/artifacts*
+packages/hardhat/deployments
+packages/react-app/src/contracts/*
+!packages/react-app/src/contracts/external_contracts.js
+packages/hardhat/cache*
+packages/**/data
+!packages/react-app/src/contracts/contracts.js
+
+
+# ts
+packages/hardhat-ts/cache
+# secrets
+.secret
+
+packages/subgraph/config/config.json
+tenderly.yaml
 
 # dependencies
 /node_modules
+/.pnp
+.pnp.js
 
 # testing
-/coverage
+coverage
 
 # production
-/build
+build
+# yarn / eslint
+.yarn/cache
+.yarn/install-state.gz
+.yarn/build-state.yml
+.eslintcache
+# testing
+coverage
+
+# production
+build
+
+# Hardhat files
+cache
+artifacts
 
 # misc
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*
 
-/.netlify
-
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-notes.txt
-.idea/
+.idea
 
-.vscode/
+# Local Netlify folder
+.netlify
+*.tsbuildinfo
+*.stackdump
 
-package-lock.json
-
-cypress/videos
-cypress/screenshots
-cypress/fixtures/example.json
+# doc directory
+/doc
