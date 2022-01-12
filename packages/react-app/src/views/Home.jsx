@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useContractReader } from "eth-hooks";
+import { useEventListener } from "eth-hooks/events/useEventListener";
 import { ethers } from "ethers";
+import { Card, List, Descriptions } from "antd";
+import { Address } from "../components";
 
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
@@ -9,59 +11,62 @@ import { ethers } from "ethers";
  * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
  * @returns react component
  */
-function Home({ yourLocalBalance, readContracts }) {
-  // you can also use hooks locally in your component of choice
-  // in this case, let's keep track of 'purpose' variable from our contract
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+function Home({ readContracts, localProvider, blockExplorer }) {
+  const pgs = (
+    useEventListener(readContracts, "RetFundERC721Deployer", "tokenDeployed", localProvider, 1) || []
+  ).reverse();
+
+  console.log(pgs);
 
   return (
-    <div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>📝</span>
-        This Is Your App Home. You can start editing it in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/react-app/views/Home.jsx
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤓</span>
-        The "purpose" variable from our contract is{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          {purpose}
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤖</span>
-        An example prop of your balance{" "}
-        <span style={{ fontWeight: "bold", color: "green" }}>({ethers.utils.formatEther(yourLocalBalance)})</span> was
-        passed into the
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          Home.jsx
-        </span>{" "}
-        component from
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          App.jsx
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>💭</span>
-        Check out the <Link to="/hints">"Hints"</Link> tab for more tips.
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🛠</span>
-        Tinker with your smart contract using the <Link to="/debug">"Debug Contract"</Link> tab.
+    <div className="container mx-auto mt-5">
+      <div className="flex flex-1 mt-20 w-full">
+        <List
+          className="w-full"
+          grid={{ gutter: 16, column: 3 }}
+          dataSource={pgs}
+          renderItem={item => {
+            return (
+              <List.Item>
+                <Card
+                  size="small"
+                  className="hoverableLight"
+                  title={
+                    <div
+                      style={{
+                        padding: "0 0.5rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "1rem",
+                        justifyContent: "space-between",
+                        fontWeight: 400,
+                      }}
+                    >
+                      <div style={{ fontSize: "1rem", fontWeight: 500 }}>
+                        <Link to={`/token/${item.args.token}`}>{item.args.name}</Link>
+                      </div>
+                      <Address fontSize="15" value={item.args.token} />
+                    </div>
+                  }
+                >
+                  <Descriptions bordered size="small" labelStyle={{ textAlign: "center", height: "2.5rem" }}>
+                    <Descriptions.Item label="Creator" span={4}>
+                      <Address
+                        className="inline-flex justify-center items-center"
+                        address={item.args.creator}
+                        fontSize={15}
+                        blockExplorer={blockExplorer}
+                      />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Created At" span={4}>
+                      <div>{new Date(item.args.timestamp.toNumber() * 1000).toLocaleString()}</div>
+                    </Descriptions.Item>
+                  </Descriptions>
+                </Card>
+              </List.Item>
+            );
+          }}
+        />
       </div>
     </div>
   );

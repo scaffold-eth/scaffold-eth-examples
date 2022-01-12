@@ -137,7 +137,7 @@ export default function Account({
   );
 
   return (
-    <div>
+    <div className="mt-1">
       {display}
       {modalButtons}
     </div>
