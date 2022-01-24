@@ -243,26 +243,30 @@ export default function useERC20(address, provider, signer, params = {}) {
   }, [signer, address, abi]);
 
   const handleTokenInfo = async (r, p) => {
-    // load token information here
-    const name = await r.name?.();
-    const symbol = await r.symbol?.();
-    const decimals = await r.decimals?.();
-    const totalSupply = await r.totalSupply?.();
-    let allowance;
-    let balanceOfOwner;
-    let balanceOfSpender;
+    try {
+      // load token information here
+      const name = await r.name?.();
+      const symbol = await r.symbol?.();
+      const decimals = await r.decimals?.();
+      const totalSupply = await r.totalSupply?.();
+      let allowance;
+      let balanceOfOwner;
+      let balanceOfSpender;
 
-    if (p.spender && p.owner) {
-      allowance = await r.allowance?.(p.owner, p.spender);
-      balanceOfOwner = await r.balanceOf?.(p.owner);
-      balanceOfSpender = await r.balanceOf?.(p.spender);
+      if (p.spender && p.owner) {
+        allowance = await r.allowance?.(p.owner, p.spender);
+        balanceOfOwner = await r.balanceOf?.(p.owner);
+        balanceOfSpender = await r.balanceOf?.(p.spender);
+      }
+
+      setTokenInfo({ name, symbol, decimals, totalSupply, allowance, balanceOfOwner, balanceOfSpender });
+    } catch (error) {
+      console.log(`Unable to load token information`);
     }
-
-    setTokenInfo({ name, symbol, decimals, totalSupply, allowance, balanceOfOwner, balanceOfSpender });
   };
 
   useEffect(() => {
-    if (read) {
+    if (address && read?.address === address) {
       handleTokenInfo(read, params);
     }
   }, [read, params.owner, params.spender]);
