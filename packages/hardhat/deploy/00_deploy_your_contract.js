@@ -9,30 +9,34 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
 
+  const admin = "0xbF7877303B90297E7489AA1C067106331DfF7288";
+
   await deploy("Multidrop", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
-    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
+    args: [],
     log: true,
     waitConfirmations: 5,
   });
 
-  await deploy("SampleERC20", {
-    from: deployer,
-    log: true,
-    waitConfirmations: 5,
-  });
+  if (chainId === localChainId) {
+    await deploy("SampleERC20", {
+      from: deployer,
+      log: true,
+      waitConfirmations: 5,
+    });
+  }
 
   // Getting a previously deployed contract
   const Multidrop = await ethers.getContract("Multidrop", deployer);
-  /*  await Multidrop.setPurpose("Hello");
-  
-    To take ownership of Multidrop using the ownable library uncomment next line and add the 
-    address you want to be the owner. 
-    // await Multidrop.transferOwnership(YOUR_ADDRESS_HERE);
 
-    //const Multidrop = await ethers.getContractAt('Multidrop', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
-  */
+  const feesUpdate = await Multidrop.updateFee(ethers.utils.parseEther("0.05"));
+
+  await feesUpdate.wait(4);
+
+  const transferOwnership = await Multidrop.transferOwnership(admin);
+
+  await transferOwnership.wait(4);
 
   /*
   //If you want to send value to an address from the deployer
@@ -47,14 +51,6 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   //If you want to send some ETH to a contract on deploy (make your constructor payable!)
   const Multidrop = await deploy("Multidrop", [], {
   value: ethers.utils.parseEther("0.05")
-  });
-  */
-
-  /*
-  //If you want to link a library into your contract:
-  // reference: https://github.com/austintgriffith/scaffold-eth/blob/using-libraries-example/packages/hardhat/scripts/deploy.js#L19
-  const Multidrop = await deploy("Multidrop", [], {}, {
-   LibraryName: **LibraryAddress**
   });
   */
 

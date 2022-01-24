@@ -4,14 +4,28 @@ pragma solidity >=0.8.0 <0.9.0;
 // import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 // import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-contract Multidrop is Ownable {
+contract Multidrop is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
-    constructor() payable {}
+    uint256 public fee;
+
+    event tokenDropped(
+        address indexed from,
+        address indexed to,
+        address indexed token,
+        uint256 timestamp
+    );
+    event ETHdropped(
+        address indexed from,
+        address indexed to,
+        uint256 amount,
+        uint256 timestamp
+    );
 
     modifier validList(address[] memory users, uint256[] memory values) {
         require(users.length == values.length, "Users - Invalid length");
@@ -19,9 +33,12 @@ contract Multidrop is Ownable {
         _;
     }
 
+    constructor() payable {}
+
     function sendETH(address[] memory users, uint256[] memory values)
         public
         payable
+        nonReentrant
         validList(users, values)
     {
         uint256 totalETHValue = msg.value;
@@ -37,15 +54,32 @@ contract Multidrop is Ownable {
             totalETHValue -= values[i];
             (bool sent, ) = currentUser.call{value: values[i]}("");
             require(sent, "Failed to send Ether");
+
+            emit ETHdropped(
+                msg.sender,
+                currentUser,
+                values[i],
+                block.timestamp
+            );
         }
+
+        require(
+            totalETHValue >= fee,
+            "Not enough NativeToken sent for platform fees"
+        );
     }
 
     function sendToken(
         address[] memory users,
         uint256[] memory values,
         IERC20 token
-    ) public validList(users, values) {
+    ) public payable nonReentrant validList(users, values) {
         uint256 totalTokens = 0;
+
+        require(
+            msg.value >= fee,
+            "Not enough NativeToken sent for platform fees"
+        );
 
         for (uint256 i = 0; i < values.length; i++) {
             totalTokens += values[i];
@@ -63,6 +97,27 @@ contract Multidrop is Ownable {
         // handle indexes drop
         for (uint256 i = 0; i < users.length; i++) {
             token.safeTransferFrom(msg.sender, users[i], values[i]);
+
+            emit tokenDropped(
+                msg.sender,
+                users[i],
+                address(token),
+                block.timestamp
+            );
+        }
+    }
+
+    function updateFee(uint256 _fee) public onlyOwner {
+        fee = _fee;
+    }
+
+    function withdraw(address[] memory to, uint256[] memory amount)
+        public
+        onlyOwner
+    {
+        for (uint256 i = 0; i < to.length; i++) {
+            (bool sent, ) = to[i].call{value: amount[i]}("");
+            require(sent, "Failed to withdraw Ether");
         }
     }
 
