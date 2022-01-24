@@ -5,8 +5,6 @@ import { Alert, Form, Input, Button } from "antd";
 import { TokenSelect } from "../components";
 import { useERC20 } from "../hooks";
 
-const zero = ethers.BigNumber.from("0");
-
 function Home({
   tx,
   address,
@@ -25,8 +23,6 @@ function Home({
     spender: readContracts?.Multidrop?.address,
     owner: address,
   });
-
-  console.log(tokenInfo);
 
   const handleParseFormatting = async (unit = "ether") => {
     const { addressList } = form.getFieldsValue();
@@ -101,13 +97,22 @@ function Home({
 
       if (tokenInfo.allowance.lt(totalAmount)) {
         setMessage(`Not enough allowance to spend, awaiting approval...`);
-        await tx(tokenWrite.approve(readContracts?.Multidrop?.address, totalAmount));
+        const approval = await tx(tokenWrite.approve(readContracts?.Multidrop?.address, totalAmount));
+        await approval.wait(1);
       }
     }
 
     const params = [addresses, amounts];
 
-    params.push(token ? token : { value: totalAmount });
+    if (token) {
+      params.push(token);
+    }
+
+    // add fees here
+    const fees = await readContracts.Multidrop.fee();
+
+    // add fees to tx value
+    params.push({ value: token ? fees : totalAmount.add(fees) });
 
     setMessage(
       `Dropping ${ethers.utils.formatUnits(totalAmount, token ? tokenInfo.decimals : "ether")} ${
@@ -167,9 +172,10 @@ function Home({
           >
             <TokenSelect
               chainId={localChainId}
-              onChange={v => setToken(v !== "0x0000000000000000000000000000000000000000" ? v : null)}
-              nativeToken={{ name: "Native Token", symbol: "ETH" }}
+              localProvider={localProvider}
               placeholder="Search for your token... Eg: Gitcoin"
+              nativeToken={{ name: "Native Token", symbol: "ETH" }}
+              onChange={v => setToken(v !== "0x0000000000000000000000000000000000000000" ? v : null)}
             />
           </Form.Item>
           <Form.Item
@@ -198,9 +204,16 @@ function Home({
                 type="primary"
                 htmlType="submit"
                 className="flex items-center justify-center"
+                disabled={token && !tokenInfo.name}
                 loading={submitting}
               >
-                {submitting ? "Faucet turning..." : token ? `Approve & Drop ${tokenInfo.symbol}` : "Drop ETH"}
+                {submitting
+                  ? "Faucet turning..."
+                  : token
+                  ? !tokenInfo.name
+                    ? `...`
+                    : `Approve & Drop ${tokenInfo.symbol}`
+                  : "Drop ETH"}
               </Button>
             </Form.Item>
           </div>
