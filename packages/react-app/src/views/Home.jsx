@@ -97,8 +97,15 @@ function Home({
 
       if (tokenInfo.allowance.lt(totalAmount)) {
         setMessage(`Not enough allowance to spend, awaiting approval...`);
-        const approval = await tx(tokenWrite.approve(readContracts?.Multidrop?.address, totalAmount));
-        await approval.wait(1);
+
+        try {
+          const approval = await tx(tokenWrite.approve(readContracts?.Multidrop?.address, totalAmount));
+          await approval.wait(1);
+        } catch (error) {
+          console.log(`Approval was not successful`);
+
+          return null;
+        }
       }
     }
 
