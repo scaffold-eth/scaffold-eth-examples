@@ -17,15 +17,9 @@ contract Multidrop is ReentrancyGuard, Ownable {
     event tokenDropped(
         address indexed from,
         address indexed to,
-        address indexed token,
-        uint256 timestamp
+        address indexed token
     );
-    event ETHdropped(
-        address indexed from,
-        address indexed to,
-        uint256 amount,
-        uint256 timestamp
-    );
+    event ETHdropped(address indexed from, address indexed to, uint256 amount);
 
     modifier validList(address[] memory users, uint256[] memory values) {
         require(users.length == values.length, "Users - Invalid length");
@@ -55,12 +49,7 @@ contract Multidrop is ReentrancyGuard, Ownable {
             (bool sent, ) = currentUser.call{value: values[i]}("");
             require(sent, "Failed to send Ether");
 
-            emit ETHdropped(
-                msg.sender,
-                currentUser,
-                values[i],
-                block.timestamp
-            );
+            emit ETHdropped(msg.sender, currentUser, values[i]);
         }
 
         require(
@@ -74,36 +63,16 @@ contract Multidrop is ReentrancyGuard, Ownable {
         uint256[] memory values,
         IERC20 token
     ) public payable nonReentrant validList(users, values) {
-        uint256 totalTokens = 0;
-
         require(
             msg.value >= fee,
             "Not enough NativeToken sent for platform fees"
-        );
-
-        for (uint256 i = 0; i < values.length; i++) {
-            totalTokens += values[i];
-        }
-
-        require(
-            token.balanceOf(msg.sender) >= totalTokens,
-            "Not enough token balance"
-        );
-        require(
-            token.allowance(msg.sender, address(this)) >= totalTokens,
-            "Not enough token allowance"
         );
 
         // handle indexes drop
         for (uint256 i = 0; i < users.length; i++) {
             token.safeTransferFrom(msg.sender, users[i], values[i]);
 
-            emit tokenDropped(
-                msg.sender,
-                users[i],
-                address(token),
-                block.timestamp
-            );
+            emit tokenDropped(msg.sender, users[i], address(token));
         }
     }
 
@@ -114,6 +83,7 @@ contract Multidrop is ReentrancyGuard, Ownable {
     function withdraw(address[] memory to, uint256[] memory amount)
         public
         onlyOwner
+        validList(to, amount)
     {
         for (uint256 i = 0; i < to.length; i++) {
             (bool sent, ) = to[i].call{value: amount[i]}("");
