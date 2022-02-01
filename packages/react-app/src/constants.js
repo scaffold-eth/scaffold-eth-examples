@@ -66,15 +66,14 @@ export const NETWORKS = {
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
   },
-  matic: {
-    name: "matic",
+  polygon: {
+    name: "polygon",
     color: "#2bbdf7",
     chainId: 137,
     price: 1,
     gasPrice: 1000000000,
-    rpcUrl: "https://rpc-mainnet.maticvigil.com",
-    faucet: "https://faucet.matic.network/",
-    blockExplorer: "https://explorer-mainnet.maticvigil.com//",
+    rpcUrl: "https://polygon-rpc.com/",
+    blockExplorer: "https://polygonscan.com/",
   },
   mumbai: {
     name: "mumbai",
@@ -83,8 +82,8 @@ export const NETWORKS = {
     price: 1,
     gasPrice: 1000000000,
     rpcUrl: "https://rpc-mumbai.maticvigil.com",
-    faucet: "https://faucet.matic.network/",
-    blockExplorer: "https://mumbai-explorer.matic.today/",
+    faucet: "https://faucet.polygon.technology/",
+    blockExplorer: "https://mumbai.polygonscan.com/",
   },
   localArbitrum: {
     name: "localArbitrum",
@@ -170,7 +169,7 @@ export const NETWORKS = {
     gasPrice: 225000000000,
   },
   testnetHarmony: {
-    name: "Harmony Testnet",
+    name: "testnetHarmony",
     color: "#00b0ef",
     chainId: 1666700000,
     blockExplorer: "https://explorer.pops.one/",
@@ -178,12 +177,29 @@ export const NETWORKS = {
     gasPrice: 1000000000,
   },
   mainnetHarmony: {
-    name: "Harmony Mainnet",
+    name: "mainnetHarmony",
     color: "#00b0ef",
     chainId: 1666600000,
     blockExplorer: "https://explorer.harmony.one/",
     rpcUrl: `https://api.harmony.one`,
     gasPrice: 1000000000,
+  },
+  fantom: {
+    name: "fantom",
+    color: "#1969ff",
+    chainId: 250,
+    blockExplorer: "https://ftmscan.com/",
+    rpcUrl: `https://rpcapi.fantom.network`,
+    gasPrice: 1000000000,
+  },
+  testnetFantom: {
+    name: "testnetFantom",
+    color: "#1969ff",
+    chainId: 4002,
+    blockExplorer: "https://testnet.ftmscan.com/",
+    rpcUrl: `https://rpc.testnet.fantom.network`,
+    gasPrice: 1000000000,
+    faucet: "https://faucet.fantom.network/",
   },
 };
 

@@ -90,6 +90,13 @@ The frontend is powered by the `ZkpInterface` component. It needs to be fed a fe
 - `vkey`: (optional) A verification key used to verify the the generated proof. If this is not provided the interface will generate one for you.
 - `scVerifyFunc`: The verification function from our smart contract verifier.
 
+---
+
+📣 Make sure you update the `InfuraID` before you go to production. Huge thanks to [Infura](https://infura.io/) for our special account that fields 7m req/day!
+
+# 🏃💨 Speedrun Ethereum
+Register as a builder [here](https://speedrunethereum.com) and start on some of the challenges and build a portfolio.
+
 # 💬 Support Chat
 
 Join the telegram [support chat 💬](https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA) to ask questions and find others building with 🏗 scaffold-eth!
