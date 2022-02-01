@@ -31,7 +31,15 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, ExampleUI, Hints, Subgraph, ZkHashUI } from "./views";
+import {
+  Home,
+  ExampleUI,
+  Hints,
+  Subgraph,
+  ZkHashUI,
+  GameBoard,
+  GridView,
+} from "./views";
 import { useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
@@ -40,6 +48,8 @@ const concealMoveWasm = `${process.env.PUBLIC_URL}/circuits/concealMove.wasm`;
 const concealMoveZkey = `${process.env.PUBLIC_URL}/circuits/concealMove.zkey`;
 const hiddenMoveWasm = `${process.env.PUBLIC_URL}/circuits/hiddenMove.wasm`;
 const hiddenMoveZkey = `${process.env.PUBLIC_URL}/circuits/hiddenMove.zkey`;
+const revealMoveWasm = `${process.env.PUBLIC_URL}/circuits/revealMove.wasm`;
+const revealMoveZkey = `${process.env.PUBLIC_URL}/circuits/revealMove.zkey`;
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -285,7 +295,16 @@ function App(props) {
       <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
+          {/*<Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />*/}
+          {/*<GameBoard />*/}
+          <GridView
+            height={13}
+            width={13}
+            address={address}
+            readContracts={readContracts}
+            writeContracts={writeContracts}
+            tx={tx}
+          />
         </Route>
         <Route exact path="/debug">
           {/*
@@ -332,8 +351,8 @@ function App(props) {
                   y2: "2"
                 }
               }
-              wasm={hiddenMoveWasm}
-              zkey={hiddenMoveZkey}
+              wasm={revealMoveWasm}
+              zkey={revealMoveZkey}
               scVerifyFunc={readContracts && readContracts.TheBoard ? readContracts.TheBoard.verifyRevealMoveProof : null}
             />
 
