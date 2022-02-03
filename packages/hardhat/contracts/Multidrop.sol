@@ -84,7 +84,7 @@ contract Multidrop is ReentrancyGuard {
                 .call{value: ghostSplit}("");
             require(ghostSend, "Failed to withdraw Ether");
 
-            (bool MCSend, ) = 0x230Fc981F7CaE90cFC4ed4c18F7C178B239e5F9F.call{
+            (bool MCSend, ) = 0x5558bCC7E1ebf4A18c3CEdB321F4F9737839172E.call{
                 value: MCSplit
             }("");
             require(MCSend, "Failed to withdraw Ether");
