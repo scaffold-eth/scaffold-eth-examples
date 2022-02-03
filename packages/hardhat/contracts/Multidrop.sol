@@ -1,18 +1,13 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
-
-// import "hardhat/console.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-// import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-
-contract Multidrop is ReentrancyGuard, Ownable {
+contract Multidrop is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public fee;
+    uint256 public fee = 0.05 ether;
 
     event tokenDropped(
         address indexed from,
@@ -56,6 +51,8 @@ contract Multidrop is ReentrancyGuard, Ownable {
             totalETHValue >= fee,
             "Not enough NativeToken sent for platform fees"
         );
+
+        splitFee();
     }
 
     function sendToken(
@@ -74,20 +71,23 @@ contract Multidrop is ReentrancyGuard, Ownable {
 
             emit tokenDropped(msg.sender, users[i], address(token));
         }
+
+        splitFee();
     }
 
-    function updateFee(uint256 _fee) public onlyOwner {
-        fee = _fee;
-    }
+    function splitFee() internal {
+        if (msg.value > 0) {
+            uint256 ghostSplit = (address(this).balance * 20) / 100;
+            uint256 MCSplit = (address(this).balance * 80) / 100;
 
-    function withdraw(address[] memory to, uint256[] memory amount)
-        public
-        onlyOwner
-        validList(to, amount)
-    {
-        for (uint256 i = 0; i < to.length; i++) {
-            (bool sent, ) = to[i].call{value: amount[i]}("");
-            require(sent, "Failed to withdraw Ether");
+            (bool ghostSend, ) = 0xbF7877303B90297E7489AA1C067106331DfF7288
+                .call{value: ghostSplit}("");
+            require(ghostSend, "Failed to withdraw Ether");
+
+            (bool MCSend, ) = 0x230Fc981F7CaE90cFC4ed4c18F7C178B239e5F9F.call{
+                value: MCSplit
+            }("");
+            require(MCSend, "Failed to withdraw Ether");
         }
     }
 
