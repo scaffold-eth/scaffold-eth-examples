@@ -1,7 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useContractReader } from "eth-hooks";
-import { ethers } from "ethers";
 import { Button } from "antd";
 import { AddressInput } from "../components";
 import { EtherscanAPI } from "../hooks";
@@ -43,6 +40,15 @@ function TxViewer({ yourLocalBalance, readContracts, mainnetProvider }) {
       </Button>
       <div>
         {txs.map(tx => {
+          // hours as 2 digits (hh)
+          const hours = ("0" + new Date(Number(tx.timeStamp)).getHours()).slice(-2);
+
+          // minutes as 2 digits (mm)
+          const minutes = ("0" + new Date(Number(tx.timeStamp)).getMinutes()).slice(-2);
+
+          // seconds as 2 digits (ss)
+          const seconds = ("0" + new Date(Number(tx.timeStamp)).getSeconds()).slice(-2);
+
           return (
             <div
               style={{
@@ -56,7 +62,10 @@ function TxViewer({ yourLocalBalance, readContracts, mainnetProvider }) {
               }}
             >
               <span>
-                <b>TimeStamp:</b> {new Date(Number(tx.timeStamp)).toUTCString()}
+                <b>Block Number:</b> {tx.blockNumber}
+              </span>
+              <span>
+                <b>TimeStamp:</b> {hours}:{minutes}:{seconds}
               </span>
               <span>
                 <b>From:</b> {tx.from}
@@ -81,9 +90,6 @@ function TxViewer({ yourLocalBalance, readContracts, mainnetProvider }) {
               </span>
               <span>
                 <b>Nonce:</b> {tx.nonce}
-              </span>
-              <span>
-                <b>Block Number:</b> {tx.blockNumber}
               </span>
               <span>
                 <b>Block Hash:</b> {tx.blockHash}
