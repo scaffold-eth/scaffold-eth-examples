@@ -30,13 +30,13 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   // Getting a previously deployed contract
   const Multidrop = await ethers.getContract("Multidrop", deployer);
 
-  const feesUpdate = await Multidrop.updateFee(ethers.utils.parseEther("0.05"));
+  // const feesUpdate = await Multidrop.updateFee(ethers.utils.parseEther("0.05"));
 
-  await feesUpdate.wait(4);
+  // await feesUpdate.wait(4);
 
-  const transferOwnership = await Multidrop.transferOwnership(admin);
+  // const transferOwnership = await Multidrop.transferOwnership(admin);
 
-  await transferOwnership.wait(4);
+  // await transferOwnership.wait(4);
 
   /*
   //If you want to send value to an address from the deployer
