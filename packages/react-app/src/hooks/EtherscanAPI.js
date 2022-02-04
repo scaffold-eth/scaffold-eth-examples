@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ETHERSCAN_KEY } from "../constants";
 
-//Accounts
+// Accounts
 const getAccountBalance = async (address, tag = "latest") => {
   const url = `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=${tag}&apikey=${ETHERSCAN_KEY}`;
   const response = await axios.get(url);
@@ -26,7 +26,7 @@ const getTxListInternal = async (address, limit, startblock = 0, endblock = 9999
   return response.data;
 };
 
-//Contracts
+// Contracts
 const getContractABI = async (address) => {
   const url = `https://api.etherscan.io/api?module=contract&action=getabi&address=${address}&apikey=${ETHERSCAN_KEY}`;
   const response = await axios.get(url);
@@ -40,7 +40,7 @@ const getContractSourceCode = async (address) => {
 };
 
 
-//Transactions
+// Transactions
 const getTxReceiptStatus = async txHash => {
   const url = `https://api.etherscan.io/api?module=transaction&action=gettxreceiptstatus&txhash=${txHash}&apikey=${ETHERSCAN_KEY}`;
   const response = await axios.get(url);
@@ -53,7 +53,7 @@ const getTransactionStatus = async txHash => {
   return response.data;
 };
 
-//Blocks
+// Blocks
 const getBlockReward = async blockNo => {
   const url = `https://api.etherscan.io/api?module=block&action=getBlockReward&blockNo=${blockNo}&apikey=${ETHERSCAN_KEY}`;
   const response = await axios.get(url);
