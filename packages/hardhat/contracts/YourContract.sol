@@ -2,8 +2,9 @@ pragma solidity >=0.8.11 < 0.9.0;
 //SPDX-License-Identifier: MIT
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 //import "@openzeppelin/contracts/access/Ownable.sol"; //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
-// import "./Verifier.sol";
+import "./Verifier.sol";
 
 interface IPoseidon3 {
     function poseidon(uint256[3] calldata) external pure returns(uint256);
@@ -76,7 +77,7 @@ contract YourContract {
         }
     }
 
-    function constructRoot(uint256[] calldata _data) public view returns(uint256 x) {
+    function constructRoot(uint256[] memory _data) public view returns(uint256 x) {
         uint256 levelLength = _data.length /*& 1 == 1 ? _data.length + 1 : _data.length*/;
         uint256 currentLevel;
 
@@ -112,6 +113,16 @@ contract YourContract {
         }
 
         return x = data[0];
+    }
+
+    function generateOwnedRoot(address _addr, address _ERC721Contract) public view returns(uint256) {
+        uint256 bal = IERC721Enumerable(_ERC721Contract).balanceOf(_addr);
+        require((bal & (bal - 1)) == 0); // temp until figure out better root calc
+        uint256[] memory ids = new uint256[](bal);
+        for (uint256 i; i<bal; i++) {
+            ids[i] = IERC721Enumerable(_ERC721Contract).tokenOfOwnerByIndex(_addr, i);
+        }
+        return constructRoot(ids);
     }
 
 
