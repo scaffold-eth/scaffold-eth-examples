@@ -28,6 +28,7 @@ contract YourContract {
         Poseidon3 = IPoseidon3(_poseidon3);
     }
 
+    // ROOT GENERATION FUNCTIONS //
     function poseidon2(
         uint256 a,
         uint256 b
@@ -115,6 +116,8 @@ contract YourContract {
         return x = data[0];
     }
 
+    mapping(address => uint256) public addrToCommitment;
+
     function generateOwnedRoot(address _addr, address _ERC721Contract) public view returns(uint256) {
         uint256 bal = IERC721Enumerable(_ERC721Contract).balanceOf(_addr);
         require((bal & (bal - 1)) == 0); // temp until figure out better root calc
@@ -123,6 +126,40 @@ contract YourContract {
             ids[i] = IERC721Enumerable(_ERC721Contract).tokenOfOwnerByIndex(_addr, i);
         }
         return constructRoot(ids);
+    }
+
+    function commitHiddenTokens(
+        address _ERC721Contract,
+        uint256[2] memory a,
+        uint256[2][2] memory b,
+        uint256[2] memory c,
+        uint256[2] memory input
+    ) public returns(uint256) {
+        uint256 heldRoot = generateOwnedRoot(msg.sender, _ERC721Contract);
+        require(heldRoot == input[1], "Invalid.heldRoot");
+        uint256 commitRoot = input[0];
+
+        require(
+            Verifier.verifyCommit721TokensProof(a, b, c, input) == true,
+            "Invalid.Proof"
+        );
+
+        addrToCommitment[msg.sender] = commitRoot;
+        return commitRoot;
+    }
+
+    function verifyCommit721TokensProof(
+        uint256[2] memory a,
+        uint256[2][2] memory b,
+        uint256[2] memory c,
+        uint256[2] memory input
+    ) public view returns(bool) {
+        return Verifier.verifyCommit721TokensProof(
+            a,
+            b,
+            c,
+            input
+        );
     }
 
 
