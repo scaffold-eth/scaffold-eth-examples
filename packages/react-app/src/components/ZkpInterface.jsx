@@ -107,23 +107,57 @@ export default function ZkpInterface({
       );
     } else {
       const arrElements = [];
-      for (let j = 0; j < proofInputs[inputFieldsKeys[i]].length; j++)
-      arrElements.push(
-        <div style={{padding: "4px"}}>
-          <div style={{ float: "left"}}>
-            <h4>index: {j}</h4>
-          </div>
-          <Input
-            defaultValue={proofInputs[inputFieldsKeys[i]][j]}
-            allowClear={true}
-            onChange={(event) => {
-              const inputUpdate = { ...proofInputs };
-              inputUpdate[inputFieldsKeys[i]][j] = event.target.value;
-              setProofInputs(inputUpdate);
-            }}
-          />
-        </div>
-      );
+      for (let j = 0; j < proofInputs[inputFieldsKeys[i]].length; j++) {
+        if (!Array.isArray(proofInputs[inputFieldsKeys[i]][j])) {
+          arrElements.push(
+            <div style={{padding: "4px"}}>
+              <div style={{ float: "left"}}>
+                <h4>index: {j}</h4>
+              </div>
+              <Input
+                defaultValue={proofInputs[inputFieldsKeys[i]][j]}
+                allowClear={true}
+                onChange={(event) => {
+                  const inputUpdate = { ...proofInputs };
+                  inputUpdate[inputFieldsKeys[i]][j] = event.target.value;
+                  setProofInputs(inputUpdate);
+                }}
+              />
+            </div>
+          );
+        } else {
+          const arrArrElements = [];
+          for (let k = 0; k < proofInputs[inputFieldsKeys[i]][j].length; k++) {
+            arrArrElements.push(
+              <div style={{padding: "4px"}}>
+                <div style={{ float: "left"}}>
+                  <h4>index: {k}</h4>
+                </div>
+                <Input
+                  defaultValue={proofInputs[inputFieldsKeys[i]][j][k]}
+                  allowClear={true}
+                  onChange={(event) => {
+                    const inputUpdate = { ...proofInputs };
+                    inputUpdate[inputFieldsKeys[i]][j][k] = event.target.value;
+                    setProofInputs(inputUpdate);
+                  }}
+                />
+              </div>
+            );
+          }
+          arrElements.push(
+            <div style={{padding: "8px"}}>
+              <div style={{ float: "left"}}>
+                <h3>{inputFieldsKeys[i]}: {j}</h3>
+              </div>
+              <br/>
+              <div style={{padding: "2vw"}}>
+                {arrArrElements}
+              </div>
+            </div>
+          );
+        }
+      }
       fields.push(
         <div style={{padding: "8px"}}>
           <div style={{ float: "left"}}>
