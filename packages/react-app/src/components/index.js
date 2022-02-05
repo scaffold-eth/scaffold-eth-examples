@@ -26,3 +26,4 @@ export { default as TokenSelect } from "./TokenSelect";
 export { default as EdDSABurner } from "./EdDSABurner";
 export { default as PoseidonInterface } from "./PoseidonInterface";
 export { default as ZkpInterface } from "./ZkpInterface";
+export { default as SmtInterface } from "./SmtInterface";
