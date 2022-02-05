@@ -24,6 +24,7 @@ import {
   FaucetHint,
   NetworkSwitch,
   ZkpInterface,
+  SmtInterface,
 } from "./components";
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
@@ -35,8 +36,8 @@ import { useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
 
-const wasm = `${process.env.PUBLIC_URL}/circuits/init.wasm`;
-const zkey = `${process.env.PUBLIC_URL}/circuits/init.zkey`;
+const wasm = `${process.env.PUBLIC_URL}/circuits/commit721Tokens.wasm`;
+const zkey = `${process.env.PUBLIC_URL}/circuits/commit721Tokens.zkey`;
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -297,17 +298,47 @@ function App(props) {
             <ZkpInterface
               inputFields={
                 {
-                  x: "1764",
-                  hash: "15893827533473716138720882070731822975159228540693753428689375377280130954696"
+                  "heldRoot": "3216994579476368752051730975595079547756184129839745130039722450490954703452",
+                  "indices": ["0"],
+                  "ids": ["1"],
+                  "heldSiblings": [
+                    [
+                      "18633177681087256093917781501598535787288636319458863703297766874648581812180",
+                      "1479217662866806931373864062491316660552929911858847787763625339341170026316",
+                      "9800886985851864869083087748906553790090797461220007985647333200643961820500",
+                      "6811512262668269723235630483591064899968978577259489346957798557247472535153",
+                      "0"
+                    ]
+                  ],
+                  "commitNewKeys": ["1"],
+                  "commitOldKeys": ["1"],
+                  "commitSiblings": [
+                    [
+                      "0",
+                      "0",
+                      "0",
+                      "0"
+                    ]
+                  ]
                 }
               }
               wasm={wasm}
               zkey={zkey}
-              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyInitProof : null}
+              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyCommit721TokensProof : null}
             />
+            <SmtInterface />
 
             <Contract
               name="YourContract"
+              price={price}
+              signer={userSigner}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
+            />
+            <Contract
+              name="Test721"
               price={price}
               signer={userSigner}
               provider={localProvider}
