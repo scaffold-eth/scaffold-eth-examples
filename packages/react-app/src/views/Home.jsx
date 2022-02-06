@@ -1,7 +1,14 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+
+import { Button } from "antd";
 import { useContractReader } from "eth-hooks";
+import { NftCard, Address } from "../components";
+import { parseGroth16ToSolidityCalldata } from "../helpers";
+import { useSMT } from "../hooks";
+
 import { ethers } from "ethers";
+const snarkjs = require("snarkjs");
+const crypto = require("crypto");
 
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
@@ -9,74 +16,152 @@ import { ethers } from "ethers";
  * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
  * @returns react component
  */
-function Home({ yourLocalBalance, readContracts }) {
+function Home({
+  address,
+  readContracts,
+  writeContracts,
+  tx,
+  wasm,
+  zkey
+}) {
   // you can also use hooks locally in your component of choice
   // in this case, let's keep track of 'purpose' variable from our contract
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+
+  const [heldLeafData, setHeldLeafData] = useState({});
+  const heldTree = useSMT(heldLeafData);
+  const [selectedKey, setSelectedKey] = useState();
+
+  const [commitLeafData, setCommitLeafData] = useState({});
+  const commitTree = useSMT(commitLeafData);
+
+  const blankTree = useSMT();
+
+  const bal = useContractReader(readContracts, "Test721", "balanceOf", [address]);
+  const test721Addr = readContracts && readContracts.Test721 ? readContracts.Test721.address : null;
+
+  const comRoot = useContractReader(readContracts, "YourContract", "addrToCommitment", [address]);
+
+  function updateLeaf(key, value) {
+    setHeldLeafData(
+      {
+        ...heldLeafData,
+        [key]: value
+      }
+    );
+  }
+
+  function commit721(index, commitKey, value) {
+    setCommitLeafData(
+      {[commitKey]: value}
+    );
+    setSelectedKey(index);
+    console.log(index);
+  }
+
+  async function generateCommitCalldata() {
+    const commitKey = Object.keys(commitLeafData)[0];
+    // console.log(commitKey);
+    // console.log(commitLeafData[commitKey]);
+
+    const commitRes = await blankTree.insert(commitKey, commitLeafData[commitKey]);
+    // console.log(commitRes.oldKey);
+
+    const commitInputs = {
+      heldRoot: BigInt(heldTree.root.toString()),
+      indices: [selectedKey],
+      ids: [commitLeafData[commitKey]],
+      heldSiblings: [new Array(5).fill(BigInt(0))],
+      commitNewKeys: [BigInt(commitKey)],
+      commitOldKeys: [commitRes.oldKey],
+      commitSiblings: [new Array(4).fill(BigInt(0))]
+    }
+
+    const heldProof = await heldTree.find(selectedKey);
+    // console.log(heldProof.siblings);
+
+    for (let i = 0; i < 5; i++) {
+      // console.log(heldProof.siblings[i]);
+      if (heldProof.siblings[i]) {
+        commitInputs.heldSiblings[i] = heldProof.siblings[i];
+      } else {
+        commitInputs.heldSiblings[i] = BigInt(0);
+      }
+    }
+
+    for (let i = 0; i < 4; i++) {
+      if (commitRes.siblings[i]) {
+        commitInputs.commitSiblings[i] = commitRes.siblings[i];
+      }
+    }
+
+    blankTree.delete(commitKey);
+
+    // console.log("proof inputs: ",commitInputs);
+
+    const { proof, publicSignals } = await snarkjs.groth16.fullProve(commitInputs, wasm, zkey);
+    const vkey = await snarkjs.zKey.exportVerificationKey(zkey);
+    const verified = await snarkjs.groth16.verify(vkey, publicSignals, proof);
+    console.log("Proof Verification: ", verified);
+    // console.log(publicSignals);
+    const proofCaldata = parseGroth16ToSolidityCalldata(proof, publicSignals);
+
+    tx( writeContracts.YourContract.commitHiddenTokens(test721Addr, ...proofCaldata) );
+  }
+
+  function commitOnChain() {
+
+  }
+
+  const nftDisp = [];
+  for (let i=0; i<bal; i++) {
+    nftDisp.push(
+      <div>
+        <NftCard
+          address={address}
+          tokenAddress={test721Addr}
+          readContracts={readContracts}
+          index={i}
+          key={i}
+          updateLeaf={updateLeaf}
+          commit721={commit721}
+        />
+      </div>
+    )
+  }
 
   return (
-    <div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>📝</span>
-        This Is Your App Home. You can start editing it in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/react-app/src/views/Home.jsx
-        </span>
+    <div style={{ margin: "auto"}}>
+      <div style={{ padding: "2%" }}>
+        <h4>Holdings Merkle Root:</h4>
+        <h3>{heldTree.root ? heldTree.root.toString() : "undefined"}</h3>
       </div>
-      {!purpose?<div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>👷‍♀️</span>
-        You haven't deployed your contract yet, run
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          yarn chain
-        </span> and <span
-            className="highlight"
-            style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-          >
-            yarn deploy
-          </span> to deploy your first contract!
-      </div>:<div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤓</span>
-        The "purpose" variable from your contract is{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          {purpose}
-        </span>
-      </div>}
-
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤖</span>
-        An example prop of your balance{" "}
-        <span style={{ fontWeight: "bold", color: "green" }}>({ethers.utils.formatEther(yourLocalBalance)})</span> was
-        passed into the
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          Home.jsx
-        </span>{" "}
-        component from
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          App.jsx
-        </span>
+      <div style={{ padding: "2%" }}>
+        <h4>Commit Merkle Root:</h4>
+        <h3>{comRoot ? comRoot.toString() : "undefined"}</h3>
       </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>💭</span>
-        Check out the <Link to="/hints">"Hints"</Link> tab for more tips.
+      <div style={{ padding: "2%" }}>
+        <h4>New Commit Merkle Root:</h4>
+        <h3>{commitTree.root ? commitTree.root.toString() : "undefined"}</h3>
+        <Button
+          danger
+          type="primary"
+          onClick={() => {
+            generateCommitCalldata();
+          }}
+        >
+          Commit On Chain
+        </Button>
       </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🛠</span>
-        Tinker with your smart contract using the <Link to="/debug">"Debug Contract"</Link> tab.
+      <h1>Balance: {bal ? bal.toString():null}</h1>
+      {nftDisp}
+      <div style={{ padding: "2%" }}>
+        <Button
+          type="primary"
+          size="large"
+          onClick={() => tx( writeContracts.Test721.mint() )}
+        >
+          Mint
+        </Button>
       </div>
     </div>
   );
