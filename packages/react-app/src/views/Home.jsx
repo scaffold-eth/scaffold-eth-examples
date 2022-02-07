@@ -184,10 +184,10 @@ function Home({
 
   return (
     <div className="mt-16">
-      {/* <div className="flex flex-1 justify-center">
-        <h1 className="text-2xl">Multidrop</h1>
-      </div> */}
-      (
+      <div className="flex flex-1 justify-center">
+        <h1 className="text-2xl">Multidrop Native & ERC-20 Tokens</h1>
+      </div>
+
       <div className="flex flex-1 max-w-3xl mx-auto justify-center mt-4">
         <Form
           className="w-full"
@@ -230,6 +230,11 @@ function Home({
               placeholder="Addresses & values pairs, each per line: Eg: 0x...., 0.01"
             />
           </Form.Item>
+
+          <div className="flex flex-1 justify-end mb-4">
+            <span className="italic">Fee: Ξ 0.05</span>
+          </div>
+
           <div className="flex flex-1 flex-col mt-4 justify-center items-center">
             {/* {submitting && (
                 <div className="my-4 italic">
