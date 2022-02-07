@@ -258,6 +258,7 @@ function App(props) {
             address={address}
             localChainId={localChainId}
             localProvider={localProvider}
+            loadWeb3Modal={loadWeb3Modal}
             readContracts={readContracts}
             writeContracts={writeContracts}
             mainnetProvider={mainnetProvider}

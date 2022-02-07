@@ -10,6 +10,7 @@ import { useERC20 } from "../hooks";
 function Home({
   tx,
   address,
+  loadWeb3Modal,
   localChainId,
   localProvider,
   userSigner,
@@ -244,15 +245,21 @@ function Home({
                 </div>
               )} */}
             <Form.Item className="no-bottom-margin">
-              <Button
-                size="large"
-                type="primary"
-                htmlType="submit"
-                className="flex items-center justify-center"
-                disabled={token && !tokenInfo.name}
-              >
-                Review {token ? tokenInfo.symbol : "ETH"} drop
-              </Button>
+              {address ? (
+                <Button
+                  size="large"
+                  type="primary"
+                  htmlType="submit"
+                  className="flex items-center justify-center"
+                  disabled={token && !tokenInfo.name}
+                >
+                  Review {token ? tokenInfo.symbol : "ETH"} drop
+                </Button>
+              ) : (
+                <Button className="mt-2" type="primary" size="large" onClick={loadWeb3Modal}>
+                  Connect Wallet
+                </Button>
+              )}
             </Form.Item>
           </div>
         </Form>
