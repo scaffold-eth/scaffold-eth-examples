@@ -1,7 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 // import { Link } from "react-router-dom";
 import { ethers } from "ethers";
-import { Alert, Form, Input, Button } from "antd";
+import { Alert, Form, Input, Button, Modal } from "antd";
+
+import { useOnBlock } from "eth-hooks";
 import { TokenSelect } from "../components";
 import { useERC20 } from "../hooks";
 
@@ -15,13 +17,23 @@ function Home({
   readContracts,
   mainnetProvider,
 }) {
+  const [approving, setApproving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [token, setToken] = useState(null);
   const [message, setMessage] = useState("");
+  const [reviewData, setReviewData] = useState({});
+  const [review, setReview] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(Date.now());
   const [form] = Form.useForm();
   const [tokenInfo, tokenRead, tokenWrite] = useERC20(token, localProvider, userSigner, {
     spender: readContracts?.Multidrop?.address,
     owner: address,
+    refreshKey: refreshKey,
+  });
+
+  useOnBlock(localProvider, () => {
+    console.log(`Refreshing token info on new Block`);
+    setRefreshKey(Date.now());
   });
 
   const handleParseFormatting = async (unit = "ether") => {
@@ -81,35 +93,43 @@ function Home({
 
   // const handleTokenChecks = async () => {}
 
-  const onFinish = async () => {
-    // handle finish here
-    setSubmitting(true);
-
-    const { addresses, amounts, totalAmount } = await handleParseFormatting(token ? tokenInfo.decimals : "ether");
-
+  const approveToken = async () => {
+    setApproving(true);
     if (token) {
       setMessage(`Checking spend limit for ${tokenInfo.symbol}...`);
       // check for approvals before continuing
-      if (tokenInfo.balanceOfOwner.lt(totalAmount)) {
+      if (tokenInfo.balanceOfOwner.lt(reviewData.totalAmount)) {
         setMessage(`Not enough ${tokenInfo.symbol} balance`);
+        setApproving(false);
+        setReview(false);
         return null;
       }
 
-      if (tokenInfo.allowance.lt(totalAmount)) {
+      if (tokenInfo.allowance.lt(reviewData.totalAmount)) {
         setMessage(`Not enough allowance to spend, awaiting approval...`);
 
         try {
-          const approval = await tx(tokenWrite.approve(readContracts?.Multidrop?.address, totalAmount));
+          const approval = await tx(tokenWrite.approve(readContracts?.Multidrop?.address, reviewData.totalAmount));
           await approval.wait(1);
+
+          setRefreshKey(Date.now());
         } catch (error) {
           console.log(`Approval was not successful`);
 
+          setApproving(false);
+          setReview(false);
           return null;
         }
       }
-    }
 
-    const params = [addresses, amounts];
+      setApproving(false);
+      setReview(false);
+    }
+  };
+
+  const handleSend = async () => {
+    setSubmitting(true);
+    const params = [reviewData.addresses, reviewData.amounts];
 
     if (token) {
       params.push(token);
@@ -119,10 +139,10 @@ function Home({
     const fees = await readContracts.Multidrop.fee();
 
     // add fees to tx value
-    params.push({ value: token ? fees : totalAmount.add(fees) });
+    params.push({ value: token ? fees : reviewData.totalAmount.add(fees) });
 
     setMessage(
-      `Dropping ${ethers.utils.formatUnits(totalAmount, token ? tokenInfo.decimals : "ether")} ${
+      `Dropping ${ethers.utils.formatUnits(reviewData.totalAmount, token ? tokenInfo.decimals : "ether")} ${
         !token ? "ETH" : tokenInfo.symbol
       } into accounts`,
     );
@@ -144,7 +164,17 @@ function Home({
         );
       }
     });
+  };
 
+  const onFinish = async () => {
+    // handle finish here
+    setSubmitting(true);
+
+    const { addresses, amounts, totalAmount } = await handleParseFormatting(token ? tokenInfo.decimals : "ether");
+
+    setReviewData({ addresses, amounts, totalAmount });
+
+    setReview(true);
     setSubmitting(false);
   };
 
@@ -157,7 +187,7 @@ function Home({
       {/* <div className="flex flex-1 justify-center">
         <h1 className="text-2xl">Multidrop</h1>
       </div> */}
-
+      (
       <div className="flex flex-1 max-w-3xl mx-auto justify-center mt-4">
         <Form
           className="w-full"
@@ -172,7 +202,7 @@ function Home({
             name="tokenselect"
             rules={[
               {
-                required: true,
+                required: false,
                 message: "Select your token...",
               },
             ]}
@@ -201,31 +231,82 @@ function Home({
             />
           </Form.Item>
           <div className="flex flex-1 flex-col mt-4 justify-center items-center">
-            {submitting && (
-              <div className="my-4 italic">
-                <Alert type="info" message={message} />
-              </div>
-            )}
+            {/* {submitting && (
+                <div className="my-4 italic">
+                  <Alert type="info" message={message} />
+                </div>
+              )} */}
             <Form.Item className="no-bottom-margin">
               <Button
+                size="large"
                 type="primary"
                 htmlType="submit"
                 className="flex items-center justify-center"
                 disabled={token && !tokenInfo.name}
-                loading={submitting}
               >
-                {submitting
-                  ? "Faucet turning..."
-                  : token
-                  ? !tokenInfo.name
-                    ? `...`
-                    : `Approve & Drop ${tokenInfo.symbol}`
-                  : "Drop ETH"}
+                Review {token ? tokenInfo.symbol : "ETH"} drop
               </Button>
             </Form.Item>
           </div>
         </Form>
       </div>
+      <Modal visible={review} onCancel={() => setReview(false)} footer={null} centered>
+        {review && (
+          <div className="flex flex-1 flex-col mx-auto items-center justify-center mt-4">
+            <h1 className="text-2xl">You are dropping</h1>
+            <div className="text-xl italic">
+              <span>
+                {ethers.utils.formatUnits(reviewData.totalAmount, token ? tokenInfo.decimals : "ether")}{" "}
+                {!token ? "ETH" : tokenInfo.symbol}{" "}
+              </span>
+              to <span>{reviewData.addresses.length}</span> unique addresses
+            </div>
+            {token ? (
+              <>
+                <div className="mt-6 flex flex-col w-full">
+                  {tokenInfo.balanceOfOwner.lt(reviewData.totalAmount) && (
+                    <div className="mb-4 flex items-center justify-center">
+                      <Alert type="warning" message="Your token balance is less than your drop total" />
+                    </div>
+                  )}
+                  {tokenInfo?.allowance.lt(reviewData.totalAmount) && (
+                    <Button
+                      className="mt-2"
+                      type="primary"
+                      size="large"
+                      loading={approving}
+                      block
+                      onClick={approveToken}
+                    >
+                      Approve {tokenInfo.symbol}
+                    </Button>
+                  )}
+                  <Button
+                    className="mt-2"
+                    block
+                    loading={submitting}
+                    disabled={
+                      tokenInfo.balanceOfOwner.lt(reviewData.totalAmount) ||
+                      tokenInfo?.allowance.lt(reviewData.totalAmount)
+                    }
+                    type="primary"
+                    size="large"
+                    onClick={handleSend}
+                  >
+                    Drop {tokenInfo.symbol}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="mt-6 flex flex-col w-full">
+                <Button className="mt-2" type="primary" size="large" loading={submitting} onClick={handleSend} block>
+                  Send ETH
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

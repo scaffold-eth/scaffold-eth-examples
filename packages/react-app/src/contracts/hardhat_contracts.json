@@ -5,7 +5,7 @@
       "chainId": "1",
       "contracts": {
         "Multidrop": {
-          "address": "0x03AE0cadF76F76019290B2a6B267B13E63f95073",
+          "address": "0xa718D712cf928EE4673BC1d3958376252C047698",
           "abi": [
             {
               "inputs": [],
@@ -35,25 +35,6 @@
                 }
               ],
               "name": "ETHdropped",
-              "type": "event"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "previousOwner",
-                  "type": "address"
-                },
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "newOwner",
-                  "type": "address"
-                }
-              ],
-              "name": "OwnershipTransferred",
               "type": "event"
             },
             {
@@ -99,26 +80,6 @@
               "type": "function"
             },
             {
-              "inputs": [],
-              "name": "owner",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "renounceOwnership",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
               "inputs": [
                 {
                   "internalType": "address[]",
@@ -160,50 +121,6 @@
               "type": "function"
             },
             {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "newOwner",
-                  "type": "address"
-                }
-              ],
-              "name": "transferOwnership",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "_fee",
-                  "type": "uint256"
-                }
-              ],
-              "name": "updateFee",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address[]",
-                  "name": "to",
-                  "type": "address[]"
-                },
-                {
-                  "internalType": "uint256[]",
-                  "name": "amount",
-                  "type": "uint256[]"
-                }
-              ],
-              "name": "withdraw",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
               "stateMutability": "payable",
               "type": "receive"
             }
@@ -218,7 +135,7 @@
       "chainId": "4",
       "contracts": {
         "Multidrop": {
-          "address": "0xE963eFFC4427dA10733125470258a186DeD0adB6",
+          "address": "0x3ba14a4ddB1BE54a5f39BDAb66138Ad2f593a33F",
           "abi": [
             {
               "inputs": [],

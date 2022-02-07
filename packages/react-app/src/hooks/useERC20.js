@@ -236,11 +236,11 @@ export default function useERC20(address, provider, signer, params = {}) {
 
   const read = useMemo(() => {
     return isValidParams(address, provider, abi) ? new ethers.Contract(address, abi, provider) : null;
-  }, [provider, address, abi]);
+  }, [provider, address, abi, params?.refreshKey]);
 
   const write = useMemo(() => {
     return isValidParams(address, signer, abi) ? new ethers.Contract(address, abi, signer) : null;
-  }, [signer, address, abi]);
+  }, [signer, address, abi, params?.refreshKey]);
 
   const handleTokenInfo = async (r, p) => {
     try {
@@ -269,7 +269,7 @@ export default function useERC20(address, provider, signer, params = {}) {
     if (address && read?.address === address) {
       handleTokenInfo(read, params);
     }
-  }, [read, params.owner, params.spender]);
+  }, [read, params.owner, params.spender, params?.refreshKey]);
 
   return [tokenInfo, read, write];
 }
