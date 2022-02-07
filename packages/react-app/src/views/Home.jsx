@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { ethers } from "ethers";
 import { Alert, Form, Input, Button, Modal } from "antd";
 
-import { useOnBlock } from "eth-hooks";
+import { useContractReader, useOnBlock } from "eth-hooks";
 import { TokenSelect } from "../components";
 import { useERC20 } from "../hooks";
 
@@ -35,6 +35,8 @@ function Home({
     console.log(`Refreshing token info on new Block`);
     setRefreshKey(Date.now());
   });
+
+  const fee = useContractReader(readContracts, "Multidrop", "fee") || ethers.BigNumber.from("0");
 
   const handleParseFormatting = async (unit = "ether") => {
     const { addressList } = form.getFieldsValue();
@@ -101,7 +103,6 @@ function Home({
       if (tokenInfo.balanceOfOwner.lt(reviewData.totalAmount)) {
         setMessage(`Not enough ${tokenInfo.symbol} balance`);
         setApproving(false);
-        setReview(false);
         return null;
       }
 
@@ -117,13 +118,11 @@ function Home({
           console.log(`Approval was not successful`);
 
           setApproving(false);
-          setReview(false);
           return null;
         }
       }
 
       setApproving(false);
-      setReview(false);
     }
   };
 
@@ -147,11 +146,9 @@ function Home({
       } into accounts`,
     );
 
-    await tx(writeContracts.Multidrop[token ? "sendToken" : "sendETH"](...params), update => {
+    const sendTx = await tx(writeContracts.Multidrop[token ? "sendToken" : "sendETH"](...params), update => {
       console.log("📡 Transaction Update:", update);
       if (update && (update.status === "confirmed" || update.status === 1)) {
-        // form.resetFields();
-        setSubmitting(false);
         console.log(" 🍾 Transaction " + update.hash + " finished!");
         console.log(
           " ⛽️ " +
@@ -164,6 +161,11 @@ function Home({
         );
       }
     });
+
+    await sendTx.wait(2);
+
+    setSubmitting(false);
+    setReview(false);
   };
 
   const onFinish = async () => {
@@ -184,8 +186,8 @@ function Home({
 
   return (
     <div className="mt-16">
-      <div className="flex flex-1 justify-center">
-        <h1 className="text-2xl">Multidrop Native & ERC-20 Tokens</h1>
+      <div className="flex flex-1 justify-center mb-12">
+        <h1 className="text-xl">Drop Native & ERC-20 Tokens to Unique Addresses</h1>
       </div>
 
       <div className="flex flex-1 max-w-3xl mx-auto justify-center mt-4">
@@ -232,7 +234,7 @@ function Home({
           </Form.Item>
 
           <div className="flex flex-1 justify-end mb-4">
-            <span className="italic">Fee: Ξ 0.05</span>
+            <span className="italic">Fee: Ξ {ethers.utils.formatUnits(fee)}</span>
           </div>
 
           <div className="flex flex-1 flex-col mt-4 justify-center items-center">
