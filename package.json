@@ -65,5 +65,7 @@
       "**/hardhat-ts/**"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "eth-hooks": "^4.0.29"
+  }
 }

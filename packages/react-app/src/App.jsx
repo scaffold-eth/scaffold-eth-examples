@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
-//import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
 import { Alert, Button, Col, Menu, Row, Input, Select } from "antd";
 import "antd/dist/antd.css";
@@ -22,7 +21,6 @@ import {
 } from "eth-hooks";
 import { useEventListener } from "eth-hooks/events/useEventListener";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
-// import Hints from "./Hints";
 import { ExampleUI, Hints, Subgraph } from "./views";
 
 // contracts
@@ -62,8 +60,8 @@ if (!targetNetwork) {
 }
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
-const NETWORKCHECK = true;
+const DEBUG = false;
+const NETWORKCHECK = false;
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -77,8 +75,8 @@ const scaffoldEthProvider = navigator.onLine
   : null;
 const poktMainnetProvider = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider(
-      "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
-    )
+    "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+  )
   : null;
 const mainnetInfura = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID)
@@ -109,8 +107,8 @@ function App(props) {
     poktMainnetProvider && poktMainnetProvider._isProvider
       ? poktMainnetProvider
       : scaffoldEthProvider && scaffoldEthProvider._network
-      ? scaffoldEthProvider
-      : mainnetInfura;
+        ? scaffoldEthProvider
+        : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
@@ -187,6 +185,9 @@ function App(props) {
   const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
     "0x34aA3F359A9D614239015126635CE7732c18fDF3",
   ]);
+
+  const myMainnetDAIInterface = mainnetContracts
+  console.log("interface", myMainnetDAIInterface)
 
   //
   // 🧫 DEBUG 👨🏻‍🔬
@@ -355,17 +356,18 @@ function App(props) {
   const [contractAddress, setContractAddress] = useState("");
   const [contractABI, setContractABI] = useState("");
   const { TextArea } = Input;
-  let theExternalContract = useExternalContractLoader(injectedProvider, contractAddress, contractABI);
+  let theExternalContract = useExternalContractLoader(userProviderAndSigner.provider, contractAddress, contractABI);
 
   let externalContractDisplay = "";
+
   if (contractAddress && contractABI) {
     externalContractDisplay = (
       <div>
         <Contract
           customContract={theExternalContract}
           signer={userSigner}
-          provider={localProvider}
-          chainId={selectedChainId} 
+          provider={userProviderAndSigner.provider}
+          chainId={selectedChainId}
         />
       </div>
     );
@@ -383,7 +385,7 @@ function App(props) {
           customContract={theExternalContractFromURL}
           signer={userSigner}
           provider={localProvider}
-          chainId={selectedChainId} 
+          chainId={selectedChainId}
         />
       </div>
     );
@@ -430,8 +432,8 @@ function App(props) {
       <Header />
       {networkDisplay}
       <span style={{ verticalAlign: "middle" }}>
-          {networkSelect}
-          {/*faucetHint*/}
+        {networkSelect}
+        {/*faucetHint*/}
       </span>
       <BrowserRouter>
         <Switch>
@@ -439,8 +441,8 @@ function App(props) {
             <AddressFromURL />
           </Route>
           <Route exact path="/">
-          <div>Paste the contract's address and ABI below:</div>
-            <div class="center" style={{ width: "50%"}}>
+            <div>Paste the contract's address and ABI below:</div>
+            <div class="center" style={{ width: "50%" }}>
               <div style={{ padding: 4 }}>
                 <AddressInput
                   placeholder="Enter Contract Address"
@@ -451,7 +453,7 @@ function App(props) {
               </div>
               <div style={{ padding: 4 }}>
                 <TextArea
-                  rows={6} 
+                  rows={6}
                   placeholder="Enter Contract ABI JSON"
                   value={contractABI}
                   onChange={e => {
