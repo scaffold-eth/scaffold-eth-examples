@@ -186,9 +186,6 @@ function App(props) {
     "0x34aA3F359A9D614239015126635CE7732c18fDF3",
   ]);
 
-  const myMainnetDAIInterface = mainnetContracts
-  console.log("interface", myMainnetDAIInterface)
-
   //
   // 🧫 DEBUG 👨🏻‍🔬
   //
@@ -356,6 +353,7 @@ function App(props) {
   const [contractAddress, setContractAddress] = useState("");
   const [contractABI, setContractABI] = useState("");
   const { TextArea } = Input;
+
   let theExternalContract = useExternalContractLoader(userProviderAndSigner.provider, contractAddress, contractABI);
 
   let externalContractDisplay = "";
