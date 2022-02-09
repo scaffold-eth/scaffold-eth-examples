@@ -13,24 +13,12 @@ import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
 import {
   useBalance,
-  useContractLoader,
-  useContractReader,
   useGasPrice,
-  useOnBlock,
   useUserProviderAndSigner,
 } from "eth-hooks";
-import { useEventListener } from "eth-hooks/events/useEventListener";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
-import { ExampleUI, Hints, Subgraph } from "./views";
 
-// contracts
-import deployedContracts from "./contracts/hardhat_contracts.json";
-import externalContracts from "./contracts/external_contracts";
-
-import { useContractConfig, useExternalContractLoader } from "./hooks";
-import Portis from "@portis/web3";
-import Fortmatic from "fortmatic";
-import Authereum from "authereum";
+import { useExternalContractLoader } from "./hooks";
 
 const { ethers } = require("ethers");
 /*
@@ -65,8 +53,6 @@ const NETWORKCHECK = false;
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
-// const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
-// const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 //
 // attempt to connect to our own scaffold eth rpc and if that fails fall back to infura...
 // Using StaticJsonRpcProvider as the chainId won't change see https://github.com/ethers-io/ethers.js/issues/901
@@ -124,10 +110,10 @@ function App(props) {
   };
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
-  const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
+  const price = useExchangeEthPrice(targetNetwork, mainnetProvider, 30000);
 
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
-  const gasPrice = useGasPrice(targetNetwork, "fast");
+  const gasPrice = useGasPrice(targetNetwork, "fast", 30000);
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider);
   const userSigner = userProviderAndSigner.signer;
@@ -149,42 +135,11 @@ function App(props) {
 
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
-  // The transactor wraps transactions and provides notificiations
-  const tx = Transactor(userSigner, gasPrice);
-
   // Faucet Tx can be used to send funds from the faucet
   const faucetTx = Transactor(localProvider, gasPrice);
 
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
-  const yourLocalBalance = useBalance(localProvider, address);
-
-  // Just plug in different 🛰 providers to get your balance on different chains:
-  const yourMainnetBalance = useBalance(mainnetProvider, address);
-
-  // const contractConfig = useContractConfig();
-
-  const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
-
-  // Load in your local 📝 contract and read a value from it:
-  const readContracts = useContractLoader(localProvider, contractConfig);
-
-  // If you want to make 🔐 write transactions to your contracts, use the userSigner:
-  const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
-
-  // EXTERNAL CONTRACT EXAMPLE:
-  //
-  // If you want to bring in the mainnet DAI contract it would look like:
-  const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
-
-  // If you want to call a function on a new block
-  useOnBlock(mainnetProvider, () => {
-    console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
-  });
-
-  // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
-    "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-  ]);
+  const yourLocalBalance = useBalance(localProvider, address, 30000);
 
   //
   // 🧫 DEBUG 👨🏻‍🔬
@@ -195,11 +150,7 @@ function App(props) {
       mainnetProvider &&
       address &&
       selectedChainId &&
-      yourLocalBalance &&
-      yourMainnetBalance &&
-      readContracts &&
-      writeContracts &&
-      mainnetContracts
+      yourLocalBalance
     ) {
       console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
       console.log("🌎 mainnetProvider", mainnetProvider);
@@ -207,21 +158,12 @@ function App(props) {
       console.log("👩‍💼 selected address:", address);
       console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
       console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
-      console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
-      console.log("📝 readContracts", readContracts);
-      console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
-      console.log("🔐 writeContracts", writeContracts);
     }
   }, [
     mainnetProvider,
     address,
     selectedChainId,
-    yourLocalBalance,
-    yourMainnetBalance,
-    readContracts,
-    writeContracts,
-    mainnetContracts,
+    yourLocalBalance
   ]);
 
   let networkDisplay = "";
@@ -353,7 +295,6 @@ function App(props) {
   const [contractAddress, setContractAddress] = useState("");
   const [contractABI, setContractABI] = useState("");
   const { TextArea } = Input;
-
   let theExternalContract = useExternalContractLoader(userProviderAndSigner.provider, contractAddress, contractABI);
 
   let externalContractDisplay = "";
@@ -375,14 +316,14 @@ function App(props) {
 
   function AddressFromURL() {
     let { addr, abi } = useParams();
-    let theExternalContractFromURL = useExternalContractLoader(injectedProvider, addr, abi);
+    let theExternalContractFromURL = useExternalContractLoader(userProviderAndSigner.provider, addr, abi);
 
     return (
       <div>
         <Contract
           customContract={theExternalContractFromURL}
           signer={userSigner}
-          provider={localProvider}
+          provider={userProviderAndSigner.provider}
           chainId={selectedChainId}
         />
       </div>
@@ -393,7 +334,6 @@ function App(props) {
   console.log("==-- localProvider: ", localProvider);
   console.log("==-- address: ", address);
   console.log("==-- blockExplorer: ", blockExplorer);
-  console.log("==-- contractConfig: ", contractConfig);
   console.log("==-- selectedChainId: ", selectedChainId);
   console.log("==-- theExternalContract: ", theExternalContract);
 
