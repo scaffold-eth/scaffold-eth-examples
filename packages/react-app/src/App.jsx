@@ -167,8 +167,8 @@ function App(props) {
     poktMainnetProvider && poktMainnetProvider._isProvider
       ? poktMainnetProvider
       : scaffoldEthProvider && scaffoldEthProvider._network
-      ? scaffoldEthProvider
-      : mainnetInfura;
+        ? scaffoldEthProvider
+        : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
@@ -255,10 +255,10 @@ function App(props) {
   // Find the events which have not been processed yet. Pass processed dataset down to the DAo component.
   let processedDataSet = [];
 
-  if(submitProposalEvents) {
-    for(let i=0; i<submitProposalEvents.length; i++) {
-      for(let j=0; j<processedProposalEvents.length; j++) {
-        if(parseInt(submitProposalEvents[i].args["proposalId"]) == parseInt(processedProposalEvents[j].args["proposalId"])) {
+  if (submitProposalEvents) {
+    for (let i = 0; i < submitProposalEvents.length; i++) {
+      for (let j = 0; j < processedProposalEvents.length; j++) {
+        if (parseInt(submitProposalEvents[i].args["proposalId"]) == parseInt(processedProposalEvents[j].args["proposalId"])) {
           processedDataSet.push(submitProposalEvents[i])
         }
       }
@@ -266,22 +266,22 @@ function App(props) {
     const intersection = submitProposalEvents.filter(x => !processedDataSet.includes(x));
     processedDataSet = intersection
   }
-  else{
+  else {
     processedDataSet = submitProposalEvents
   }
-  
+
   // Get contract address
-  const [contractAddress, setContractAddress ] = useState()
-  useEffect(async() => {
+  const [contractAddress, setContractAddress] = useState()
+  useEffect(async () => {
     if (readContracts) {
       const PowDAO = await readContracts.PowDAO
-      if(PowDAO) {
-          setContractAddress(PowDAO.address)
-          return PowDAO.address
-      } 
-  }
+      if (PowDAO) {
+        setContractAddress(PowDAO.address)
+        return PowDAO.address
+      }
+    }
   });
-  
+
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
@@ -481,7 +481,7 @@ function App(props) {
       {networkDisplay}
       <BrowserRouter>
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
-        <Menu.Item key="/">
+          <Menu.Item key="/">
             <Link
               onClick={() => {
                 setRoute("/");
@@ -515,42 +515,42 @@ function App(props) {
 
         <Switch>
           <Route exact path="/">
-              <DAO
-                address={address}
-                contractAddress={contractAddress}
-                readContracts={readContracts}
-                writeContracts={writeContracts}
-                processedDataSet={processedDataSet}
-                yourLocalBalance={yourLocalBalance}
-                mainnetProvider={mainnetProvider}
-                price={price}
-                localProvider={localProvider}
-                tx={tx}
-                blockExplorer={blockExplorer}
-              />
-            </Route>
+            <DAO
+              address={address}
+              contractAddress={contractAddress}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+              processedDataSet={processedDataSet}
+              yourLocalBalance={yourLocalBalance}
+              mainnetProvider={mainnetProvider}
+              price={price}
+              localProvider={localProvider}
+              tx={tx}
+              blockExplorer={blockExplorer}
+            />
+          </Route>
 
-            <Route exact path="/contract">
-              <Contract
-                name="PowDAO"
-                signer={userSigner}
-                provider={localProvider}
-                address={address}
-                blockExplorer={blockExplorer}
-                contractConfig={contractConfig}
-              />
-            </Route>
+          <Route exact path="/contract">
+            <Contract
+              name="PowDAO"
+              signer={userSigner}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
+            />
+          </Route>
 
-            <Route exact path="/reentrancycontract">
-              <Contract
-                name="ReEntrancyAttack"
-                signer={userSigner}
-                provider={localProvider}
-                address={address}
-                blockExplorer={blockExplorer}
-                contractConfig={contractConfig}
-              />
-            </Route>
+          <Route exact path="/reentrancycontract">
+            <Contract
+              name="ReEntrancyAttack"
+              signer={userSigner}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractConfig={contractConfig}
+            />
+          </Route>
         </Switch>
       </BrowserRouter>
 
@@ -572,15 +572,18 @@ function App(props) {
         {faucetHint}
       </div>
 
-      <div style={{ position: "fixed", textAlign: "center", right: 450, top:0, padding: 10 }}>
-        
-       PowDAO Balance
-        <Balance
-            address={contractAddress} 
-            provider={localProvider} // Change to Mainnet when contracts are deployed
-            price={price}
-        />
-        
+      <div style={{ position: "fixed", textAlign: "center", right: 575, top: 0, padding: 10 }}>
+        <Descriptions bordered>
+          <Descriptions.Item label="DAO Balance">
+            <Balance
+              address={contractAddress}
+              provider={localProvider} // Change to Mainnet when contracts are deployed
+              price={price}
+              size={16}
+            />
+          </Descriptions.Item>
+
+        </Descriptions>
       </div>
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}

@@ -5,22 +5,14 @@
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  const members = ["0x347DD16dE7d64dA4E32B1905d68Faf880b4D78f7", "0x9E67029403675Ee18777Ed38F9C1C5c75F7B34f2"]  // browser burner wallet and powvt.eth addresses.
-  PowDAO = await deploy("PowDAO", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    args: [members],
-    log: true,
-  });
 
-  /*
   await deploy("ReEntrancyAttack", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
-    args:[PowDAO.address],
+    args: [PowDAO.address],
     log: true,
   });
-  */
+
 
   /*
     // Getting a previously deployed contract
