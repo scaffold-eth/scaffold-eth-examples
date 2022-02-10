@@ -1,5 +1,9 @@
 # 🏗 scaffold-eth - 🧑‍🎤 [PunkWallet.io](https://PunkWallet.io)
 
+⚠️ I think this repo is out of date and the right one is actually back on scaffold-eth:
+
+👉 https://github.com/scaffold-eth/scaffold-eth/tree/punk-wallet
+
 🎥 [watch this 10m demo](https://youtu.be/lYRd1k1RBAQ)
 
 
