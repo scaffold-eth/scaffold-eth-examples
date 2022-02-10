@@ -2,8 +2,6 @@
 
 > a quickstart forking kit to UniswapV2
 
-<--- Under experimentation and work in progress --->
-
 This repository contains a ready-to-go fork of UniswapV2 deployed on Kovan.
 
 
