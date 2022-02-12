@@ -23,7 +23,7 @@ yarn install
 yarn start
 ```
 
-📝 Edit your frontend `App.jsx` in `packages/react-app/src`
+📝 Edit your frontend `App.jsx` in `packages/react-app/src` and `ABINinja.jsx` in `packages/react-app/src/views`
 
 📱 Open http://localhost:3000 to see the app
 
@@ -31,7 +31,7 @@ yarn start
 
 The application supports two modes of operation.
 
-First, an interactive mode where the user can enter the contract's address and ABI. The second mode is the URL parameters mode where the contract's address and ABI are passed as URL parameters.
+First, an interactive mode where the user can enter the contract's address and ABI. The second mode is the URL parameters mode where the contract's address and ABI are passed as URL parameters. You can also copy the current configuration as a url to send or use later.
 
 ## Interactive Mode:
 
