@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch, useParams } from "react-router-dom";
-import { Alert, Button, Col, Menu, Row, Input, Select } from "antd";
+import { Alert, Button, Col, Menu, Row, Input, Select, Tooltip } from "antd";
+import { LinkOutlined, SaveOutlined } from "@ant-design/icons";
 import { Contract, AddressInput } from "../components";
 import { useExternalContractLoader } from "../hooks";
 
@@ -11,15 +12,14 @@ export default function ABINinja({ mainnetProvider, userSigner, userProviderAndS
   const [contractABI, setContractABI] = useState(abi || "");
   const { TextArea } = Input;
 
-  //const [externalContract, setExternalContract] = useState(useExternalContractLoader(userProviderAndSigner.provider, contractAddress, contractABI));
   let externalContract = useExternalContractLoader(userProviderAndSigner.provider, contractAddress, contractABI);
 
   let externalContractDisplay = "";
 
-  // if (chainId) {
-  //   console.log("chainId", chainId);
-  //   updateSelectedChain(chainId);
-  // }
+  const copyURL = () => {
+    const url = `${window.location.origin}/contract/${contractAddress}/${contractABI}`;
+    navigator.clipboard.writeText(url);
+  };
 
   if (contractAddress && contractABI && selectedChainId) {
     externalContractDisplay = (
@@ -40,6 +40,32 @@ export default function ABINinja({ mainnetProvider, userSigner, userProviderAndS
 
   return (
     <div>
+      <div
+        className="side-menu"
+        style={{
+          position: "fixed",
+          right: 0,
+          display: "flex",
+          flexDirection: "column",
+          zIndex: 1,
+        }}
+      >
+        <Tooltip placement="left" title="copied!" trigger={contractAddress && contractABI ? "click" : ""}>
+          <Button
+            title="Copy current configuration as url"
+            disabled={!(contractAddress && contractABI)}
+            icon={<LinkOutlined />}
+            size="large"
+            onClick={copyURL}
+          />
+        </Tooltip>
+        {/* <Button
+          title="Save current configuration to local storage"
+          disabled={!(contractAddress && contractABI)}
+          icon={<SaveOutlined />}
+          size="large"
+        /> */}
+      </div>
       <div>Paste the contract's address and ABI below:</div>
       <div className="center" style={{ width: "50%" }}>
         <div style={{ padding: 4 }}>
