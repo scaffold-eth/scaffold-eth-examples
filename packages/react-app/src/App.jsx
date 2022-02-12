@@ -17,8 +17,7 @@ import {
   useUserProviderAndSigner,
 } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
-
-import { useExternalContractLoader } from "./hooks";
+import ABINinja from "./views/ABINinja";
 
 const { ethers } = require("ethers");
 /*
@@ -42,14 +41,12 @@ const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
 const cachedNetwork = window.localStorage.getItem("network");
-let targetNetwork = NETWORKS[cachedNetwork || NETWORKS.ropsten]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-if (!targetNetwork) {
-  targetNetwork = NETWORKS.xdai;
-}
-
+console.log("chachedNetwork: ", cachedNetwork);
+let targetNetwork = NETWORKS[cachedNetwork || NETWORKS.ropsten.name]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+console.log("targetNetwork: ", targetNetwork);
 // 😬 Sorry for all the console logging
 const DEBUG = false;
-const NETWORKCHECK = false;
+const NETWORKCHECK = true;
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -109,6 +106,14 @@ function App(props) {
     }, 1);
   };
 
+  const [chain, setChain] = useState(targetNetwork);
+
+  const updateSelectedChain = (newChain) => {
+    window.localStorage.setItem("network", newChain);
+    targetNetwork = NETWORKS[newChain];
+    setChain(NETWORKS[newChain]);
+  };
+
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider, 30000);
 
@@ -130,8 +135,7 @@ function App(props) {
 
   // You can warn the user if you would like them to be on a specific network
   const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
-  const selectedChainId =
-    userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
+  const selectedChainId = userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
 
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
@@ -292,51 +296,6 @@ function App(props) {
     );
   }
 
-  const [contractAddress, setContractAddress] = useState("");
-  const [contractABI, setContractABI] = useState("");
-  const { TextArea } = Input;
-  let theExternalContract = useExternalContractLoader(userProviderAndSigner.provider, contractAddress, contractABI);
-
-  let externalContractDisplay = "";
-
-  if (contractAddress && contractABI) {
-    externalContractDisplay = (
-      <div>
-        <Contract
-          customContract={theExternalContract}
-          signer={userSigner}
-          provider={userProviderAndSigner.provider}
-          chainId={selectedChainId}
-        />
-      </div>
-    );
-  } else {
-    theExternalContract = null;
-  }
-
-  function AddressFromURL() {
-    let { addr, abi } = useParams();
-    let theExternalContractFromURL = useExternalContractLoader(userProviderAndSigner.provider, addr, abi);
-
-    return (
-      <div>
-        <Contract
-          customContract={theExternalContractFromURL}
-          signer={userSigner}
-          provider={userProviderAndSigner.provider}
-          chainId={selectedChainId}
-        />
-      </div>
-    );
-  }
-
-  console.log("==-- userSigner: ", userSigner);
-  console.log("==-- localProvider: ", localProvider);
-  console.log("==-- address: ", address);
-  console.log("==-- blockExplorer: ", blockExplorer);
-  console.log("==-- selectedChainId: ", selectedChainId);
-  console.log("==-- theExternalContract: ", theExternalContract);
-
   const options = [];
   for (const id in NETWORKS) {
     options.push(
@@ -353,7 +312,7 @@ function App(props) {
       style={{ textAlign: "left", width: "15%", fontSize: 30 }}
       onChange={value => {
         if (targetNetwork.chainId != NETWORKS[value].chainId) {
-          window.localStorage.setItem("network", value);
+          updateSelectedChain(NETWORKS[value].name);
           setTimeout(() => {
             window.location.reload();
           }, 1);
@@ -371,38 +330,24 @@ function App(props) {
       {networkDisplay}
       <span style={{ verticalAlign: "middle" }}>
         {networkSelect}
-        {/*faucetHint*/}
       </span>
       <BrowserRouter>
         <Switch>
-          <Route path="/contract/:addr/:abi">
-            <AddressFromURL />
-          </Route>
           <Route exact path="/">
-            <div>Paste the contract's address and ABI below:</div>
-            <div class="center" style={{ width: "50%" }}>
-              <div style={{ padding: 4 }}>
-                <AddressInput
-                  placeholder="Enter Contract Address"
-                  ensProvider={mainnetProvider}
-                  value={contractAddress}
-                  onChange={setContractAddress}
-                />
-              </div>
-              <div style={{ padding: 4 }}>
-                <TextArea
-                  rows={6}
-                  placeholder="Enter Contract ABI JSON"
-                  value={contractABI}
-                  onChange={e => {
-                    setContractABI(e.target.value);
-                  }}
-                />
-              </div>
-            </div>
-            <div>
-              {externalContractDisplay}
-            </div>
+            <ABINinja
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              userProviderAndSigner={userProviderAndSigner}
+              selectedChainId={chain.chainId}
+            />
+          </Route>
+          <Route path="/contract/:addr/:abi">
+            <ABINinja
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              userProviderAndSigner={userProviderAndSigner}
+              selectedChainId={chain.chainId}
+            />
           </Route>
         </Switch>
       </BrowserRouter>
