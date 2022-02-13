@@ -5,7 +5,7 @@ import WalletLink from "walletlink";
 import { Alert, Button, Col, Menu, Row, Input, Select } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
-import { BrowserRouter, Link, Route, Switch, useParams } from "react-router-dom";
+import { HashRouter, Link, Route, Switch, useParams } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
 import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch, AddressInput } from "./components";
@@ -331,7 +331,7 @@ function App(props) {
       <span style={{ verticalAlign: "middle" }}>
         {networkSelect}
       </span>
-      <BrowserRouter>
+      <HashRouter>
         <Switch>
           <Route exact path="/">
             <ABINinja
@@ -350,7 +350,7 @@ function App(props) {
             />
           </Route>
         </Switch>
-      </BrowserRouter>
+      </HashRouter>
       <ThemeSwitch />
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}

@@ -17,7 +17,7 @@ export default function ABINinja({ mainnetProvider, userSigner, userProviderAndS
   let externalContractDisplay = "";
 
   const copyURL = () => {
-    const url = `${window.location.origin}/contract/${contractAddress}/${contractABI}`;
+    const url = `${window.location.origin}/#/contract/${contractAddress}/${contractABI}`;
     navigator.clipboard.writeText(url);
   };
 
