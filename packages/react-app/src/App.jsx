@@ -24,7 +24,7 @@ import {
   FaucetHint,
   NetworkSwitch,
 } from "./components";
-import { NETWORKS, ALCHEMY_KEY } from "./constants";
+import { NETWORKS, ALCHEMY_KEY, BLOCKNATIVE_DAPPID } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
@@ -84,10 +84,7 @@ function App(props) {
   const blockExplorer = targetNetwork.blockExplorer;
 
   // setup blocknative onboard
-  const [onboardModule, injectedProvider] = useBlockNativeOnboard(
-    "bfbcf084-d6ae-4f06-a3a7-6f18818ed905",
-    targetNetwork?.chainId,
-  );
+  const [onboardModule, injectedProvider] = useBlockNativeOnboard(BLOCKNATIVE_DAPPID, targetNetwork?.chainId);
 
   console.log({ injectedProvider, onboardModule });
 
