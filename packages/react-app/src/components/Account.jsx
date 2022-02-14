@@ -50,7 +50,7 @@ export default function Account({
   mainnetProvider,
   price,
   minimized,
-  web3Modal,
+  isWalletConnected,
   loadWeb3Modal,
   logoutOfWeb3Modal,
   blockExplorer,
@@ -59,39 +59,37 @@ export default function Account({
   const { currentTheme } = useThemeSwitcher();
 
   const modalButtons = [];
-  if (web3Modal) {
-    if (web3Modal.cachedProvider) {
-      modalButtons.push(
-        <Button
-          key="logoutbutton"
-          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
-          shape="round"
-          size="large"
-          onClick={logoutOfWeb3Modal}
-        >
-          logout
-        </Button>,
-      );
-    } else {
-      modalButtons.push(
-        <Button
-          key="loginbutton"
-          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
-          shape="round"
-          size="large"
-          /* type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time */
-          onClick={loadWeb3Modal}
-        >
-          connect
-        </Button>,
-      );
-    }
+  if (isWalletConnected) {
+    modalButtons.push(
+      <Button
+        key="logoutbutton"
+        style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
+        shape="round"
+        size="large"
+        onClick={logoutOfWeb3Modal}
+      >
+        logout
+      </Button>,
+    );
+  } else {
+    modalButtons.push(
+      <Button
+        key="loginbutton"
+        style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
+        shape="round"
+        size="large"
+        /* type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time */
+        onClick={loadWeb3Modal}
+      >
+        connect
+      </Button>,
+    );
   }
   const display = minimized ? (
     ""
   ) : (
     <span>
-      {web3Modal && web3Modal.cachedProvider ? (
+      {isWalletConnected ? (
         <>
           {address && <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />}
           <Balance address={address} provider={localProvider} price={price} />
@@ -114,7 +112,7 @@ export default function Account({
       ) : (
         ""
       )}
-      {useBurner && web3Modal && !web3Modal.cachedProvider ? (
+      {useBurner && !isWalletConnected ? (
         <>
           <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
           <Balance address={address} provider={localProvider} price={price} />
