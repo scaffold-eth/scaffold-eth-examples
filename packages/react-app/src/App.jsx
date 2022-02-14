@@ -28,9 +28,9 @@ import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
-import { Transactor, Web3ModalSetup } from "./helpers";
+import { Transactor } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
-import { useStaticJsonRPC } from "./hooks";
+import { useBlockNativeOnboard, useStaticJsonRPC } from "./hooks";
 
 const { ethers } = require("ethers");
 /*
@@ -53,15 +53,13 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.mainnet; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
 const NETWORKCHECK = true;
 const USE_BURNER_WALLET = true; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
-
-const web3Modal = Web3ModalSetup();
 
 // 🛰 providers
 const providers = [
@@ -75,7 +73,7 @@ function App(props) {
   // reference './constants.js' for other networks
   const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
 
-  const [injectedProvider, setInjectedProvider] = useState();
+  // const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
   const location = useLocation();
@@ -84,6 +82,14 @@ function App(props) {
 
   // 🔭 block explorer URL
   const blockExplorer = targetNetwork.blockExplorer;
+
+  // setup blocknative onboard
+  const [onboardModule, injectedProvider] = useBlockNativeOnboard(
+    "bfbcf084-d6ae-4f06-a3a7-6f18818ed905",
+    targetNetwork?.chainId,
+  );
+
+  console.log({ injectedProvider, onboardModule });
 
   // load all your providers
   const localProvider = useStaticJsonRPC([
@@ -97,10 +103,11 @@ function App(props) {
   if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
   const logoutOfWeb3Modal = async () => {
-    await web3Modal.clearCachedProvider();
-    if (injectedProvider && injectedProvider.provider && typeof injectedProvider.provider.disconnect == "function") {
-      await injectedProvider.provider.disconnect();
-    }
+    onboardModule.walletReset();
+
+    // remove selected wallet from localstorage
+    window.localStorage.removeItem("selectedWallet");
+
     setTimeout(() => {
       window.location.reload();
     }, 1);
@@ -215,32 +222,26 @@ function App(props) {
   ]);
 
   const loadWeb3Modal = useCallback(async () => {
-    const provider = await web3Modal.connect();
-    setInjectedProvider(new ethers.providers.Web3Provider(provider));
-
-    provider.on("chainChanged", chainId => {
-      console.log(`chain changed to ${chainId}! updating providers`);
-      setInjectedProvider(new ethers.providers.Web3Provider(provider));
-    });
-
-    provider.on("accountsChanged", () => {
-      console.log(`account changed!`);
-      setInjectedProvider(new ethers.providers.Web3Provider(provider));
-    });
-
-    // Subscribe to session disconnection
-    provider.on("disconnect", (code, reason) => {
-      console.log(code, reason);
-      logoutOfWeb3Modal();
-    });
+    await onboardModule.walletSelect();
+    await onboardModule.walletCheck();
     // eslint-disable-next-line
-  }, [setInjectedProvider]);
+  }, [onboardModule]);
+
+  const handleWalletReconnect = async () => {
+    // get the selectedWallet value from local storage
+    const previouslySelectedWallet = window.localStorage.getItem("selectedWallet");
+
+    // call wallet select with that value if it exists
+    if (previouslySelectedWallet != null) {
+      await onboardModule.walletSelect(previouslySelectedWallet);
+    }
+  };
 
   useEffect(() => {
-    if (web3Modal.cachedProvider) {
-      loadWeb3Modal();
+    if (window && onboardModule && !injectedProvider) {
+      handleWalletReconnect();
     }
-  }, [loadWeb3Modal]);
+  }, [window, onboardModule]);
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -374,7 +375,7 @@ function App(props) {
             userSigner={userSigner}
             mainnetProvider={mainnetProvider}
             price={price}
-            web3Modal={web3Modal}
+            isWalletConnected={injectedProvider !== undefined}
             loadWeb3Modal={loadWeb3Modal}
             logoutOfWeb3Modal={logoutOfWeb3Modal}
             blockExplorer={blockExplorer}
