@@ -5,16 +5,18 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ GITHUB_USERNAME/your-contract",
-    "create-local": "graph create --node http://localhost:8020/ scaffold-eth/your-contract",
-    "remove-local": "graph remove --node http://localhost:8020/ scaffold-eth/your-contract",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 scaffold-eth/your-contract"
-  },
-  "dependencies": {
-    "@graphprotocol/graph-cli": "^0.22.1",
-    "@graphprotocol/graph-ts": "^0.22.1"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ ironsoul0/venft",
+    "prepare": "mustache src/config/mumbai.json src/subgraph.template.yaml > subgraph.yaml"
   },
   "devDependencies": {
-    "mustache": "^3.1.0"
+    "@graphprotocol/graph-cli": "0.26.0",
+    "@graphprotocol/graph-ts": "0.24.1",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
+    "eslint": "^7.16.0",
+    "eslint-plugin-json": "^2.1.2",
+    "eslint-plugin-unicorn": "^24.0.0",
+    "mustache": "^4.2.0",
+    "typescript": "^4.1.3"
   }
 }

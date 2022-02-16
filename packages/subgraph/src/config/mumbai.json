@@ -1,0 +1,9 @@
+{
+  "network": "mumbai",
+  "contracts": {
+    "token": {
+      "address": "0xef33BAA23f09D5505b47FC87D39cC25805FD5D5b",
+      "startBlock": 24645546
+    }
+  }
+}

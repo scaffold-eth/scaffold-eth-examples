@@ -1,33 +1,20 @@
-import { BigInt, Address } from "@graphprotocol/graph-ts";
+import { BigInt } from '@graphprotocol/graph-ts'
+
 import {
-  YourContract,
-  SetPurpose,
-} from "../generated/YourContract/YourContract";
-import { Purpose, Sender } from "../generated/schema";
+  Approval,
+} from '../generated/veNFTCollateral/veNFTCollateral'
+import { Person } from '../generated/schema'
 
-export function handleSetPurpose(event: SetPurpose): void {
-  let senderString = event.params.sender.toHexString();
+export function handleApproval(event: Approval): void {
+  const spender = event.params.spender.toHexString()
 
-  let sender = Sender.load(senderString);
-
-  if (sender === null) {
-    sender = new Sender(senderString);
-    sender.address = event.params.sender;
-    sender.createdAt = event.block.timestamp;
-    sender.purposeCount = BigInt.fromI32(1);
+  let person = Person.load(spender)
+  if (person === null) {
+    person = new Person(spender)
+    person.allowance = event.params.value.plus(BigInt.fromI32(0))
   } else {
-    sender.purposeCount = sender.purposeCount.plus(BigInt.fromI32(1));
+    person.allowance = person.allowance.plus(event.params.value)
   }
 
-  let purpose = new Purpose(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  );
-
-  purpose.purpose = event.params.purpose;
-  purpose.sender = senderString;
-  purpose.createdAt = event.block.timestamp;
-  purpose.transactionHash = event.transaction.hash.toHex();
-
-  purpose.save();
-  sender.save();
+  person.save()
 }

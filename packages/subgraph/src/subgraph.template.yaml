@@ -3,23 +3,22 @@ schema:
   file: ./src/schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: YourContract
-    network: localhost
+    name: veNFTCollateral
+    network: {{network}}
     source:
-      address: "{{localhost_YourContractAddress}}"
-      abi: YourContract
-      startBlock: 1
+      address: "{{contracts.token.address}}"
+      abi: veNFTCollateral
+      startBlock: {{ contracts.token.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Purpose
-        - Sender
+        - Person
       abis:
-        - name: YourContract
-          file: ./abis/localhost_YourContract.json
+        - name: veNFTCollateral
+          file: ./abis/veNFTCollateral.json
       eventHandlers:
-        - event: SetPurpose(address,string)
-          handler: handleSetPurpose
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
       file: ./src/mapping.ts

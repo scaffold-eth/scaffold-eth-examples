@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "ES2017"],
+    "sourceMap": true,
+    // "inlineSources": true,
+    "allowJs": false,
+    "declarationMap": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "types": [
+      // "vite/client",
+      // "node",
+      // "ethers",
+      // "@ethersproject/providers",
+      // "@ethersproject/abstract-provider",
+      // "@ethersproject/abstract-signer",
+      // "@ethersproject/wallet"
+    ],
+    "typeRoots": ["node_modules/@types", "helpers/types"] /* List of folders to include type definitions from. */,
+    "forceConsistentCasingInFileNames": true,
+    "module": "es2020",
+    "moduleResolution": "Node",
+    "incremental": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "outDir": "dist",
+    "jsx": "react-jsxdev",
+    "jsxImportSource": "@emotion/react",
+    "paths": {
+      "~~/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "src/helpers/__global.ts", "vite.config.ts"],
+  "exclude": [
+    "**/node_modules",
+    ".husky",
+    "./src/styles/css",
+    "./tailwind.config.js",
+    "node_modules",
+    "**/.yalc/**/*",
+    ".yalc/**/*"
+  ]
+}
