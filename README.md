@@ -1,6 +1,6 @@
-# 🏗 Scaffold-ETH - Etherscan API Starter Kit
+# 🏗 Scaffold-ETH - Etherscan Spreadsheet Starter
 
-> Vizualize transactions in the front end using the Etherscan API 🚀
+> Turn the transactions from the Etherscan API into Spreadsheet 🚀
 
 # 🏄‍♂️ Quick Start
 
@@ -9,11 +9,11 @@ Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://class
 > clone/fork 🏗 scaffold-eth:
 
 ```bash
-git clone https://github.com/scaffold-eth/scaffold-eth-examples.git etherscan-starter
+git clone https://github.com/scaffold-eth/scaffold-eth-examples.git etherscan-spreadheet-starter
 
-cd etherscan-starter
+cd etherscan-spreadheet-starter
 
-git switch etherscan-starter
+git switch etherscan-spreadheet-starter
 ```
 
 > create an Etherscan account and add your api key to packages\react-app\src\constants.js
@@ -37,6 +37,19 @@ packages\react-app\src\hooks\EtherscanAPI.js
 
 📱 Open http://localhost:3000 to see the app
 
+# How to Use
+
+> enter your address and click Look Up TXs:
+
+![img.png](img.png)
+
+> look through the TXs and edit online in the Spreadsheet:
+
+![img_3.png](img_3.png)
+
+> download as CSV whenever you are ready!
+ 
+![img_2.png](img_2.png)
 
 # 💬 Support Chat
 

@@ -1,7 +1,12 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Button } from "antd";
 import { AddressInput } from "../components";
 import { EtherscanAPI } from "../hooks";
+import Spreadsheet from "react-spreadsheet";
+import {useThemeSwitcher} from "react-css-theme-switcher";
+import { CSVLink, CSVDownload } from "react-csv";
+
+
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
  * @param {*} yourLocalBalance balance on current network
@@ -13,6 +18,13 @@ function TxViewer({ yourLocalBalance, readContracts, mainnetProvider }) {
   const [isValid, isAddressValid] = React.useState(false);
   const [address, setAddress] = React.useState("");
   const [txs, setTxs] = React.useState([]);
+  const [isDarkMode, setIsDarkMode] = React.useState(window.localStorage.getItem("theme") || false)
+  const { currentTheme } = useThemeSwitcher();
+
+  useEffect(() => {
+    setIsDarkMode(currentTheme === "dark")
+  }, [currentTheme]);
+
   const checkValidAddress = address => {
     setAddress(address);
     console.log(address);
@@ -26,21 +38,7 @@ function TxViewer({ yourLocalBalance, readContracts, mainnetProvider }) {
     EtherscanAPI.getTxList(address, 1000).then(res => {
       if (res.status === "1" && res.result) {
         console.log(res);
-        setTxs(res.result);
-      }
-    });
-  };
-
-  return (
-    <div style={{ border: "1px solid #cccccc", padding: 16, width: 700, margin: "auto", marginTop: 64 }}>
-      <h1>Transaction Viewer</h1>
-      <AddressInput ensProvider={mainnetProvider} onChange={checkValidAddress} />
-      <Button style={{ marginTop: "20px" }} disabled={!isValid} onClick={search}>
-        Look up TXs!
-      </Button>
-      <div>
-        {txs.map(tx => {
-          // hours as 2 digits (hh)
+        const _txs = res.result.map(tx => {
           const hours = ("0" + new Date(Number(tx.timeStamp)).getHours()).slice(-2);
 
           // minutes as 2 digits (mm)
@@ -49,78 +47,71 @@ function TxViewer({ yourLocalBalance, readContracts, mainnetProvider }) {
           // seconds as 2 digits (ss)
           const seconds = ("0" + new Date(Number(tx.timeStamp)).getSeconds()).slice(-2);
 
-          return (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                border: "solid #000 2px",
-                borderRadius: "6px",
-                padding: "20px",
-                margin: "20px",
-              }}
-            >
-              <span>
-                <b>Block Number:</b> {tx.blockNumber}
-              </span>
-              <span>
-                <b>TimeStamp:</b> {hours}:{minutes}:{seconds}
-              </span>
-              <span>
-                <b>From:</b> {tx.from}
-              </span>
-              <span>
-                <b>To:</b> {tx.to}
-              </span>
-              <span>
-                <b>Tx Hash:</b> {tx.hash}
-              </span>
-              <span>
-                <b>Value:</b> {tx.value}
-              </span>
-              <span>
-                <b>Gas:</b> {tx.gas}
-              </span>
-              <span>
-                <b>Gas Price:</b> {tx.gasPrice}
-              </span>
-              <span>
-                <b>Gas Used:</b> {tx.gasUsed}
-              </span>
-              <span>
-                <b>Nonce:</b> {tx.nonce}
-              </span>
-              <span>
-                <b>Block Hash:</b> {tx.blockHash}
-              </span>
-              <span>
-                <b>Transaction Index:</b> {tx.transactionIndex}
-              </span>
-              <span>
-                <b>Status:</b> {tx.status}
-              </span>
-              <span style={{ overflow: "hidden", width: "100%", textAlign: "left", textOverflow: "ellipsis" }}>
-                <b>Input:</b> {tx.input}
-              </span>
-              <span>
-                <b>Contract Address:</b> {tx.contractAddress}
-              </span>
-              <span>
-                <b>Cumulative Gas Used:</b> {tx.cumulativeGasUsed}
-              </span>
-              <span>
-                <b>Gas Limit:</b> {tx.gasLimit}
-              </span>
-              <span>
-                <b>Confirmations:</b> {tx.confirmations}
-              </span>
-              <span>
-                <b>Error:</b> {tx.error}
-              </span>
-            </div>
-          );
-        })}
+          return [
+            { value: tx.blockNumber },
+            { value: `${hours}:${minutes}:${seconds}` },
+            { value: tx.from },
+            { value: tx.to },
+            { value: tx.hash },
+            { value: tx.value },
+            { value: tx.gas },
+            { value: tx.gasPrice },
+            { value: tx.gasUsed },
+            { value: tx.nonce },
+            { value: tx.blockHash },
+            { value: tx.transactionIndex },
+            { value: tx.status },
+            { value: tx.contractAddress },
+            { value: tx.cumulativeGasUsed },
+            { value: tx.gasLimit },
+            { value: tx.confirmations },
+            { value: tx.error },
+            { value: tx.input },
+          ];
+        });
+
+        setTxs([
+          [
+            { value: "Block Number" },
+            { value: `TimeStamp` },
+            { value: "From" },
+            { value: "To" },
+            { value: "Hash" },
+            { value: "Value" },
+            { value: "Gas" },
+            { value: "Gas Price" },
+            { value: "Gas Used" },
+            { value: "Nonce" },
+            { value: "Block Hash" },
+            { value: "Transaction Index" },
+            { value: "Status" },
+            { value: "Contract Address" },
+            { value: "Cumulative Gas Used" },
+            { value: "Gas Limit" },
+            { value: "Confirmations" },
+            { value: "Error" },
+            { value: "Input" }
+          ],
+          ..._txs,
+        ]);
+      }
+    });
+  };
+
+  return (
+    <div>
+      <div style={{ border: "1px solid #cccccc", padding: 16, width: 700, margin: "auto", marginTop: 64 }}>
+        <h1>Transaction Viewer</h1>
+        <AddressInput ensProvider={mainnetProvider} onChange={checkValidAddress} />
+        <Button style={{ marginTop: "20px" }} disabled={!isValid} onClick={search}>
+          Look up TXs!
+        </Button>
+      </div>
+      <div style={{marginTop: 20}} >
+        {txs.length > 0 && (<CSVLink data={txs.map(el => el.map(tx => tx['value']))}>Download as CSV</CSVLink>)}
+      </div>
+      <div style={{ margin: "auto", marginTop: 20, maxWidth: "95%", overflowX: "scroll"}}>
+          {txs.length > 0 && (<Spreadsheet data={txs} onChange={setTxs} darkMode={isDarkMode} />)}
       </div>
     </div>
   );
