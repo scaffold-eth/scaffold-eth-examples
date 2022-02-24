@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 // import "hardhat/console.sol";
 
-contract RetFundERC721 is ERC721Enumerable, Ownable {
+contract RetFundERC721 is ERC721Enumerable, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -100,7 +100,7 @@ contract RetFundERC721 is ERC721Enumerable, Ownable {
      * @notice Executes a sale and updates the floor price
      * @param _id nft id
      */
-    function redeem(uint256 _id) external {
+    function redeem(uint256 _id) external nonReentrant {
         require(ownerOf(_id) == msg.sender, "Not Owner");
         require(limit == totalSupply(), "Mint not completed yet");
         uint256 currentFloor = floor();
