@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+// import "hardhat/console.sol";
 
 contract RetFundERC721 is ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
@@ -46,7 +49,7 @@ contract RetFundERC721 is ERC721Enumerable, Ownable {
         require(_tokenIds.current() < limit, "DONE MINTING");
         require(msg.value >= price, "NOT ENOUGH");
 
-        price = (price * curve) / 1000;
+        price = (price + (price * curve) / 10000);
         currentSupply++;
 
         _tokenIds.increment();
@@ -105,7 +108,9 @@ contract RetFundERC721 is ERC721Enumerable, Ownable {
             "sale cannot be made until floor is established"
         );
         currentSupply--;
-        super._burn(_id);
+
+        transferFrom(msg.sender, address(this), _id);
+
         (bool success, ) = msg.sender.call{value: currentFloor}("");
         require(success, "sending floor price failed");
     }
