@@ -102,6 +102,7 @@ contract RetFundERC721 is ERC721Enumerable, Ownable {
      */
     function redeem(uint256 _id) external {
         require(ownerOf(_id) == msg.sender, "Not Owner");
+        require(limit == totalSupply(), "Mint not completed yet");
         uint256 currentFloor = floor();
         require(
             currentFloor > 0,
