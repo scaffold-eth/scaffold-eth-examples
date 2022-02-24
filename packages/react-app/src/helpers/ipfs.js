@@ -14,15 +14,10 @@ export function urlFromCID(cid) {
 
 // helper function to "Get" from IPFS
 // you usually go content.toString() after this...
-// export async function getFromIPFS(hashToGet) {
-//   for await (const file of ipfs.get(hashToGet)) {
-//     console.log(file.path);
-//     if (!file.content) continue;
-//     const content = new BufferList();
-//     for await (const chunk of file.content) {
-//       content.append(chunk);
-//     }
-//     console.log(content);
-//     return content;
-//   }
-// }
+export async function getFromIPFS(hashToGet) {
+  for await (const file of ipfs.cat(hashToGet)) {
+    const content = new BufferList(file).toString();
+
+    return content;
+  }
+}
