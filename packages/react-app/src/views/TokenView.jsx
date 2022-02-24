@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useOnBlock, usePoller } from "eth-hooks";
-import { useExternalContractLoader } from "../hooks";
-import nftABI from "../contracts/ERC721ABI";
+import classnames from "classnames";
 import { ethers } from "ethers";
-import { Button } from "antd";
+import { Alert, Button, Row, Col, Card } from "antd";
+import { Address } from "../components";
+import { useContractReader } from "eth-hooks";
+import { useRetFundERC721 } from "../hooks";
+import nftABI from "../contracts/ERC721ABI";
+import { ipfs } from "../helpers";
+
+const zero = ethers.BigNumber.from("0");
 
 /**
  * web3 props can be passed from '../App.jsx' into your local view component for use
@@ -12,131 +17,199 @@ import { Button } from "antd";
  * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
  * @returns react component
  */
-function TokenView({ tx, localProvider, address, readContracts, writeContracts, loadWeb3Modal }) {
+function TokenView({
+  tx,
+  localProvider,
+  mainnetProvider,
+  userSigner,
+  address,
+  readContracts,
+  writeContracts,
+  loadWeb3Modal,
+}) {
+  const [minting, setMinting] = useState(false);
+  const [myCollection, setMyCollection] = useState([]);
   const { addressParam } = useParams();
-  const [collection, setCollection] = useState({
-    loading: true,
-    items: [],
-  });
-  const [floor, setFloor] = useState("0.0");
-  const [supply, setSupply] = useState();
-  const [limit, setLimit] = useState();
-  const [nftPrice, setNFTPrice] = useState();
 
-  const NFT = useExternalContractLoader(localProvider, addressParam, nftABI);
+  const [info, readRetFund, writeRetFund, refreshRetFund] = useRetFundERC721(
+    localProvider,
+    userSigner,
+    addressParam,
+    nftABI,
+  );
 
-  usePoller(async () => {
-    if (NFT && address) {
-      const nftNowPrice = await NFT.price();
-      const floorPrice = await NFT.floor();
-      const supply = await NFT.currentToken();
-      const limit = await NFT.limit();
-      setSupply(supply.toNumber());
-      setLimit(limit.toNumber());
-      setFloor(ethers.utils.formatEther(floorPrice));
-      setNFTPrice(nftNowPrice);
-    }
-  }, 15000);
+  // const transferEvents = useEventListener({ readRetFund }, "readRetFund", "Transfer", localProvider);
+  const myBalance = (useContractReader({ readRetFund }, "readRetFund", "balanceOf", [address]) || zero).toNumber();
 
-  const loadCollection = async () => {
-    if (!address || !NFT) return;
-    setCollection({
-      loading: true,
-      items: [],
-    });
-    const balance = (await NFT.balanceOf(address)).toNumber();
-    const tokensPromises = [];
-    for (let i = 0; i < balance; i += 1) {
-      tokensPromises.push(getTokenURI(address, i));
-    }
-    const tokens = await Promise.all(tokensPromises);
-    setCollection({
-      loading: false,
-      items: tokens,
-    });
+  const isMintComplete = info?.totalSupply && info?.limit ? info.totalSupply.eq(info.limit) : false;
+  const hasFloor = info?.floor && info?.floor.gt(zero);
+
+  const bigNumberRender = n => {
+    return n ? n?.toString() : null;
   };
 
-  const redeem = async id => {
+  const mint = async () => {
+    setMinting(true);
     try {
-      const redeemTx = await tx(NFT.redeem(id));
-      await redeemTx.wait();
-    } catch (e) {
-      console.log("redeem tx error:", e);
+      const mintTX = await tx(writeRetFund.mintItem(address, { value: info.price }), update => {
+        console.log("📡 Transaction Update:", update);
+        if (update && (update.status === "confirmed" || update.status === 1)) {
+          console.log(" 🍾 Transaction " + update.hash + " finished!");
+          console.log(
+            " ⛽️ " +
+              update.gasUsed +
+              "/" +
+              (update.gasLimit || update.gas) +
+              " @ " +
+              parseFloat(update.gasPrice) / 1000000000 +
+              " gwei",
+          );
+        }
+      });
+
+      await mintTX.wait(1);
+    } catch (error) {
+      console.log(`Mint error occurred`, error);
     }
-    loadCollection();
+    setMinting(false);
   };
 
   const approveForBurn = async id => {
-    try {
-      const approveTx = await tx(NFT.approve(NFT.address, id));
-      await approveTx.wait();
-    } catch (e) {
-      console.log("Approve tx error:", e);
+    tx(writeRetFund.approve(addressParam, id), update => {
+      console.log("📡 Transaction Update:", update);
+      if (update && (update.status === "confirmed" || update.status === 1)) {
+        console.log(" 🍾 Transaction " + update.hash + " finished!");
+        console.log(
+          " ⛽️ " +
+            update.gasUsed +
+            "/" +
+            (update.gasLimit || update.gas) +
+            " @ " +
+            parseFloat(update.gasPrice) / 1000000000 +
+            " gwei",
+        );
+      }
+    });
+  };
+
+  const tradeForETH = async id => {
+    tx(writeRetFund.redeem(id), update => {
+      console.log("📡 Transaction Update:", update);
+      if (update && (update.status === "confirmed" || update.status === 1)) {
+        console.log(" 🍾 Transaction " + update.hash + " finished!");
+        console.log(
+          " ⛽️ " +
+            update.gasUsed +
+            "/" +
+            (update.gasLimit || update.gas) +
+            " @ " +
+            parseFloat(update.gasPrice) / 1000000000 +
+            " gwei",
+        );
+      }
+    });
+  };
+
+  const updateMyCollect = async () => {
+    const myCollectionUpdate = [];
+
+    for (let i = 0; i < myBalance; i++) {
+      try {
+        const tokenIdAtIndex = await readRetFund.tokenOfOwnerByIndex(address, i);
+        const tokenURI = ((await readRetFund.tokenURI(tokenIdAtIndex)) || "").split("/");
+        const hash = tokenURI[tokenURI.length - 1];
+        const content = JSON.parse((await ipfs.getFromIPFS(hash)) || "{}");
+
+        myCollectionUpdate.push({ ...content, _tokenId: tokenIdAtIndex.toNumber() });
+      } catch (error) {
+        console.log(`Error on index ${i}`, error);
+      }
     }
-    loadCollection();
+
+    setMyCollection(myCollectionUpdate);
   };
 
   useEffect(() => {
-    if (NFT) loadCollection();
-  }, [address, NFT, NFT]);
-
-  console.log({ floor, supply, limit, nftPrice });
+    if (myBalance > 0 && readRetFund) {
+      updateMyCollect();
+    }
+  }, [myBalance, readRetFund]);
 
   return (
-    <div className="container mx-auto mt-5">
+    <div className="container mx-auto mt-12">
       {address ? (
         <>
-          <div style={{ display: "row", margin: "0 auto" }}>
-            <div style={{ marginLeft: "20px" }}>
-              <Button
-                style={{ marginTop: 15 }}
-                type="primary"
-                disabled={supply >= limit}
-                onClick={async () => {
-                  const priceRightNow = await NFT.price();
-                  setNFTPrice(priceRightNow);
-                  try {
-                    const txCur = await tx(NFT.mintItem(address, { value: nftPrice }));
-                    await txCur.wait();
-                  } catch (e) {
-                    console.log("mint failed", e);
-                  }
-                  loadCollection();
-                }}
-              >
-                MINT for Ξ{nftPrice && (+ethers.utils.formatEther(nftPrice)).toFixed(4)}
-              </Button>
-            </div>
-            {collection.items.length === 0 && <p>Your collection is empty</p>}
-            {collection.items.length > 0 &&
-              collection.items.map(item => (
-                <div
-                  style={{
-                    border: "1px solid #cccccc",
-                    padding: 16,
-                    width: 380,
-                    margin: "auto",
-                    marginTop: 20,
-                    display: "flex",
-                    flexDirection: "row",
-                  }}
-                >
-                  <img
-                    style={{ maxWidth: "150px", display: "block", margin: "0 auto", marginBottom: "10px" }}
-                    src={item.image}
-                    alt="Your NFT"
+          <div>
+            <div className="flex flex-1 justify-between items-center pb-6 border-b-2">
+              <div>
+                <Address mainnetProvider={mainnetProvider} address={addressParam} fontSize={16} />
+                <h1 className="text-lg font-semibold p-0 m-0">
+                  {info.name} ({info.symbol})
+                </h1>
+              </div>
+
+              {info?.floor?.gt(zero) && (
+                <div className="flex items-center justify-center">
+                  <Alert
+                    type="info"
+                    message={`Token floor price is Ξ ${bigNumberRender(ethers.utils.formatEther(info.floor))}`}
                   />
-                  <div style={{ marginLeft: "20px" }}>
-                    <p style={{ textAlign: "center", marginTop: 15 }}>Contract: {item.contractName}</p>
-                    <Button style={{ width: "100%", minWidth: 100 }} onClick={() => redeem(item.id)}>
-                      Redeem
-                    </Button>
-                    <p style={{ textAlign: "center", marginTop: 15 }}>{item.name}</p>
-                  </div>
                 </div>
-              ))}
+              )}
+
+              <div className="flex flex-col items-center">
+                <span className="italic mb-1">
+                  {bigNumberRender(info.totalSupply)}/{bigNumberRender(info.limit)} minted
+                </span>
+                {info.price && (
+                  <Button disabled={isMintComplete} loading={minting} onClick={mint} type="primary">
+                    {isMintComplete
+                      ? "Mint Completed"
+                      : `Mint for Ξ ${bigNumberRender(ethers.utils.formatEther(info.price))}`}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-12">
+              <h2 className="mb-6 text-base">Your Collection</h2>
+              <div className="flex flex-1">
+                <Row gutter={16}>
+                  {myCollection.map((item, i) => (
+                    <Col className="mb-3" span={8} key={`${item.name}-${i}`}>
+                      <Card
+                        bordered
+                        cover={
+                          <div className="rounded w-full overflow-hidden">
+                            <img alt={item.name} className="object-cover" src={ipfs.urlFromCID(item.image)} />
+                          </div>
+                        }
+                      >
+                        <Card.Meta
+                          title={item.name}
+                          description={
+                            <div className="flex items-center justify-center">
+                              {hasFloor && isMintComplete && (
+                                <>
+                                  <Button
+                                    className={classnames({ "mr-2": hasFloor && isMintComplete })}
+                                    onClick={() => approveForBurn(item._tokenId)}
+                                  >
+                                    Approve for burn
+                                  </Button>
+                                  <Button onClick={() => tradeForETH(item._tokenId)}>Trade for floor Ξ</Button>
+                                </>
+                              )}
+                            </div>
+                          }
+                        />
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              </div>
+            </div>
           </div>
-          <p style={{ textAlign: "center", marginTop: 15 }}>Current floor price = {floor.substr(0, 6)} ETH</p>
         </>
       ) : (
         <Button key="loginbutton" type="primary" onClick={loadWeb3Modal}>

@@ -231,10 +231,12 @@ function App(props) {
           <TokenView
             tx={tx}
             address={address}
+            userSigner={userSigner}
             loadWeb3Modal={loadWeb3Modal}
             localProvider={localProvider}
             readContracts={readContracts}
             writeContracts={writeContracts}
+            mainnetProvider={mainnetProvider}
             yourLocalBalance={yourLocalBalance}
           />
         </Route>

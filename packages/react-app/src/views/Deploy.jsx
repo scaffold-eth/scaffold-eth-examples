@@ -58,7 +58,7 @@ function Deploy({ tx, writeContracts, address, readContracts }) {
           values.symbol,
           files.length,
           ethers.utils.parseUnits(`${values.startPrice}`),
-          parseFloat(values.inflationRate).toFixed(2) * 1000,
+          parseFloat(values.inflationRate).toFixed(2) * 100,
           "https://ipfs.infura.io/ipfs/",
           uris,
         ),
