@@ -17,7 +17,7 @@ export default function UseBlockNativeOnboard() {
 
   // Checkout Blocknative packages for web3-onboard here - https://www.npmjs.com/package/@web3-onboard/core
   // Each wallet type is a separate node package allowing devs to keep their
-  // onboarding experience, fast light and fully customizable
+  // onboarding experience, fast light and fully customizable - www.blocknative.com
 
   const injected = injectedModule({
     custom: [
