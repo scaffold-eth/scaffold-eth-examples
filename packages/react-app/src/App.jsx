@@ -24,7 +24,7 @@ import {
   FaucetHint,
   NetworkSwitch,
 } from "./components";
-import { NETWORKS, ALCHEMY_KEY, BLOCKNATIVE_DAPPID } from "./constants";
+import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
@@ -73,9 +73,10 @@ function App(props) {
   // reference './constants.js' for other networks
   const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
 
-  // const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
+  const [injectedWallet, setInjectedWallet] = useState();
+  const [connectedWalletList, setConnectedWalletList] = useState([]);
   const location = useLocation();
 
   const targetNetwork = NETWORKS[selectedNetwork];
@@ -84,9 +85,9 @@ function App(props) {
   const blockExplorer = targetNetwork.blockExplorer;
 
   // setup blocknative onboard
-  const [onboardModule, injectedProvider] = useBlockNativeOnboard(BLOCKNATIVE_DAPPID, targetNetwork?.chainId);
+  const [blocknativeOnboardModule] = useBlockNativeOnboard(targetNetwork?.chainId);
 
-  console.log({ injectedProvider, onboardModule });
+  console.log({ injectedWallet, blocknativeOnboardModule });
 
   // load all your providers
   const localProvider = useStaticJsonRPC([
@@ -99,12 +100,13 @@ function App(props) {
   // 🛰 providers
   if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
-  const logoutOfWeb3Modal = async () => {
-    onboardModule.walletReset();
-
-    // remove selected wallet from localstorage
-    window.localStorage.removeItem("selectedWallet");
-
+  const logoutOfBlocknativeWeb3Modal = async () => {
+    // disconnect the first wallet in the wallets array...
+    // note: Mulitple wallets can connect with Blocknative web3-onboard!
+    const walletArrayState = await blocknativeOnboardModule.disconnectWallet({ label: injectedWallet.label });
+    window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
+    setInjectedWallet(null);
+    setConnectedWalletList(walletArrayState);
     setTimeout(() => {
       window.location.reload();
     }, 1);
@@ -116,7 +118,7 @@ function App(props) {
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice(targetNetwork, "fast");
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
-  const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider, USE_BURNER_WALLET);
+  const userProviderAndSigner = useUserProviderAndSigner(injectedWallet?.provider, localProvider, USE_BURNER_WALLET);
   const userSigner = userProviderAndSigner.signer;
 
   useEffect(() => {
@@ -218,27 +220,61 @@ function App(props) {
     myMainnetDAIBalance,
   ]);
 
-  const loadWeb3Modal = useCallback(async () => {
-    await onboardModule.walletSelect();
-    await onboardModule.walletCheck();
-    // eslint-disable-next-line
-  }, [onboardModule]);
+  const loadBlocknativeOnboardModal = useCallback(async () => {
+    const wallets = await blocknativeOnboardModule.connectWallet();
+
+    let mostRecentlySelectedWallet;
+    if (wallets.length) {
+      mostRecentlySelectedWallet = wallets[0];
+      setInjectedWallet(mostRecentlySelectedWallet);
+      setConnectedWalletList(wallets);
+    }
+    if (!mostRecentlySelectedWallet) return;
+
+    mostRecentlySelectedWallet.provider.on("chainChanged", chainId => {
+      console.log(`chain changed to ${chainId}! updating providers`);
+      blocknativeOnboardModule.setChain({ chainId: chainId });
+      setInjectedWallet(mostRecentlySelectedWallet);
+    });
+
+    mostRecentlySelectedWallet.provider.on("accountsChanged", () => {
+      console.log(`account changed!`);
+    });
+
+    // Subscribe to session disconnection
+    mostRecentlySelectedWallet.provider.on("disconnect", (code, reason) => {
+      console.log(code, reason);
+      logoutOfBlocknativeWeb3Modal();
+    });
+  }, [blocknativeOnboardModule]);
+
+  useEffect(() => {
+    if (connectedWalletList.length) {
+      const connectedWallets = connectedWalletList.map(({ label }) => label);
+
+      window.localStorage.setItem("connectedWallets", JSON.stringify(connectedWallets));
+    }
+  }, [connectedWalletList]);
 
   const handleWalletReconnect = async () => {
-    // get the selectedWallet value from local storage
-    const previouslySelectedWallet = window.localStorage.getItem("selectedWallet");
-
-    // call wallet select with that value if it exists
-    if (previouslySelectedWallet != null) {
-      await onboardModule.walletSelect(previouslySelectedWallet);
+    const previouslyConnectedWallets = JSON.parse(window.localStorage.getItem("connectedWallets"));
+    if (blocknativeOnboardModule && previouslyConnectedWallets?.length) {
+      async function setWalletFromLocalStorage() {
+        const autoSetWallets = await blocknativeOnboardModule.connectWallet({
+          autoSelect: previouslyConnectedWallets[0],
+        });
+        setConnectedWalletList(autoSetWallets);
+        setInjectedWallet(autoSetWallets[0]);
+      }
+      setWalletFromLocalStorage();
     }
   };
 
   useEffect(() => {
-    if (window && onboardModule && !injectedProvider) {
+    if (window && blocknativeOnboardModule && !injectedWallet?.provider) {
       handleWalletReconnect();
     }
-  }, [window, onboardModule]);
+  }, [window, blocknativeOnboardModule]);
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -251,7 +287,7 @@ function App(props) {
         localChainId={localChainId}
         selectedChainId={selectedChainId}
         targetNetwork={targetNetwork}
-        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        logoutOfWeb3Modal={logoutOfBlocknativeWeb3Modal}
         USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
       />
       <Menu style={{ textAlign: "center", marginTop: 40 }} selectedKeys={[location.pathname]} mode="horizontal">
@@ -372,9 +408,9 @@ function App(props) {
             userSigner={userSigner}
             mainnetProvider={mainnetProvider}
             price={price}
-            isWalletConnected={injectedProvider !== undefined}
-            loadWeb3Modal={loadWeb3Modal}
-            logoutOfWeb3Modal={logoutOfWeb3Modal}
+            isWalletConnected={injectedWallet?.provider !== undefined}
+            loadWeb3Modal={loadBlocknativeOnboardModal}
+            logoutOfWeb3Modal={logoutOfBlocknativeWeb3Modal}
             blockExplorer={blockExplorer}
           />
         </div>
