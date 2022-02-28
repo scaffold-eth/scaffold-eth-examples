@@ -102,21 +102,7 @@ export default function UseBlockNativeOnboard(networkId) {
       //   }
       // }
     });
-    // return Onboard({
-    //   dappId: apiKey,
-    //   networkId,
-    //   subscriptions: {
-    //     wallet: wallet => {
-    //       if (!wallet.provider) {
-    //         return null;
-    //       }
 
-    //       setInjectedProvider(new ethers.providers.Web3Provider(wallet.provider));
-
-    //       window.localStorage.setItem("selectedWallet", wallet.name);
-    //     },
-    //   },
-    // });
   }, []);
 
   return [onboard];
