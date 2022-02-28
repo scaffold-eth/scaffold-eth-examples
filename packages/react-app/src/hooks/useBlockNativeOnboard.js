@@ -12,9 +12,8 @@ import torusModule from "@web3-onboard/torus";
 import keepkeyModule from "@web3-onboard/keepkey";
 import keystoneModule from "@web3-onboard/keystone";
 import blocknativeLogo from "../blocknative-logo";
-import { ethers } from "ethers";
 
-export default function UseBlockNativeOnboard(networkId) {
+export default function UseBlockNativeOnboard() {
   const injected = injectedModule({
     custom: [
       // include custom injected wallet modules here
@@ -105,5 +104,5 @@ export default function UseBlockNativeOnboard(networkId) {
 
   }, []);
 
-  return [onboard];
+  return onboard;
 }

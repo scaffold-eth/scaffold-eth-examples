@@ -85,7 +85,7 @@ function App(props) {
   const blockExplorer = targetNetwork.blockExplorer;
 
   // setup blocknative onboard
-  const [blocknativeOnboardModule] = useBlockNativeOnboard(targetNetwork?.chainId);
+  const blocknativeOnboardModule = useBlockNativeOnboard();
 
   console.log({ injectedWallet, blocknativeOnboardModule });
 
