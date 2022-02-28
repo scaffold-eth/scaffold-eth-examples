@@ -29,6 +29,7 @@ contract YourContractChild is FxBaseChildTunnel {
     latestStateId = stateId;
     latestRootMessageSender = sender;
     latestData = data;
+    purpose = abi.decode(data, (string));
 }
 
 function sendMessageToRoot(bytes memory message) public {

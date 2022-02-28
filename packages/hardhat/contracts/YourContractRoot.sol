@@ -6,15 +6,13 @@ import "@maticnetwork/fx-portal/contracts/tunnel/FxBaseRootTunnel.sol";
 
 contract YourContractRoot is FxBaseRootTunnel {
 
-  string public purpose = "Building Unstoppable Apps!!!";
-
   constructor(address _checkpointManager, address _fxRoot) FxBaseRootTunnel(_checkpointManager, _fxRoot) {
   }
 
   // Waddap
 
   function setChildPurpose(string memory newPurpose) public {
-      sendMessageToChild(abi.encode(newPurpose));
+      _sendMessageToChild(abi.encode(newPurpose));
   }
   
 
