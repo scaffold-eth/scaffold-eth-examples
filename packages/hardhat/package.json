@@ -11,7 +11,7 @@
     "eslint-plugin-prettier": "^3.4.0"
   },
   "dependencies": {
-    "@eth-optimism/hardhat-ovm": "^0.2.2",
+    "@maticnetwork/fx-portal": "^1.0.4",
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
     "@nomiclabs/hardhat-waffle": "^2.0.0",
     "@openzeppelin/contracts": "^4.3.3",
@@ -42,6 +42,7 @@
     "send": "hardhat send",
     "generate": "hardhat generate",
     "account": "hardhat account",
-    "etherscan-verify": "hardhat etherscan-verify --api-key PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8"
+    "polytest-verify": "hardhat etherscan-verify --api-key M4J4HZ5HXN84FKJ11Y7KY5IP5JV74KMN3J --network polytest",
+    "etherscan-verify": "hardhat etherscan-verify --api-key KDHMCWMT1RQRRNQC89J8HCEWUYEUYDBYBF --network goerli"
   }
 }
