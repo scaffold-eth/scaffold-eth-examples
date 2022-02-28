@@ -234,7 +234,6 @@ function App(props) {
     mostRecentlySelectedWallet.provider.on("chainChanged", chainId => {
       console.log(`chain changed to ${chainId}! updating providers`);
       blocknativeOnboardModule.setChain({ chainId: chainId });
-      setInjectedWallet(mostRecentlySelectedWallet);
     });
 
     mostRecentlySelectedWallet.provider.on("accountsChanged", () => {

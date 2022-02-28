@@ -14,6 +14,11 @@ import keystoneModule from "@web3-onboard/keystone";
 import blocknativeLogo from "../blocknative-logo";
 
 export default function UseBlockNativeOnboard() {
+
+  // Checkout Blocknative packages for web3-onboard here - https://www.npmjs.com/package/@web3-onboard/core
+  // Each wallet type is a separate node package allowing devs to keep their
+  // onboarding experience, fast light and fully customizable
+
   const injected = injectedModule({
     custom: [
       // include custom injected wallet modules here
