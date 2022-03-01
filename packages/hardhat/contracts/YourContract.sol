@@ -10,29 +10,28 @@ contract YourContract {
     uint256 private nonce = 0;
     uint256 public prize = 0;
     uint256 public lastRoll;
-    bool public prizeWon = false;
 
+    event Roll(address indexed player, uint256 roll);
     event Winner(address winner, uint256 amount);
 
     constructor() {}
 
     function rollTheDice() public payable {
-        require (!prizeWon, "The prize has already been won");
-
         prize += msg.value;
         bytes32 prevHash = blockhash(block.number - 1);
         bytes32 hash = keccak256(abi.encodePacked(prevHash, address(this), nonce));
         uint256 roll = numberRolled(hash);
         lastRoll = roll;
+        nonce++;
+
+        emit Roll(msg.sender, roll);
 
         if (roll != 0) {
-            nonce++;
             return;
         }
 
         uint256 amount = prize;
         prize = 0;
-        prizeWon = true;
         (bool sent, ) = msg.sender.call{value: amount}("");
         require(sent, "Failed to send Ether");
         emit Winner(msg.sender, amount);
