@@ -1,6 +1,6 @@
 import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Alert, Button, Col, Menu, Row } from "antd";
+import { Alert, Button, Col, List, Menu, Row } from "antd";
 import "antd/dist/antd.css";
 import Authereum from "authereum";
 import {
@@ -12,6 +12,7 @@ import {
   useUserProviderAndSigner,
 } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
+import { useEventListener } from "eth-hooks/events/useEventListener";
 import Fortmatic from "fortmatic";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
@@ -19,7 +20,7 @@ import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import WalletLink from "walletlink";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
+import { Address, Account, Balance, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
@@ -27,6 +28,16 @@ import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
 // import Hints from "./Hints";
 import { ExampleUI, Hints, Subgraph } from "./views";
+
+function importAll(r) {
+  let images = {};
+  r.keys().map((item, index) => {
+    images[item.replace("./", "")] = r(item);
+  });
+  return images;
+}
+
+const diceImages = importAll(require.context("./images/", false, /\.(png)$/));
 
 const { ethers } = require("ethers");
 /*
@@ -438,6 +449,44 @@ function App(props) {
     );
   }
 
+  const winnerEvents = useEventListener(readContracts, "YourContract", "Winner");
+  const prize = useContractReader(readContracts, "YourContract", "prize");
+
+  const [diceRolled, setDiceRolled] = useState(false);
+  const [diceRollImage, setDiceRollImage] = useState(null);
+  const [claiming, setClaiming] = useState(false);
+
+  let diceRollImg = "";
+  if (diceRollImage) {
+    diceRollImg = <img style={{ width: "300px", heigth: "300px" }} src={diceImages[`${diceRollImage}.png`].default} />;
+  }
+
+  const filter = readContracts.YourContract?.filters.Roll(address, null);
+  readContracts.YourContract?.on(filter, (_, value) => {
+    if (value) {
+      const numberRolled = value.toNumber().toString(16).toUpperCase();
+      setDiceRollImage(numberRolled);
+      setDiceRolled(false);
+    }
+  });
+
+  const rollTheDice = async () => {
+    tx(
+      writeContracts.YourContract.rollTheDice({ value: ethers.utils.parseEther("0.01"), gasLimit: 500000 }),
+      update => {
+        if (update?.status === "sent" || update?.status === 1) {
+          setDiceRolled(true);
+          setDiceRollImage("ROLL");
+        }
+
+        if (update?.status === "failed") {
+          setDiceRolled(false);
+          setDiceRollImage(null);
+        }
+      },
+    );
+  };
+
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -452,7 +501,17 @@ function App(props) {
               }}
               to="/"
             >
-              YourContract
+              Dice!
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/debug">
+            <Link
+              onClick={() => {
+                setRoute("/debug");
+              }}
+              to="/debug"
+            >
+              Debug
             </Link>
           </Menu.Item>
           <Menu.Item key="/hints">
@@ -499,6 +558,29 @@ function App(props) {
 
         <Switch>
           <Route exact path="/">
+            Prize: <Balance balance={prize} dollarMultiplier={price} fontSize={64} />
+            <div style={{ padding: 16 }}>
+              <Button type="primary" disabled={diceRolled} onClick={rollTheDice}>
+                Roll the dice!
+              </Button>
+            </div>
+            {diceRollImg}
+            <div style={{ width: 500, margin: "auto", marginTop: 64 }}>
+              <div>Winner Events:</div>
+              <List
+                dataSource={winnerEvents}
+                renderItem={item => {
+                  return (
+                    <List.Item key={item[0] + item[1] + item.blockNumber}>
+                      <Address value={item.args[0]} ensProvider={mainnetProvider} fontSize={16} /> =>
+                      <Balance balance={item.args[1]} dollarMultiplier={price} />
+                    </List.Item>
+                  );
+                }}
+              />
+            </div>
+          </Route>
+          <Route exact path="/debug">
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
