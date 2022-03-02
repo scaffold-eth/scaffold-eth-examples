@@ -1,14 +1,12 @@
 import { Skeleton, Typography } from "antd";
 import React from "react";
-import { useThemeSwitcher } from "react-css-theme-switcher";
 import Blockies from "react-blockies";
+import { useThemeSwitcher } from "react-css-theme-switcher";
 import { useLookupAddress } from "eth-hooks/dapps/ens";
 
 // changed value={address} to address={address}
 
-const { Text } = Typography;
-
-/** 
+/*
   ~ What it does? ~
 
   Displays an address with a blockie image and option to copy address
@@ -29,7 +27,9 @@ const { Text } = Typography;
   - Provide blockExplorer={blockExplorer}, click on address and get the link
               (ex. by default "https://etherscan.io/" or for xdai "https://blockscout.com/poa/xdai/")
   - Provide fontSize={fontSize} to change the size of address text
-**/
+*/
+
+const { Text } = Typography;
 
 const blockExplorerLink = (address, blockExplorer) => `${blockExplorer || "https://etherscan.io/"}address/${address}`;
 
@@ -74,11 +74,16 @@ export default function Address(props) {
   }
 
   return (
-    <span>
-      <span style={{ verticalAlign: "middle" }}>
-        <Blockies seed={address.toLowerCase()} size={8} scale={props.fontSize ? props.fontSize / 7 : 4} />
+    <div className="inline-flex items-center justify-center">
+      <span style={{ verticalAlign: "middle", display: "inline-flex" }}>
+        <Blockies
+          className={props.short && "rounded-full mr-1"}
+          seed={address.toLowerCase()}
+          size={8}
+          scale={props.fontSize ? props.fontSize / 7 : 4}
+        />
       </span>
-      <span style={{ verticalAlign: "middle", paddingLeft: 5, fontSize: props.fontSize ? props.fontSize : 28 }}>
+      <span style={{ verticalAlign: "middle", paddingLeft: 5, fontSize: props.fontSize ? props.fontSize : 22 }}>
         {props.onChange ? (
           <Text editable={{ onChange: props.onChange }} copyable={{ text: address }}>
             <a
@@ -91,7 +96,7 @@ export default function Address(props) {
             </a>
           </Text>
         ) : (
-          <Text copyable={{ text: address }}>
+          <Text copyable={props.short ? false : { text: address }} className="m-0 p-0">
             <a
               style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }}
               target="_blank"
@@ -103,6 +108,6 @@ export default function Address(props) {
           </Text>
         )}
       </span>
-    </span>
+    </div>
   );
 }

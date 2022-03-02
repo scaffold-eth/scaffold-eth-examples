@@ -1,121 +1,91 @@
-import { useContractReader } from "eth-hooks";
+import React, { useState, useEffect } from "react";
+import random from "random";
+import randomcolor from "randomcolor";
+import { Button, Slider } from "antd";
 import { ethers } from "ethers";
-import React from "react";
-import { Link } from "react-router-dom";
+// import { useContractReader } from "eth-hooks";
+// import { Link } from "react-router-dom";
 
-/**
- * web3 props can be passed from '../App.jsx' into your local view component for use
- * @param {*} yourLocalBalance balance on current network
- * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
- * @returns react component
- **/
-function Home({ yourLocalBalance, readContracts }) {
-  // you can also use hooks locally in your component of choice
-  // in this case, let's keep track of 'purpose' variable from our contract
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+const splitAlpha = color => {
+  const rgb = color.replace(/^rgba?\(|\s+|\)$/g, "").split(",");
+  const alpha = ethers.utils.parseUnits(rgb.pop().toString());
+
+  return [rgb, alpha];
+};
+
+function Home({ tx, readContracts, writeContracts }) {
+  const [shades, setShades] = useState({
+    background: "rgba(0, 0, 0, 0)",
+    left: "rgba(0, 0, 0, 0)",
+    right: "rgba(0, 0, 0, 0)",
+  });
+  const [degree, setDegree] = useState(0);
+
+  const rotateShades = () => {
+    setShades({
+      background: randomcolor({ luminosity: "light", format: "rgba" }),
+      left: randomcolor({ luminosity: "light", format: "rgba" }),
+      right: randomcolor({ luminosity: "bright", format: "rgba" }),
+    });
+    setDegree(random.int(0, 360));
+  };
+
+  // console.log(
+  //   randomcolor({ luminosity: "light", format: "rgba" })
+  //     .replace(/^rgba?\(|\s+|\)$/g, "")
+  //     .split(","),
+  // );
+
+  const handleMint = async () => {
+    const [bgRGB, bgAlpha] = splitAlpha(shades.background);
+    const [leftRGB, leftAlpha] = splitAlpha(shades.left);
+    const [rightRGB, rightAlpha] = splitAlpha(shades.right);
+
+    const shadesArr = [...bgRGB, ...leftRGB, ...rightRGB];
+    const alphas = [bgAlpha, leftAlpha, rightAlpha];
+
+    tx(
+      writeContracts.OptimisticShades.mint(shadesArr, degree, alphas, { value: ethers.utils.parseUnits("0.1") }),
+      update => {
+        console.log("📡 Transaction Update:", update);
+        if (update && (update.status === "confirmed" || update.status === 1)) {
+          console.log(" 🍾 Transaction " + update.hash + " finished!");
+          console.log(
+            " ⛽️ " +
+              update.gasUsed +
+              "/" +
+              (update.gasLimit || update.gas) +
+              " @ " +
+              parseFloat(update.gasPrice) / 1000000000 +
+              " gwei",
+          );
+        }
+      },
+    );
+  };
+
+  useEffect(() => {
+    rotateShades();
+  }, []);
 
   return (
-    <div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>📝</span>
-        This Is Your App Home. You can start editing it in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/react-app/src/views/Home.jsx
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>✏️</span>
-        Edit your smart contract{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          YourContract.sol
-        </span>{" "}
-        in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/hardhat/contracts
-        </span>
-      </div>
-      {!purpose ? (
-        <div style={{ margin: 32 }}>
-          <span style={{ marginRight: 8 }}>👷‍♀️</span>
-          You haven't deployed your contract yet, run
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            yarn chain
-          </span>{" "}
-          and{" "}
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            yarn deploy
-          </span>{" "}
-          to deploy your first contract!
-        </div>
-      ) : (
-        <div style={{ margin: 32 }}>
-          <span style={{ marginRight: 8 }}>🤓</span>
-          The "purpose" variable from your contract is{" "}
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            {purpose}
-          </span>
-        </div>
-      )}
+    <div className="flex flex-1 flex-col justify-center items-center">
+      <div
+        className="w-80 h-80 rounded"
+        style={{
+          backgroundColor: shades.background,
+          backgroundImage: `linear-gradient(${degree}deg, ${shades.left}, ${shades.right})`,
+        }}
+      ></div>
 
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤖</span>
-        An example prop of your balance{" "}
-        <span style={{ fontWeight: "bold", color: "green" }}>({ethers.utils.formatEther(yourLocalBalance)})</span> was
-        passed into the
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          Home.jsx
-        </span>{" "}
-        component from
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          App.jsx
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>💭</span>
-        Check out the <Link to="/hints">"Hints"</Link> tab for more tips.
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🛠</span>
-        Tinker with your smart contract using the <Link to="/debug">"Debug Contract"</Link> tab.
+      <div className="mt-8 flex flex-1 flex-col items-center justify-center w-full">
+        <Slider min={0} max={360} value={degree} className="w-full max-w-xl" onChange={setDegree} />
+        <div className="mt-8">
+          <Button className="mr-4" onClick={rotateShades}>
+            Change Shades
+          </Button>
+          <Button onClick={handleMint}>Mint Shade</Button>
+        </div>
       </div>
     </div>
   );
