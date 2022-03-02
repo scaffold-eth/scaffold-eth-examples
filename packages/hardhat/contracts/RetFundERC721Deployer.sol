@@ -17,7 +17,7 @@ contract RetFundERC721Deployer is Ownable {
     );
 
     function deploy(
-        address admin,
+        address beneficiary,
         string memory name,
         string memory symbol,
         uint256 maxSupply,
@@ -28,7 +28,7 @@ contract RetFundERC721Deployer is Ownable {
     ) public {
         // deploy new token
         RetFundERC721 token = new RetFundERC721(
-            admin,
+            beneficiary,
             name,
             symbol,
             maxSupply,
@@ -39,7 +39,7 @@ contract RetFundERC721Deployer is Ownable {
         );
 
         // transfer token to owner
-        token.transferOwnership(admin);
+        token.transferOwnership(beneficiary);
 
         // emit event
         emit tokenDeployed(address(token), msg.sender, name, block.timestamp);

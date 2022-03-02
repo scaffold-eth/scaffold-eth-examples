@@ -13,7 +13,7 @@ contract RetFundERC721 is ERC721Enumerable, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    address public admin;
+    address public beneficiary;
     uint256 public currentSupply = 0;
     uint256 public curve;
     uint256 public price;
@@ -23,7 +23,7 @@ contract RetFundERC721 is ERC721Enumerable, Ownable, ReentrancyGuard {
     string private _userURI;
 
     constructor(
-        address _admin,
+        address _beneficiary,
         string memory name,
         string memory symbol,
         uint256 _maxSupply,
@@ -33,7 +33,7 @@ contract RetFundERC721 is ERC721Enumerable, Ownable, ReentrancyGuard {
         string[] memory _uris
     ) ERC721(name, symbol) {
         //
-        admin = _admin;
+        beneficiary = _beneficiary;
         limit = _maxSupply;
         curve = _curve;
         price = _basePrice;
@@ -57,7 +57,7 @@ contract RetFundERC721 is ERC721Enumerable, Ownable, ReentrancyGuard {
         uint256 id = _tokenIds.current();
         _mint(to, id);
 
-        (bool success, ) = admin.call{value: msg.value}("");
+        (bool success, ) = beneficiary.call{value: msg.value}("");
         require(success, "could not send");
 
         return id;
