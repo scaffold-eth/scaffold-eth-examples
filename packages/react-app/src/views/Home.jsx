@@ -8,44 +8,56 @@ import { ethers } from "ethers";
 
 const splitAlpha = color => {
   const rgb = color.replace(/^rgba?\(|\s+|\)$/g, "").split(",");
-  const alpha = ethers.utils.parseUnits(rgb.pop().toString());
+  const alpha = rgb.pop().toString().split(".");
 
   return [rgb, alpha];
 };
 
 function Home({ tx, readContracts, writeContracts }) {
   const [shades, setShades] = useState({
-    background: "rgba(0, 0, 0, 0)",
-    left: "rgba(0, 0, 0, 0)",
-    right: "rgba(0, 0, 0, 0)",
+    topLeft: "rgba(0, 0, 0, 0)",
+    topRight: "rgba(0, 0, 0, 0)",
+    bottomLeft: "rgba(0, 0, 0, 0)",
+    bottomRight: "rgba(0, 0, 0, 0)",
   });
-  const [degree, setDegree] = useState(0);
 
   const rotateShades = () => {
+    const colors = [];
+    let last = "light";
+
+    do {
+      const color = randomcolor({ luminosity: last, hue: "random", format: "rgba" });
+      // const color = randomcolor({ hue: "random", format: "rgba" });
+
+      if (!colors.includes(color)) {
+        colors.push(color);
+        last = last === "light" ? "bright" : "light";
+      }
+    } while (colors.length < 4);
+
+    last = "bright";
+
     setShades({
-      background: randomcolor({ luminosity: "light", format: "rgba" }),
-      left: randomcolor({ luminosity: "light", format: "rgba" }),
-      right: randomcolor({ luminosity: "bright", format: "rgba" }),
+      topLeft: colors[0],
+      topRight: colors[1],
+      bottomLeft: colors[2],
+      bottomRight: colors[3],
     });
-    setDegree(random.int(0, 360));
   };
 
-  // console.log(
-  //   randomcolor({ luminosity: "light", format: "rgba" })
-  //     .replace(/^rgba?\(|\s+|\)$/g, "")
-  //     .split(","),
-  // );
-
   const handleMint = async () => {
-    const [bgRGB, bgAlpha] = splitAlpha(shades.background);
-    const [leftRGB, leftAlpha] = splitAlpha(shades.left);
-    const [rightRGB, rightAlpha] = splitAlpha(shades.right);
+    const [topLeftRGB, topLeftAlpha] = splitAlpha(shades.topLeft);
+    const [topRightRGB, topRightAlpha] = splitAlpha(shades.topRight);
+    const [bottomLeftRGB, bottomLeftAlpha] = splitAlpha(shades.bottomLeft);
+    const [bottomRightRGB, bottomRightAlpha] = splitAlpha(shades.bottomRight);
 
-    const shadesArr = [...bgRGB, ...leftRGB, ...rightRGB];
-    const alphas = [bgAlpha, leftAlpha, rightAlpha];
+    const palletteShades = [...topLeftRGB, ...topRightRGB, ...bottomLeftRGB, ...bottomRightRGB];
+    const alphas = [topLeftAlpha, topRightAlpha, bottomLeftAlpha, bottomRightAlpha];
+
+    console.log(palletteShades, alphas);
 
     tx(
-      writeContracts.OptimisticShades.mint(shadesArr, degree, alphas, { value: ethers.utils.parseUnits("0.1") }),
+      writeContracts.OptimisticShades.mint(palletteShades, alphas, { value: ethers.utils.parseUnits("0.1") }),
       update => {
         console.log("📡 Transaction Update:", update);
         if (update && (update.status === "confirmed" || update.status === 1)) {
@@ -69,18 +81,17 @@ function Home({ tx, readContracts, writeContracts }) {
   }, []);
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center">
-      <div
-        className="w-80 h-80 rounded"
-        style={{
-          backgroundColor: shades.background,
-          backgroundImage: `linear-gradient(${degree}deg, ${shades.left}, ${shades.right})`,
-        }}
-      ></div>
+    <div className="flex flex-1 flex-col justify-center items-center" style={{ lineHeight: "0" }}>
+      <div className="w-80 h-80">
+        <div className="inline-flex m-0 p-0 w-40 h-40" style={{ backgroundColor: shades.topLeft }} />
+        <div className="inline-flex m-0 p-0 w-40 h-40" style={{ backgroundColor: shades.topRight }} />
+        <div className="inline-flex m-0 p-0 w-40 h-40" style={{ backgroundColor: shades.bottomLeft }} />
+        <div className="inline-flex m-0 p-0 w-40 h-40" style={{ backgroundColor: shades.bottomRight }} />
+      </div>
 
       <div className="mt-8 flex flex-1 flex-col items-center justify-center w-full">
-        <Slider min={0} max={360} value={degree} className="w-full max-w-xl" onChange={setDegree} />
-        <div className="mt-8">
+        {/* <Slider min={0} max={360} value={degree} className="w-full max-w-xl" onChange={setDegree} /> */}
+        <div>
           <Button className="mr-4" onClick={rotateShades}>
             Change Shades
           </Button>
