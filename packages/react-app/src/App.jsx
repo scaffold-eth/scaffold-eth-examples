@@ -212,7 +212,7 @@ function App(props) {
         </Menu.Item>
       </Menu>
 
-      <section className="container mt-12">
+      <section className="container mt-12 mx-auto">
         <Switch>
           <Route exact path="/">
             {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
