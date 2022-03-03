@@ -4565,12 +4565,21 @@
     joi "^17.4.2"
     rxjs "^7.5.2"
 
-"@web3-onboard/core@^2.0.0-alpha.4":
-  version "2.0.0-alpha.5"
-  resolved "https://registry.yarnpkg.com/@web3-onboard/core/-/core-2.0.0-alpha.5.tgz#0d40f3534a308fce668c49200fa355d9474f6252"
-  integrity sha512-1j9EcruTKizT9Fen/0SGgryvmbPXX67ampcIDSTSCtTJPuSuCiQxzT8pxSaJJn3POA0DtooKHONaf6vrufpsVQ==
+"@web3-onboard/common@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/common/-/common-2.0.1.tgz#31355bb497ac13f77f816e7d34ad8b6d7d84ea74"
+  integrity sha512-y2eJEfekIJ1GS45ReDhAKsvOZCEf6LmD7F901qzPECy6cIV3IpyzPzneLLp31isPEOQm2IUwGBb3Y+iDKiDIDA==
   dependencies:
-    "@web3-onboard/common" "^2.0.0-alpha.4"
+    ethers "5.5.4"
+    joi "^17.4.2"
+    rxjs "^7.5.2"
+
+"@web3-onboard/core@^2.0.0-alpha.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/core/-/core-2.0.4.tgz#857a3136d488aac0bb0d00692bebd0e11c63e111"
+  integrity sha512-ZP/eNCd5nNPGiTqBO2OPuUDcUzVgvidtsGNSRMn92uCIOsJVCrFLBb7QwhbsjEBQ/7+xhtaWYsNvaWwHsHKd6g==
+  dependencies:
+    "@web3-onboard/common" "^2.0.1"
     bowser "^2.11.0"
     ethers "5.5.3"
     eventemitter3 "^4.0.7"

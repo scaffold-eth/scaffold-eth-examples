@@ -170,7 +170,11 @@ function App(props) {
     injectedProvider.on("disconnect", (code, reason) => {
       console.log(code, reason);
       const walletArrayState = disconnect({ label: wallet.label });
-      window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
+      if (walletArrayState?.length) {
+        window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
+      } else {
+        window.localStorage.removeItem("connectedWallets");
+      }
     });
   }, [connect, setChain, wallet, disconnect, injectedProvider]);
 
