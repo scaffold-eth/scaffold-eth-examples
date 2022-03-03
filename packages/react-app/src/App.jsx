@@ -77,7 +77,7 @@ function App(props) {
 
   const [address, setAddress] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
-  const [injectedProvider, setInjectedProvider] = useState();
+  const [injectedProvider, setInjectedProvider] = useState(null);
   const location = useLocation();
 
   // Blocknative web3-onboard hooks
@@ -105,14 +105,79 @@ function App(props) {
   if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
   const logoutOfBlocknativeWeb3Modal = async () => {
+    if (!wallet?.label) return;
     // disconnect the first wallet in the wallets array...
     // note: Mulitple wallets can connect with Blocknative web3-onboard!
-    const walletArrayState = await disconnect({ label: wallet.label });
-    window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
+    const connectedWalletsLabelArray = await disconnect({ label: wallet.label });
+    if (connectedWalletsLabelArray?.length) {
+      window.localStorage.setItem("connectedWallets", JSON.stringify(connectedWalletsLabelArray));
+    } else {
+      window.localStorage.removeItem("connectedWallets");
+    }
     setTimeout(() => {
       window.location.reload();
     }, 1);
   };
+
+  useEffect(() => {
+    setWeb3Onboard(initWeb3Onboard);
+  }, []);
+
+  useEffect(() => {
+    if (!connectedWallets?.length) return;
+
+    const connectedWalletsLabelArray = connectedWallets.map(({ label }) => label);
+    window.localStorage.setItem("connectedWallets", JSON.stringify(connectedWalletsLabelArray));
+  }, [connectedWallets]);
+
+  useEffect(() => {
+    if (!wallet?.provider) {
+      setInjectedProvider(null);
+    } else {
+      setInjectedProvider(new ethers.providers.Web3Provider(wallet.provider, "any"));
+    }
+  }, [wallet]);
+
+  useEffect(() => {
+    if (!web3Onboard) return;
+    const previouslyConnectedWallets = JSON.parse(window.localStorage.getItem("connectedWallets"));
+
+    if (previouslyConnectedWallets?.length) {
+      async function setWalletFromLocalStorage() {
+        await connect({ autoSelect: previouslyConnectedWallets[0] });
+      }
+      setWalletFromLocalStorage();
+    }
+  }, [web3Onboard, connect]);
+
+  const loadBlocknativeOnboardModal = useCallback(async () => {
+    await connect();
+
+    if (!wallet) return;
+
+    setInjectedProvider(wallet.provider);
+
+    injectedProvider.on("chainChanged", chainId => {
+      console.log(`chain changed to ${chainId}! updating providers`);
+      setChain({ chainId: chainId });
+    });
+
+    injectedProvider.on("accountsChanged", () => {
+      console.log(`account changed!`);
+    });
+
+    // Subscribe to session disconnection
+    injectedProvider.on("disconnect", (code, reason) => {
+      console.log(code, reason);
+      const walletArrayState = disconnect({ label: wallet.label });
+      window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
+    });
+  }, [connect, setChain, wallet, disconnect, injectedProvider]);
+
+  useEffect(() => {
+    // Set/change chain with the below method for web3-onboard
+    // setChain(hexChainId);
+  }, [selectedNetwork, setChain]);
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
@@ -221,79 +286,6 @@ function App(props) {
     localChainId,
     myMainnetDAIBalance,
   ]);
-
-  useEffect(() => {
-    setWeb3Onboard(initWeb3Onboard);
-  }, []);
-
-  useEffect(() => {
-    if (!connectedWallets.length) return;
-
-    const connectedWalletsLabelArray = connectedWallets.map(({ label }) => label);
-    window.localStorage.setItem("connectedWallets", JSON.stringify(connectedWalletsLabelArray));
-  }, [connectedWallets]);
-
-  useEffect(() => {
-    if (!wallet?.provider) {
-      setInjectedProvider(null);
-    } else {
-      setInjectedProvider(new ethers.providers.Web3Provider(wallet.provider, "any"));
-    }
-  }, [wallet]);
-
-  useEffect(() => {
-    const previouslyConnectedWallets = JSON.parse(window.localStorage.getItem("connectedWallets"));
-
-    if (previouslyConnectedWallets?.length) {
-      async function setWalletFromLocalStorage() {
-        await connect({ autoSelect: previouslyConnectedWallets[0] });
-      }
-      setWalletFromLocalStorage();
-    }
-  }, [web3Onboard, connect]);
-
-  const loadBlocknativeOnboardModal = useCallback(async () => {
-    await connect();
-
-    if (!wallet) return;
-
-    setInjectedProvider(wallet.provider);
-
-    injectedProvider.on("chainChanged", chainId => {
-      console.log(`chain changed to ${chainId}! updating providers`);
-      setChain({ chainId: chainId });
-    });
-
-    injectedProvider.on("accountsChanged", () => {
-      console.log(`account changed!`);
-    });
-
-    // Subscribe to session disconnection
-    injectedProvider.on("disconnect", (code, reason) => {
-      console.log(code, reason);
-      const walletArrayState = disconnect({ label: wallet.label });
-      window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
-    });
-  }, [connect, setChain, wallet, disconnect, injectedProvider]);
-
-  useEffect(() => {
-    if (connectedWallets && connectedWallets?.length) {
-      const connectedWallets = connectedWallets.map(({ label }) => label);
-
-      window.localStorage.setItem("connectedWallets", JSON.stringify(connectedWallets));
-    }
-  }, [connectedWallets]);
-
-  useEffect(() => {
-    const previouslyConnectedWallets = JSON.parse(window.localStorage.getItem("connectedWallets"));
-
-    if (previouslyConnectedWallets?.length) {
-      async function setWalletFromLocalStorage() {
-        await connect({ autoSelect: previouslyConnectedWallets[0] });
-      }
-      setWalletFromLocalStorage();
-    }
-  }, [web3Onboard, connect]);
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -427,7 +419,7 @@ function App(props) {
             userSigner={userSigner}
             mainnetProvider={mainnetProvider}
             price={price}
-            isWalletConnected={injectedProvider !== undefined}
+            isWalletConnected={!!injectedProvider}
             loadWeb3Modal={loadBlocknativeOnboardModal}
             logoutOfWeb3Modal={logoutOfBlocknativeWeb3Modal}
             blockExplorer={blockExplorer}
