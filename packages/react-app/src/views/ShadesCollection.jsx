@@ -51,12 +51,13 @@ export default function ShadesCollection({ tx, readContracts, address, ...props 
     <div>
       <Row gutter={[16, 16]}>
         {myCollection.map((file, i) => (
-          <Col className="mb-3" span={8} key={`${file.name}-${i}`}>
+          <Col className="mb-3" span={6} key={`${file.name}-${i}`}>
             <Card
               bordered
               hoverable
               bodyStyle={{ padding: 0 }}
-              cover={<img alt={file.name} className="object-cover" src={file.image} />}
+              title={<div>{file.name}</div>}
+              cover={<img alt={file.name} className="object-cover rounded" src={file.image} />}
             />
           </Col>
         ))}
