@@ -3,6 +3,7 @@ import random from "random";
 import randomcolor from "randomcolor";
 import { Button, Slider } from "antd";
 import { ethers } from "ethers";
+import { useERC721Mint } from "../hooks";
 // import { useContractReader } from "eth-hooks";
 // import { Link } from "react-router-dom";
 
@@ -20,6 +21,10 @@ function Home({ tx, readContracts, writeContracts }) {
     bottomLeft: "rgba(0, 0, 0, 0)",
     bottomRight: "rgba(0, 0, 0, 0)",
   });
+
+  const mints = useERC721Mint(readContracts, "OptimisticShades");
+
+  console.log(mints);
 
   const rotateShades = () => {
     const colors = [];
