@@ -93,16 +93,16 @@ Check out all the [active branches](https://github.com/scaffold-eth/scaffold-eth
 Web3-Onboard is the long awaited full re-write of Onboard that takes everything that we have learned in designing/managing Onboard V1 and implements a new architecture and API. This initial release has feature parity with version 1 along with a bunch of new features. This first release will also serve as a flexible foundation/architecture for the many upcoming features that we have planned.
 Features
 
-    Re-designed UI: New modern UI that is fully customizable via CSS vars.
-    Multiple Chain Support: Your users can now switch between chains/networks with ease. You configure which EVM compatible chains you want to support.
-    Multiple Wallets and Accounts Connection: Your users can now connect multiple wallets and/or multiple accounts within each wallet at the same time.
-    React Hooks: A React Hooks package for slick integration in to React apps.
-    Minimal Dependencies: All wallet dependencies are included in separate packages, so you only include the ones you want to use.
-    Dynamic Imports: Supporting multiple wallets in your app requires a lot of dependencies. Onboard dynamically imports a wallet and dependencies only when the user selects it, so that minimal bandwidth is used.
-    Wallet Provider Standardization: All wallet modules expose a provider that is patched to be compliant with the EIP-1193, EIP-1102, EIP-3085 and EIP-3326 specifications.
+    * __Re-designed UI__ : New modern UI that is fully customizable via CSS vars.
+    * __Multiple Chain Support__ : Your users can now switch between chains/networks with ease. You configure which EVM compatible chains you want to support.
+    * __Multiple Wallets and Accounts Connection__ : Your users can now connect multiple wallets and/or multiple accounts within each wallet at the same time.
+    * __React Hooks__ : A React Hooks package for slick integration in to React apps.
+    * __Minimal Dependencies__ : All wallet dependencies are included in separate packages, so you only include the ones you want to use.
+    * __Dynamic Imports__ : Supporting multiple wallets in your app requires a lot of dependencies. Onboard dynamically imports a wallet and dependencies only when the user selects it, so that minimal bandwidth is used.
+    * __Wallet Provider Standardization__ : All wallet modules expose a provider that is patched to be compliant with the EIP-1193, EIP-1102, EIP-3085 and EIP-3326 specifications.
 
 
- The implementation found within this project leverages the `web3-onboard/react` npm package that wraps and delivers convienient hooks for implementation.
+ The implementation found within this project leverages the `web3-onboard/react` npm package that wraps and delivers convenient hooks for implementation.
  [React Hooks Package](https://www.npmjs.com/package/@web3-onboard/react)
  `web3-onboard` is framework agnostic and is simple to integrate into any front end framework. You can find the core component package [here](https://www.npmjs.com/package/@web3-onboard/core) as well as further documentation on features, customizing and handling build environments
 
@@ -119,7 +119,7 @@ Features
  @web3-onboard/gnosis 
  @web3-onboard/fortmatic
 
- Add the wallets you like and instanciate as found in `blocknativeOnboardService.js`
+ Add the wallets you like and instantiate as found in `blocknativeOnboardService.js`
 
  After wallet connection is successful you will be able to expose the wallet's provider along with the methods that will allow you to interact with the connected blockchain.
 
