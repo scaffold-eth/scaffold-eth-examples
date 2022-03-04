@@ -4574,7 +4574,7 @@
     joi "^17.4.2"
     rxjs "^7.5.2"
 
-"@web3-onboard/core@^2.0.0-alpha.4":
+"@web3-onboard/core@^2.0.3":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@web3-onboard/core/-/core-2.0.4.tgz#857a3136d488aac0bb0d00692bebd0e11c63e111"
   integrity sha512-ZP/eNCd5nNPGiTqBO2OPuUDcUzVgvidtsGNSRMn92uCIOsJVCrFLBb7QwhbsjEBQ/7+xhtaWYsNvaWwHsHKd6g==
@@ -4663,6 +4663,14 @@
   dependencies:
     "@portis/web3" "^4.0.6"
     "@web3-onboard/common" "^2.0.0-alpha.4"
+
+"@web3-onboard/react@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@web3-onboard/react/-/react-2.0.2.tgz#ee1d0aa1455930c48f054f0384bad71222c1ebb9"
+  integrity sha512-WVXh+GhSkaS6Fvb4uDO392U1DDCrjR+iaCi4qQqYq/9Dq4M1sGvv/SbZPnoDlVMpM6ZG6xi/3wC5Fk9XmMq9+A==
+  dependencies:
+    "@web3-onboard/common" "^2.0.1"
+    "@web3-onboard/core" "^2.0.3"
 
 "@web3-onboard/torus@^2.0.0-alpha.4":
   version "2.0.0-alpha.4"
