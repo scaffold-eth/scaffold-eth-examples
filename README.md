@@ -7,7 +7,7 @@
 ## quickstart
 
 ```bash
-git clone https://github.com/austintgriffith/scaffold-eth.git signature-recover
+git clone https://github.com/scaffold-eth/scaffold-eth-examples.git signature-recover
 
 cd signature-recover
 
