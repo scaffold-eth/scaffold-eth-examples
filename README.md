@@ -2,7 +2,7 @@
 
 > Quickly spin up a DAO smart contract where you choose the initial group of members.
 
-![PowDAO Dashboard](https://adaptiveclaim.s3.amazonaws.com/Screenshot+2021-09-20+114944.png)
+![PowDAO Dashboard](https://scaffold-eth-readme-images.s3.amazonaws.com/Screenshot+2022-02-10+174055.png)
 
 ## 📘 DAO Specifics
 

