@@ -24,13 +24,15 @@ import {
   FaucetHint,
   NetworkSwitch,
 } from "./components";
-import { NETWORKS, ALCHEMY_KEY, BLOCKNATIVE_DAPPID } from "./constants";
+import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
-import { useBlockNativeOnboard, useStaticJsonRPC } from "./hooks";
+import { useStaticJsonRPC } from "./hooks";
+import initWeb3Onboard from "./helpers/blocknativeOnboardService";
+import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
 
 const { ethers } = require("ethers");
 /*
@@ -73,20 +75,23 @@ function App(props) {
   // reference './constants.js' for other networks
   const networkOptions = [initialNetwork.name, "mainnet", "rinkeby"];
 
-  // const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
+  const [injectedProvider, setInjectedProvider] = useState(null);
   const location = useLocation();
+
+  // Blocknative web3-onboard hooks
+  const [{ wallet }, connect, disconnect] = useConnectWallet();
+  const [{ chains, connectedChain, settingChain }, setChain] = useSetChain();
+  const connectedWallets = useWallets();
+  const [web3Onboard, setWeb3Onboard] = useState(null);
 
   const targetNetwork = NETWORKS[selectedNetwork];
 
   // 🔭 block explorer URL
   const blockExplorer = targetNetwork.blockExplorer;
 
-  // setup blocknative onboard
-  const [onboardModule, injectedProvider] = useBlockNativeOnboard(BLOCKNATIVE_DAPPID, targetNetwork?.chainId);
-
-  console.log({ injectedProvider, onboardModule });
+  console.log({ wallet });
 
   // load all your providers
   const localProvider = useStaticJsonRPC([
@@ -99,16 +104,84 @@ function App(props) {
   // 🛰 providers
   if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 
-  const logoutOfWeb3Modal = async () => {
-    onboardModule.walletReset();
-
-    // remove selected wallet from localstorage
-    window.localStorage.removeItem("selectedWallet");
-
+  const logoutOfBlocknativeWeb3Modal = async () => {
+    if (!wallet?.label) return;
+    // disconnect the first wallet in the wallets array...
+    // note: Mulitple wallets can connect with Blocknative web3-onboard!
+    const connectedWalletsLabelArray = await disconnect({ label: wallet.label });
+    if (connectedWalletsLabelArray?.length) {
+      window.localStorage.setItem("connectedWallets", JSON.stringify(connectedWalletsLabelArray));
+    } else {
+      window.localStorage.removeItem("connectedWallets");
+    }
     setTimeout(() => {
       window.location.reload();
     }, 1);
   };
+
+  useEffect(() => {
+    setWeb3Onboard(initWeb3Onboard);
+  }, []);
+
+  useEffect(() => {
+    if (!connectedWallets?.length) return;
+
+    const connectedWalletsLabelArray = connectedWallets.map(({ label }) => label);
+    window.localStorage.setItem("connectedWallets", JSON.stringify(connectedWalletsLabelArray));
+  }, [connectedWallets]);
+
+  useEffect(() => {
+    if (!wallet?.provider) {
+      setInjectedProvider(null);
+    } else {
+      setInjectedProvider(new ethers.providers.Web3Provider(wallet.provider, "any"));
+    }
+  }, [wallet]);
+
+  useEffect(() => {
+    if (!web3Onboard) return;
+    const previouslyConnectedWallets = JSON.parse(window.localStorage.getItem("connectedWallets"));
+
+    if (previouslyConnectedWallets?.length) {
+      async function setWalletFromLocalStorage() {
+        await connect({ autoSelect: previouslyConnectedWallets[0] });
+      }
+      setWalletFromLocalStorage();
+    }
+  }, [web3Onboard, connect]);
+
+  const loadBlocknativeOnboardModal = useCallback(async () => {
+    await connect();
+
+    if (!wallet) return;
+
+    setInjectedProvider(wallet.provider);
+
+    injectedProvider.on("chainChanged", chainId => {
+      console.log(`chain changed to ${chainId}! updating providers`);
+      setChain({ chainId: chainId });
+    });
+
+    injectedProvider.on("accountsChanged", () => {
+      console.log(`account changed!`);
+    });
+
+    // Subscribe to session disconnection
+    injectedProvider.on("disconnect", (code, reason) => {
+      console.log(code, reason);
+      const walletArrayState = disconnect({ label: wallet.label });
+      if (walletArrayState?.length) {
+        window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
+      } else {
+        window.localStorage.removeItem("connectedWallets");
+      }
+    });
+  }, [connect, setChain, wallet, disconnect, injectedProvider]);
+
+  useEffect(() => {
+    // Set/change chain with the below method for web3-onboard
+    // setChain(hexChainId);
+  }, [selectedNetwork, setChain]);
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
@@ -218,28 +291,6 @@ function App(props) {
     myMainnetDAIBalance,
   ]);
 
-  const loadWeb3Modal = useCallback(async () => {
-    await onboardModule.walletSelect();
-    await onboardModule.walletCheck();
-    // eslint-disable-next-line
-  }, [onboardModule]);
-
-  const handleWalletReconnect = async () => {
-    // get the selectedWallet value from local storage
-    const previouslySelectedWallet = window.localStorage.getItem("selectedWallet");
-
-    // call wallet select with that value if it exists
-    if (previouslySelectedWallet != null) {
-      await onboardModule.walletSelect(previouslySelectedWallet);
-    }
-  };
-
-  useEffect(() => {
-    if (window && onboardModule && !injectedProvider) {
-      handleWalletReconnect();
-    }
-  }, [window, onboardModule]);
-
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
   return (
@@ -251,7 +302,7 @@ function App(props) {
         localChainId={localChainId}
         selectedChainId={selectedChainId}
         targetNetwork={targetNetwork}
-        logoutOfWeb3Modal={logoutOfWeb3Modal}
+        logoutOfWeb3Modal={logoutOfBlocknativeWeb3Modal}
         USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
       />
       <Menu style={{ textAlign: "center", marginTop: 40 }} selectedKeys={[location.pathname]} mode="horizontal">
@@ -372,9 +423,9 @@ function App(props) {
             userSigner={userSigner}
             mainnetProvider={mainnetProvider}
             price={price}
-            isWalletConnected={injectedProvider !== undefined}
-            loadWeb3Modal={loadWeb3Modal}
-            logoutOfWeb3Modal={logoutOfWeb3Modal}
+            isWalletConnected={!!injectedProvider}
+            loadWeb3Modal={loadBlocknativeOnboardModal}
+            logoutOfWeb3Modal={logoutOfBlocknativeWeb3Modal}
             blockExplorer={blockExplorer}
           />
         </div>

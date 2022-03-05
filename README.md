@@ -87,6 +87,44 @@ Check out all the [active branches](https://github.com/scaffold-eth/scaffold-eth
  - ⚖️  [Learn how a simple DEX works](https://medium.com/@austin_48503/%EF%B8%8F-minimum-viable-exchange-d84f30bd0c90)
  - 🦍  [Ape into learning!](https://github.com/scaffold-eth/scaffold-eth/tree/aave-ape)
 
+## Onboarding Users to your DApp using Blocknative's web3-onboard 
+📕 Official `web3-onboard` docs: https://docs.blocknative.com/onboard
+
+Web3-Onboard is the long awaited full re-write of Onboard that takes everything that we have learned in designing/managing Onboard V1 and implements a new architecture and API. This initial release has feature parity with version 1 along with a bunch of new features. This first release will also serve as a flexible foundation/architecture for the many upcoming features that we have planned.
+Features
+
+    * __Re-designed UI__ : New modern UI that is fully customizable via CSS vars.
+    * __Multiple Chain Support__ : Your users can now switch between chains/networks with ease. You configure which EVM compatible chains you want to support.
+    * __Multiple Wallets and Accounts Connection__ : Your users can now connect multiple wallets and/or multiple accounts within each wallet at the same time.
+    * __React Hooks__ : A React Hooks package for slick integration in to React apps.
+    * __Minimal Dependencies__ : All wallet dependencies are included in separate packages, so you only include the ones you want to use.
+    * __Dynamic Imports__ : Supporting multiple wallets in your app requires a lot of dependencies. Onboard dynamically imports a wallet and dependencies only when the user selects it, so that minimal bandwidth is used.
+    * __Wallet Provider Standardization__ : All wallet modules expose a provider that is patched to be compliant with the EIP-1193, EIP-1102, EIP-3085 and EIP-3326 specifications.
+
+
+ The implementation found within this project leverages the `web3-onboard/react` npm package that wraps and delivers convenient hooks for implementation.
+ [React Hooks Package](https://www.npmjs.com/package/@web3-onboard/react)
+ `web3-onboard` is framework agnostic and is simple to integrate into any front end framework. You can find the core component package [here](https://www.npmjs.com/package/@web3-onboard/core) as well as further documentation on features, customizing and handling build environments
+
+ With either instance the onboard package was created to be as light and fast as possible so you will have pass the wallet types you are interested in connecting to your DApp
+ @web3-onboard/injected-wallets 
+ @web3-onboard/ledger 
+ @web3-onboard/trezor 
+ @web3-onboard/keepkey 
+ @web3-onboard/walletconnect 
+ @web3-onboard/walletlink 
+ @web3-onboard/torus 
+ @web3-onboard/portis 
+ @web3-onboard/mew  (does not currently build on M1 Macs)
+ @web3-onboard/gnosis 
+ @web3-onboard/fortmatic
+
+ Add the wallets you like and instantiate as found in `blocknativeOnboardService.js`
+
+ After wallet connection is successful you will be able to expose the wallet's provider along with the methods that will allow you to interact with the connected blockchain.
+
+ Check out all the awesome products from Blocknative at https://www.Blocknative.com
+
 # 💌 P.S.
 
 🌍 You need an RPC key for testnets and production deployments, create an [Alchemy](https://www.alchemy.com/) account and replace the value of `ALCHEMY_KEY = xxx` in `packages/react-app/src/constants.js` with your new key.
