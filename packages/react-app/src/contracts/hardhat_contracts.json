@@ -5,7 +5,7 @@
       "chainId": "1",
       "contracts": {
         "Multidrop": {
-          "address": "0xa718D712cf928EE4673BC1d3958376252C047698",
+          "address": "0x58793E360f7FEAB910798fa6d026f326c801c131",
           "abi": [
             {
               "inputs": [],
@@ -57,6 +57,12 @@
                   "internalType": "address",
                   "name": "token",
                   "type": "address"
+                },
+                {
+                  "indexed": false,
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
                 }
               ],
               "name": "tokenDropped",
