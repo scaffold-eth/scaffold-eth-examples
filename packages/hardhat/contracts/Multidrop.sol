@@ -12,7 +12,8 @@ contract Multidrop is ReentrancyGuard {
     event tokenDropped(
         address indexed from,
         address indexed to,
-        address indexed token
+        address indexed token,
+        uint256 amount
     );
     event ETHdropped(address indexed from, address indexed to, uint256 amount);
 
@@ -69,7 +70,7 @@ contract Multidrop is ReentrancyGuard {
         for (uint256 i = 0; i < users.length; i++) {
             token.safeTransferFrom(msg.sender, users[i], values[i]);
 
-            emit tokenDropped(msg.sender, users[i], address(token));
+            emit tokenDropped(msg.sender, users[i], address(token), values[i]);
         }
 
         splitFee();
