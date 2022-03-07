@@ -31,7 +31,7 @@ import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
-import initWeb3Onboard from "./helpers/blockNativeOnboardService";
+import initWeb3Onboard from "./helpers/blocknativeOnboardService";
 import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
 
 const { ethers } = require("ethers");
@@ -170,7 +170,11 @@ function App(props) {
     injectedProvider.on("disconnect", (code, reason) => {
       console.log(code, reason);
       const walletArrayState = disconnect({ label: wallet.label });
-      window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
+      if (walletArrayState?.length) {
+        window.localStorage.setItem("connectedWallets", JSON.stringify(walletArrayState));
+      } else {
+        window.localStorage.removeItem("connectedWallets");
+      }
     });
   }, [connect, setChain, wallet, disconnect, injectedProvider]);
 

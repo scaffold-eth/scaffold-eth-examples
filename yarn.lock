@@ -4570,6 +4570,7 @@
   resolved "https://registry.yarnpkg.com/@web3-onboard/core/-/core-2.0.6.tgz#c7c18ea415a80716abf56e240d9870ad3134637b"
   integrity sha512-pdccJtdTyS9VQpy3WcZXGV68qe1sQMyFCR+7g3WNjWfLgquk9vOnoNQdOT3lv+Hd+/VAPDV+9O7fOg9d0SwlVg==
   dependencies:
+
     "@web3-onboard/common" "^2.0.1"
     bowser "^2.11.0"
     ethers "5.5.3"
