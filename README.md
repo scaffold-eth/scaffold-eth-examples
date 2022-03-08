@@ -33,6 +33,11 @@ export ETHERSCAN_TOKEN=YourApiToken
   2. Add the values for `ETHERSCAN_TOKEN` and `WEB3_INFURA_PROJECT_ID`
      NOTE: If you set up a global environment variable, that will take precedence
 
+4. Run
+```bash
+yarn install --lock-file
+```
+
 ## Basic Use
 
 To deploy the demo Yearn Strategy in a development environment:
