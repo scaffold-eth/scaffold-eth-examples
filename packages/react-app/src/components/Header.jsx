@@ -5,10 +5,10 @@ import React from "react";
 
 export default function Header() {
   return (
-    <a href="https://github.com/austintgriffith/scaffold-eth" target="_blank" rel="noopener noreferrer">
+    <a href="https://twitter.com/blind_nabler" target="_blank" rel="noopener noreferrer">
       <PageHeader
-        title="🏗 scaffold-eth"
-        subTitle="🖼 NFT example"
+        title="Harberger Tax NFT"
+        subTitle="by @blind_nabler"
         style={{ cursor: "pointer" }}
       />
     </a>

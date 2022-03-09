@@ -1,5 +1,4 @@
 {
-   "solidity.packageDefaultDependenciesDirectory": "packages/hardhat-ts/node_modules",
    "solidity-va.test.defaultUnittestTemplate": "hardhat",
    "files.exclude": {
       "**/.git": true,
@@ -31,5 +30,6 @@
    "search.exclude": {
       "**/yarn-error.log": true,
       "**/yarn.lock": true
-   }
+   },
+   "solidity.packageDefaultDependenciesDirectory": "packages/hardhat/node_modules"
 }
