@@ -1,16 +1,22 @@
-# 🏗 Scaffold-ETH - 🎟 Simple NFT Example
+# 🏗 Scaffold-ETH - 🎟 Harberger Tax NFT
 
-> Build, mint, and send around your own ERC721!
+> A test of a Harberger Tax NFT!
+
+# What is it?
+
+        Harberger Tax is a taxation method, which is highly effecient for public goods funding. It allows an ecosystem to strike a balance between pure private ownership, and total commons ownership of a resource or asset. It's quite simple, when someone claims an asset (in our case an NFT), they have to attach a price to it, that they pay a tax on (10%). And at any point in time anyone can buy that item for that declared price. This system makes it costly for users to unfairly price their assets, and mutually benefits the community if they were to.
+
+        This contract is a sample contract that sends 50% of the taxes collected to be redistrubted within holders of the token, and the other 50% sent to my address.
 
 # 🏃‍♀️ Quick Start
 Required: [Node](https://nodejs.org/dist/latest-v12.x/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/#mac-stable) and [Git](https://git-scm.com/downloads)
 
 ```
-git clone https://github.com/austintgriffith/scaffold-eth.git simple-nft-example
+git clone https://github.com/austintgriffith/scaffold-eth.git tax-nft
 ```
 ```
-cd simple-nft-example
-git checkout simple-nft-example
+cd tax-nft 
+git checkout tax-nft
 yarn install
 yarn start
 ```
@@ -18,32 +24,18 @@ yarn start
 > in a second terminal window, start your 📱 frontend:
 
 ```
-cd simple-nft-example
+cd tax-nft 
 yarn chain
 ```
 
 > in a third terminal window, 🛰 deploy your contract:
 
 ```
-cd simple-nft-example
+cd tax-nft 
 yarn deploy --network NETWORK_OF_CHOICE (localhost, kovan, rinkeby, mainnet)
 ```
 
 📱 Open http://localhost:3000 to see the app
-
-> ✏️ Edit the mint script mint.js in packages/hardhat/scripts and update the toAddress to your frontend address (wallet address in the top right or localhost:3000).
-
-![nft1](https://user-images.githubusercontent.com/526558/124386962-37e5dd00-dcb3-11eb-911e-0afce760d7ee.png)
-
-> in a terminal window run the mint script:
-```
-yarn mint
-```
-![nft2](https://user-images.githubusercontent.com/526558/124386972-3d432780-dcb3-11eb-933e-dad7dfd313b2.png)
-
-👀 You should see your collectibles show up if you minted to the correct address:
-
-![nft3](https://user-images.githubusercontent.com/526558/124386983-48965300-dcb3-11eb-88a7-e88ad6307976.png)
 
 👛 Open an incognito window and navigate to http://localhost:3000 (You'll notice it has a new wallet address).
 
