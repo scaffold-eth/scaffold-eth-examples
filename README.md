@@ -4,9 +4,9 @@
 
 # What is it?
 
-        Harberger Tax is a taxation method, which is highly effecient for public goods funding. It allows an ecosystem to strike a balance between pure private ownership, and total commons ownership of a resource or asset. It's quite simple, when someone claims an asset (in our case an NFT), they have to attach a price to it, that they pay a tax on (10%). And at any point in time anyone can buy that item for that declared price. This system makes it costly for users to unfairly price their assets, and mutually benefits the community if they were to.
+Harberger Tax is a taxation method, which is highly effecient for public goods funding. It allows an ecosystem to strike a balance between pure private ownership, and total commons ownership of a resource or asset. It's quite simple, when someone claims an asset (in our case an NFT), they have to attach a price to it, that they pay a tax on (10%). And at any point in time anyone can buy that item for that declared price. This system makes it costly for users to unfairly price their assets, and mutually benefits the community if they were to.
 
-        This contract is a sample contract that sends 50% of the taxes collected to be redistrubted within holders of the token, and the other 50% sent to my address.
+This contract is a sample contract that sends 50% of the taxes collected to be redistrubted within holders of the token, and the other 50% sent to my address.
 
 # 🏃‍♀️ Quick Start
 Required: [Node](https://nodejs.org/dist/latest-v12.x/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/#mac-stable) and [Git](https://git-scm.com/downloads)
