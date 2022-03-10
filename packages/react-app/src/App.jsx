@@ -1,6 +1,6 @@
 import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Alert, Button, Col, Menu, Row } from "antd";
+import { Alert, Button, Col, Menu, Row, List } from "antd";
 import "antd/dist/antd.css";
 import Authereum from "authereum";
 import {
@@ -27,7 +27,10 @@ import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
 // import Hints from "./Hints";
 import { ExampleUI, Hints, Subgraph } from "./views";
-
+import { CrossChainMessenger } from "@eth-optimism/sdk";
+import { Address, Balance } from "./components";
+import { utils } from "ethers";
+import OptimismBridge from "./components/OptimismBridge";
 const { ethers } = require("ethers");
 /*
     Welcome to 🏗 scaffold-eth !
@@ -49,7 +52,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.kovan; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -438,6 +441,80 @@ function App(props) {
     );
   }
 
+  const [crossChainMessenger, setCrossChainMessenger] = useState();
+  useEffect(() => {
+    if (!userSigner || !selectedChainId) {
+      return;
+    }
+
+    console.log(userSigner);
+    const crossChainMessenger = new CrossChainMessenger({
+      l1SignerOrProvider: userSigner,
+      l2SignerOrProvider: userSigner,
+      l1ChainId: selectedChainId,
+    });
+    setCrossChainMessenger(crossChainMessenger);
+  }, [userSigner, selectedChainId]);
+
+  const [deposits, setDeposits] = useState([]);
+  useEffect(() => {
+    if (!crossChainMessenger || !address) {
+      return;
+    }
+
+    const getDeposits = async () => {
+      const deposits = await crossChainMessenger.getDepositsByAddress(address);
+      console.log("deposits", deposits);
+      setDeposits(deposits);
+    };
+
+    getDeposits();
+  }, [crossChainMessenger, address]);
+
+  const [withdrawals, setWithdrawals] = useState([]);
+  useEffect(() => {
+    if (!crossChainMessenger || !address) {
+      return;
+    }
+
+    const getWithdrawals = async () => {
+      const wd = await crossChainMessenger.getWithdrawalsByAddress(address);
+      console.log("withdrawals", wd);
+      setWithdrawals(wd);
+    };
+
+    getWithdrawals();
+  }, [crossChainMessenger, yourLocalBalance]);
+
+  const [challengePeriodSeconds, setChallengePeriodSeconds] = useState(0);
+  useEffect(() => {
+    if (!crossChainMessenger) {
+      return;
+    }
+
+    const getChallengePeriodSeconds = async () => {
+      const challengePeriodSeconds = await crossChainMessenger.getChallengePeriodSeconds();
+      console.log("challengePeriodSeconds", challengePeriodSeconds);
+      setChallengePeriodSeconds(challengePeriodSeconds);
+    };
+
+    getChallengePeriodSeconds();
+  }, [crossChainMessenger]);
+
+  const depositEth = async () => {
+    if (crossChainMessenger) {
+      const result = await crossChainMessenger.depositETH(ethers.utils.parseEther(".01"));
+      console.log("depositEth", result);
+    }
+  };
+
+  const withdrawEth = async () => {
+    if (crossChainMessenger) {
+      const result = await crossChainMessenger.withdrawETH(ethers.utils.parseEther(".01"));
+      console.log("withdrawEth", result);
+    }
+  };
+
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -499,13 +576,37 @@ function App(props) {
 
         <Switch>
           <Route exact path="/">
+            <OptimismBridge
+              address={address}
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              localProvider={localProvider}
+            ></OptimismBridge>
+            {/* <button onClick={depositEth}>Deposit eth!</button>
+            <button onClick={withdrawEth}>Withdraw eth!</button>
+            <div>Challenge Period: {challengePeriodSeconds} seconds</div>
+            <h2>Deposits:</h2>
+            <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
+              <List
+                bordered
+                dataSource={deposits}
+                renderItem={item => {
+                  return (
+                    <List.Item key={item.transactionHash}>
+                      <Address address={item.from} ensProvider={mainnetProvider} fontSize={16} />
+                      <Balance balance={item.amount} provider={localProvider} price={price} />
+                    </List.Item>
+                  );
+                }}
+              />
+            </div> */}
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
 
-            <Contract
+            {/* <Contract
               name="YourContract"
               price={price}
               signer={userSigner}
@@ -513,7 +614,7 @@ function App(props) {
               address={address}
               blockExplorer={blockExplorer}
               contractConfig={contractConfig}
-            />
+            /> */}
           </Route>
           <Route path="/hints">
             <Hints
