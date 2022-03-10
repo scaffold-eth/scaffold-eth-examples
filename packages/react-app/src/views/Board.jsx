@@ -194,12 +194,13 @@ export default function Board({ typedSigner, mainnetProvider, address }) {
         </div>
 
         <div className="flex flex-1 mt-8">
-          <Row gutter={[16, 16]}>
+          <Row gutter={[16, 16]} className="flex flex-1">
             {proposals.map((item, i) => {
               const hasMyUpvote = myUpvotes.includes(item.id);
+              const LikeIcon = hasMyUpvote ? LikeFilled : LikeOutlined;
               return (
-                <Col className="mb-3" span={24} key={`${item.id}-${i}`}>
-                  <Card className={classnames("border")} title={null}>
+                <Col className="mb-3" span={24} key={item.id}>
+                  <Card className="w-full" title={null}>
                     <div className="flex flex-1 mb-4">
                       <h2 className="text-base font-normal">{item.proposal}</h2>
                     </div>
@@ -215,7 +216,7 @@ export default function Board({ typedSigner, mainnetProvider, address }) {
                         onClick={() => handleVote(item.id, !hasMyUpvote)}
                       >
                         <div className="inline-flex items-center justify-center">
-                          <LikeOutlined style={{ fontSize: "16px" }} />
+                          <LikeIcon style={{ fontSize: "16px" }} />
                           <span className="ml-2 text-base">{upvoteCounts[item.id] || 0}</span>
                         </div>
                       </Button>
