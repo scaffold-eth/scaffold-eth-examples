@@ -1,12 +1,11 @@
 import { Button } from "antd";
 import React from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
-
 import Address from "./Address";
 import Balance from "./Balance";
 import Wallet from "./Wallet";
 
-/** 
+/*
   ~ What it does? ~
 
   Displays an Address, Balance, and Wallet as one Account component,
@@ -40,7 +39,7 @@ import Wallet from "./Wallet";
               to be able to log in/log out to/from existing accounts
   - Provide blockExplorer={blockExplorer}, click on address and get the link
               (ex. by default "https://etherscan.io/" or for xdai "https://blockscout.com/poa/xdai/")
-**/
+*/
 
 export default function Account({
   useBurner,
@@ -90,7 +89,7 @@ export default function Account({
   const display = minimized ? (
     ""
   ) : (
-    <span>
+    <div className="inline-flex items-center justify-center">
       {web3Modal && web3Modal.cachedProvider ? (
         <>
           {address && <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />}
@@ -130,11 +129,11 @@ export default function Account({
       ) : (
         <></>
       )}
-    </span>
+    </div>
   );
 
   return (
-    <div>
+    <div className="flex items-center justify-center">
       {display}
       {modalButtons}
     </div>

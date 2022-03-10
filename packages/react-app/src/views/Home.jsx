@@ -1,121 +1,106 @@
-import { useContractReader } from "eth-hooks";
-import { ethers } from "ethers";
-import React from "react";
+// import { useContractReader } from "eth-hooks";
+// import { ethers } from "ethers";
+import { Button, Input, Row, Col, Card } from "antd";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Address } from "../components";
+import { firebase } from "../utils";
+// import { Link } from "react-router-dom";
 
-/**
- * web3 props can be passed from '../App.jsx' into your local view component for use
- * @param {*} yourLocalBalance balance on current network
- * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
- * @returns react component
- **/
-function Home({ yourLocalBalance, readContracts }) {
-  // you can also use hooks locally in your component of choice
-  // in this case, let's keep track of 'purpose' variable from our contract
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+function Home({ typedSigner, mainnetProvider }) {
+  const [boardName, setBoardName] = useState("");
+  const [creatingBoard, setCreatingBoard] = useState(false);
+  const [boards, setBoards] = useState([]);
+
+  const handleCreateBoard = async () => {
+    setCreatingBoard(true);
+
+    try {
+      // The data to sign
+      const value = {
+        boardName: boardName,
+        createdAt: Date.now(),
+      };
+
+      const signature = await typedSigner(
+        {
+          Board: [
+            { name: "boardName", type: "string" },
+            { name: "createdAt", type: "uint256" },
+          ],
+        },
+        value,
+      );
+
+      const createBoard = firebase.functions.httpsCallable("createBoard");
+
+      const { data } = await createBoard({ value, signature });
+
+      // send value and signature to backend for validation
+      console.log({ signature, id: data });
+      setBoardName("");
+    } catch (error) {
+      console.log(error);
+    }
+
+    setCreatingBoard(false);
+  };
+
+  useEffect(() => {
+    const unsubscribe = firebase.db
+      .collection("boards")
+      .orderBy("_createdAt", "desc")
+      .onSnapshot(snapshot => {
+        const data = [];
+
+        snapshot.forEach(doc => {
+          data.push({ ...doc.data(), id: doc.id });
+        });
+
+        setBoards(data);
+      });
+
+    return unsubscribe;
+  }, []);
 
   return (
-    <div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>📝</span>
-        This Is Your App Home. You can start editing it in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/react-app/src/views/Home.jsx
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>✏️</span>
-        Edit your smart contract{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          YourContract.sol
-        </span>{" "}
-        in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/hardhat/contracts
-        </span>
-      </div>
-      {!purpose ? (
-        <div style={{ margin: 32 }}>
-          <span style={{ marginRight: 8 }}>👷‍♀️</span>
-          You haven't deployed your contract yet, run
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            yarn chain
-          </span>{" "}
-          and{" "}
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            yarn deploy
-          </span>{" "}
-          to deploy your first contract!
+    <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-row justify-between items-center">
+        <h1 className="text-lg font-semibold p-0 m-0">Idea Boards</h1>
+        <div className="inline-flex flex-row">
+          <Input
+            type="text"
+            placeholder="New board name..."
+            name="boardName"
+            value={boardName}
+            onChange={v => setBoardName(v.target.value)}
+          />
+          <Button loading={creatingBoard} className="ml-2" type="primary" onClick={handleCreateBoard}>
+            Create Board
+          </Button>
         </div>
-      ) : (
-        <div style={{ margin: 32 }}>
-          <span style={{ marginRight: 8 }}>🤓</span>
-          The "purpose" variable from your contract is{" "}
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            {purpose}
-          </span>
-        </div>
-      )}
+      </div>
 
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤖</span>
-        An example prop of your balance{" "}
-        <span style={{ fontWeight: "bold", color: "green" }}>({ethers.utils.formatEther(yourLocalBalance)})</span> was
-        passed into the
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          Home.jsx
-        </span>{" "}
-        component from
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          App.jsx
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>💭</span>
-        Check out the <Link to="/hints">"Hints"</Link> tab for more tips.
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🛠</span>
-        Tinker with your smart contract using the <Link to="/debug">"Debug Contract"</Link> tab.
+      <div className="mt-12">
+        <Row gutter={[16, 16]}>
+          {boards.map((board, i) => (
+            <Col className="mb-3" span={6} key={`${board.boardName}-${i}`}>
+              <Link to={`/board/${board.id}`}>
+                <Card bordered hoverable title={null}>
+                  <div className="flex flex-1 mb-4">
+                    <h2 className="text-base font-medium">{board.boardName}</h2>
+                  </div>
+                  <div className="flex flex-1 items-center justify-between">
+                    <div className="flex flex-1 items-center">
+                      <span className="mr-2">By</span>
+                      <Address short address={board.creator} ensProvider={mainnetProvider} fontSize={14} noLink />
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            </Col>
+          ))}
+        </Row>
       </div>
     </div>
   );
