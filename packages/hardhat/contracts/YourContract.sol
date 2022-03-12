@@ -3,9 +3,9 @@ pragma solidity >=0.6.11 < 0.9.0;
 
 import "hardhat/console.sol";
 //import "@openzeppelin/contracts/access/Ownable.sol"; //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
-import "./Verifier.sol";
+import {Verifier as InitVerifier} from "./InitVerifier.sol";
 
-contract YourContract {
+contract YourContract is InitVerifier {
 
   // event SetPurpose(address sender, string purpose);
 
@@ -27,6 +27,6 @@ contract YourContract {
       uint256[2] memory c,
       uint256[2] memory input
   ) public view returns (bool) {
-      return Verifier.verifyInitProof(a, b, c, input);
+      return InitVerifier.verifyProof(a, b, c, input);
   }
 }

@@ -23,12 +23,16 @@
     "ethereum-waffle": "^3.1.1",
     "ethers": "^5.4.4",
     "hardhat": "2.6.0",
-    "hardhat-circom": "^1.2.0",
+    "hardhat-circom": "2.1.0",
     "hardhat-deploy": "^0.9.0",
     "hardhat-gas-reporter": "^1.0.4",
     "node-watch": "^0.7.0",
     "qrcode-terminal": "^0.12.0",
-    "ramda": "^0.27.1"
+    "ramda": "^0.27.1",
+    "toml": "^3.0.0"
+  },
+  "resolutions": {
+    "circom": "0.5.46"
   },
   "scripts": {
     "chain": "hardhat node --network hardhat --no-deploy",
