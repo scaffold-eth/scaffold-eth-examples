@@ -61,7 +61,7 @@ function circuits() {
     const config = toml.parse(fs.readFileSync("./circuits/circuit.config.toml", "utf-8"));
 
     circuitNames.forEach((name, index) => {
-      let protocol = config[name] || config.default || "groth16";
+      let protocol = config[name] || config.default;
       circuits[index] = {
         name: name,
         protocol: protocol,
