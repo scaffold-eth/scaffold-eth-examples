@@ -58,7 +58,7 @@ const initialNetwork = NETWORKS.mainnet; // <------- select your target frontend
 // 😬 Sorry for all the console logging
 const DEBUG = true;
 const NETWORKCHECK = true;
-const USE_BURNER_WALLET = false; // toggle burner wallet feature
+const USE_BURNER_WALLET = true; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
 
 const web3Modal = Web3ModalSetup();
@@ -206,9 +206,9 @@ function App(props) {
         <Menu.Item key="/">
           <Link to="/">App Home</Link>
         </Menu.Item>
-        <Menu.Item key="/debug">
+        {/* <Menu.Item key="/debug">
           <Link to="/debug">Debug Contracts</Link>
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu>
 
       <section className="container mx-auto mt-8">
@@ -223,7 +223,7 @@ function App(props) {
               yourLocalBalance={yourLocalBalance}
             />
           </Route>
-          <Route exact path="/board/:boardId">
+          <Route path="/board/:boardId">
             <Board
               tx={tx}
               address={address}
@@ -234,7 +234,7 @@ function App(props) {
               yourLocalBalance={yourLocalBalance}
             />
           </Route>
-          <Route exact path="/debug">
+          {/* <Route path="/debug">
             <Contract
               name="YourContract"
               price={price}
@@ -244,7 +244,7 @@ function App(props) {
               blockExplorer={blockExplorer}
               contractConfig={contractConfig}
             />
-          </Route>
+          </Route> */}
         </Switch>
       </section>
 

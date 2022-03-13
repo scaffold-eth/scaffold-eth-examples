@@ -1,50 +1,17 @@
 // import { useContractReader } from "eth-hooks";
 // import { ethers } from "ethers";
-import { Button, Input, Row, Col, Card } from "antd";
+import { Button, Input, Row, Col, Card, Form, Typography } from "antd";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Address } from "../components";
+import { NewBoard } from "../customComponents";
 import { firebase } from "../utils";
 // import { Link } from "react-router-dom";
 
 function Home({ typedSigner, mainnetProvider }) {
-  const [boardName, setBoardName] = useState("");
   const [creatingBoard, setCreatingBoard] = useState(false);
   const [boards, setBoards] = useState([]);
-
-  const handleCreateBoard = async () => {
-    setCreatingBoard(true);
-
-    try {
-      // The data to sign
-      const value = {
-        boardName: boardName,
-        createdAt: Date.now(),
-      };
-
-      const signature = await typedSigner(
-        {
-          Board: [
-            { name: "boardName", type: "string" },
-            { name: "createdAt", type: "uint256" },
-          ],
-        },
-        value,
-      );
-
-      const createBoard = firebase.functions.httpsCallable("createBoard");
-
-      const { data } = await createBoard({ value, signature });
-
-      // send value and signature to backend for validation
-      console.log({ signature, id: data });
-      setBoardName("");
-    } catch (error) {
-      console.log(error);
-    }
-
-    setCreatingBoard(false);
-  };
+  const [form] = Form.useForm();
 
   useEffect(() => {
     const unsubscribe = firebase.db
@@ -68,27 +35,24 @@ function Home({ typedSigner, mainnetProvider }) {
       <div className="flex flex-1 flex-row justify-between items-center">
         <h1 className="text-lg font-semibold p-0 m-0">Idea Boards</h1>
         <div className="inline-flex flex-row">
-          <Input
-            type="text"
-            placeholder="New board name..."
-            name="boardName"
-            value={boardName}
-            onChange={v => setBoardName(v.target.value)}
-          />
-          <Button loading={creatingBoard} className="ml-2" type="primary" onClick={handleCreateBoard}>
+          <Button type="primary" onClick={() => setCreatingBoard(true)}>
             Create Board
           </Button>
+          {/* */}
         </div>
       </div>
 
       <div className="mt-12">
         <Row gutter={[16, 16]}>
           {boards.map((board, i) => (
-            <Col className="mb-3" span={6} key={`${board.boardName}-${i}`}>
+            <Col className="mb-3" span={8} key={`${board.name}-${i}`}>
               <Link to={`/board/${board.id}`}>
                 <Card bordered hoverable title={null}>
-                  <div className="flex flex-1 mb-4">
-                    <h2 className="text-base font-medium">{board.boardName}</h2>
+                  <div className="flex flex-1 mb-2">
+                    <h2 className="text-base font-medium">{board.name}</h2>
+                  </div>
+                  <div className="flex flex-1 mb-3">
+                    <Typography.Paragraph ellipsis={{ rows: 2 }}>{board.description}</Typography.Paragraph>
                   </div>
                   <div className="flex flex-1 items-center justify-between">
                     <div className="flex flex-1 items-center">
@@ -102,6 +66,13 @@ function Home({ typedSigner, mainnetProvider }) {
           ))}
         </Row>
       </div>
+
+      <NewBoard
+        visible={creatingBoard}
+        typedSigner={typedSigner}
+        closeModal={() => setCreatingBoard(false)}
+        mainnetProvider={mainnetProvider}
+      />
     </div>
   );
 }

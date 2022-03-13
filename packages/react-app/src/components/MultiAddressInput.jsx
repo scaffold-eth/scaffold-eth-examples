@@ -130,6 +130,7 @@ export default function MultiAddressInput(props) {
         value={value}
         onChange={handleOnChange}
         notFoundContent={null}
+        size={props.size}
         style={{ width: "100%" }}
       >
         {children}

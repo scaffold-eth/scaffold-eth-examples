@@ -1,4 +1,4 @@
-import { Input, Button, Row, Col, Card, notification } from "antd";
+import { Input, Button, Row, Col, Card, notification, Typography, Tag } from "antd";
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { LikeOutlined, LikeFilled } from "@ant-design/icons";
@@ -31,6 +31,7 @@ export default function Board({ typedSigner, mainnetProvider, address }) {
           Proposal: [
             { name: "board", type: "string" },
             { name: "proposal", type: "string" },
+            { name: "createdAt", type: "uint256" },
           ],
         },
         value,
@@ -38,7 +39,9 @@ export default function Board({ typedSigner, mainnetProvider, address }) {
 
       const createBoard = firebase.functions.httpsCallable("addNewProposal");
 
-      await createBoard({ value, signature });
+      const x = await createBoard({ value, signature });
+
+      console.log(x);
 
       // send value and signature to backend for validation
       notification.success({ message: "Success", description: "Proposal submitted" });
@@ -167,37 +170,49 @@ export default function Board({ typedSigner, mainnetProvider, address }) {
     }
   }, [boardId, address]);
 
+  // console.log(boardInfo);
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="absolute">
         <Link to="/">Go Back</Link>
       </div>
-      <div className="flex flex-1 items-center justify-center">
-        <h1 className="text-lg font-semibold">{boardInfo.boardName}</h1>
+      <div className="flex flex-1 flex-col max-w-2xl mx-auto items-center justify-center">
+        <h1 className="text-lg font-semibold">{boardInfo.name}</h1>
+        <Typography.Paragraph className="text-center">{boardInfo.description}</Typography.Paragraph>
+        <div className="flex items-center justify-center">
+          <span className="mr-1">Created by</span>{" "}
+          <Address short address={boardInfo.creator} ensProvider={mainnetProvider} fontSize={14} />
+        </div>
       </div>
 
       <div className="flex flex-1 mt-8 flex-col w-full max-w-2xl mx-auto">
-        <div>
-          <Input.TextArea
-            placeholder="Add your giga idea..."
-            autoSize={{ maxRows: 6 }}
-            value={newProposal}
-            onChange={e => setNewProposal(e.target.value)}
-          />
-          {newProposal.length > 0 && (
-            <div className="mt-2 flex flex-1 justify-end">
-              <Button type="primary" onClick={handleNewProposals} loading={addingNewProposal}>
-                Add Proposal
-              </Button>
-            </div>
-          )}
-        </div>
+        {(boardInfo?.accessControl === "anyone" ||
+          (boardInfo?.accessControl === "allowList" &&
+            (boardInfo?.approvedContributors?.includes(address) || boardInfo?.creator === address))) && (
+          <div>
+            <Input.TextArea
+              placeholder="Add your giga idea..."
+              autoSize={{ maxRows: 6 }}
+              value={newProposal}
+              onChange={e => setNewProposal(e.target.value)}
+            />
+            {newProposal.length > 0 && (
+              <div className="mt-2 flex flex-1 justify-end">
+                <Button type="primary" onClick={handleNewProposals} loading={addingNewProposal}>
+                  Add Proposal
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-1 mt-8">
           <Row gutter={[16, 16]} className="flex flex-1">
             {proposals.map((item, i) => {
               const hasMyUpvote = myUpvotes.includes(item.id);
               const LikeIcon = hasMyUpvote ? LikeFilled : LikeOutlined;
+
               return (
                 <Col className="mb-3" span={24} key={item.id}>
                   <Card className="w-full" title={null}>
@@ -208,6 +223,11 @@ export default function Board({ typedSigner, mainnetProvider, address }) {
                       <div className="flex flex-1 items-center">
                         <span className="mr-2">Created by</span>
                         <Address short address={item.creator} ensProvider={mainnetProvider} fontSize={14} />
+                        {item.creator === boardInfo.creator && (
+                          <span className="ml-4">
+                            <Tag color="warning">Board creator</Tag>
+                          </span>
+                        )}
                       </div>
 
                       <Button
