@@ -2,6 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { Card, Collapse, InputNumber, Button, Tabs, Divider, Result, Typography, message, Row, Col } from "antd";
 import ReactJson from 'react-json-view';
+import {
+  parseGroth16ToSolidityCalldata,
+  parsePlonkToSolidityCalldata
+} from "../helpers";
 const circomlibjs = require("circomlibjs");
 const snarkjs = require("snarkjs");
 
@@ -20,11 +24,14 @@ const { Panel } = Collapse;
 // };
 
 export default function ZkHashUI({
+  protocol,
   wasm,
   zkey,
   vkey,
   scVerifyFn,
 }) {
+
+  if (!protocol) protocol = "groth16";
 
   const [input, setInput] = useState(0);
   const [hash, setHash] = useState(mimcsponge.multiHash([0]).toString());
@@ -36,37 +43,24 @@ export default function ZkHashUI({
   const [localVerifyResult, setLocalVerifyResult] = useState();
   const [contractVerifyResult, setContractVerifyResult] = useState();
 
-  function parseSolidityCalldata(prf, sgn) {
-
-    let calldata = [
-      [prf.pi_a[0], prf.pi_a[1]],
-      [
-        [prf.pi_b[0][1], prf.pi_b[0][0]],
-        [prf.pi_b[1][1], prf.pi_b[1][0]]
-      ],
-      [prf.pi_c[0], prf.pi_c[1]],
-      [...sgn]
-    ];
-
-    return calldata;
-  }
-
   async function proveInputs() {
     console.log("Calculating Proof! ...")
-    const { proof, publicSignals } = await snarkjs.groth16.fullProve({x: input, hash: hash}, wasm, zkey);
+    const { proof, publicSignals } = await snarkjs[protocol].fullProve({x: input, hash: hash}, wasm, zkey);
 
-    // const calldata = parseSolidityCalldata(proof, publicSignals);
+    let calldata;
+    if (protocol === "groth16") calldata = parseGroth16ToSolidityCalldata(proof, publicSignals);
+    if (protocol === "plonk") calldata = await parsePlonkToSolidityCalldata(proof, publicSignals);
 
     setZkProof(proof);
     setZkSignals(publicSignals);
-    setSolCalldata(parseSolidityCalldata(proof, publicSignals));
+    setSolCalldata(calldata);
   }
 
   async function verifyProof() {
     if (!vkey) {
       vkey = await snarkjs.zKey.exportVerificationKey(zkey);
     }
-    const verified = await snarkjs.groth16.verify(vkey, zkSignals, zkProof);
+    const verified = await snarkjs[protocol].verify(vkey, zkSignals, zkProof);
     return verified;
   }
 
@@ -162,7 +156,7 @@ export default function ZkHashUI({
       </div>
       <div style={{textAlign: "left"}}>
         <Collapse>
-          <Panel header="Groth16 Proof">
+          <Panel header={protocol + " Proof"}>
             <div style={{textAlign: "left"}}>
               <ReactJson
                 src={zkProof}

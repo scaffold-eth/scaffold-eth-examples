@@ -327,6 +327,7 @@ function App(props) {
           </Route>
           <Route path="/exampleui">
             <ZkHashUI
+              protocol="groth16"
               wasm={wasm}
               zkey={zkey}
               scVerifyFn={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProof : null}
