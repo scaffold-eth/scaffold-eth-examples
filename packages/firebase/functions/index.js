@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const ethers = require("ethers");
+const yup = require("yup");
 admin.initializeApp();
 
 const db = admin.firestore();
@@ -24,10 +25,28 @@ exports.createBoard = functions.https.onCall((data) => {
 
   // TODO : Validate value fields here
 
+  const schema = yup.object().shape({
+    name: yup.string().min("5"),
+    description: yup.string().min("10"),
+    accessControl: yup.string().matches(/(anyone|allowList)/),
+    approvedContributors: yup
+      .array()
+      .min(value.accessControl === "allowList" ? 1 : 0),
+    createdAt: yup
+      .number()
+      .min(Date.now() - 2 * 60 * 1000)
+      .max(Date.now()), // within the past 2 minutes
+  });
+
+  schema.validateSync(value);
+
   const recovered = handleRecovery(
     {
       Board: [
-        { name: "boardName", type: "string" },
+        { name: "name", type: "string" },
+        { name: "description", type: "string" },
+        { name: "accessControl", type: "string" },
+        { name: "approvedContributors", type: "address[]" },
         { name: "createdAt", type: "uint256" },
       ],
     },
@@ -35,8 +54,13 @@ exports.createBoard = functions.https.onCall((data) => {
     signature
   );
 
+  if (!ethers.utils.isAddress(recovered)) {
+    throw new Error("Invalid signer");
+  }
+
   const update = Object.assign({}, value, {
     creator: recovered,
+    signature,
     _createdAt: admin.firestore.FieldValue.serverTimestamp(),
   });
 
@@ -52,29 +76,60 @@ exports.addNewProposal = functions.https.onCall((data) => {
   const { signature, value } = data;
 
   // TODO : Validate value fields here
+  const schema = yup.object().shape({
+    board: yup.string().min("5"),
+    proposal: yup.string().min("5"),
+    createdAt: yup
+      .number()
+      .min(Date.now() - 2 * 60 * 1000)
+      .max(Date.now()), // within the past 2 minutes
+  });
+
+  schema.validateSync(value);
 
   const recovered = handleRecovery(
     {
       Proposal: [
         { name: "board", type: "string" },
         { name: "proposal", type: "string" },
+        { name: "createdAt", type: "uint256" },
       ],
     },
     value,
     signature
   );
 
-  const update = Object.assign({}, value, {
-    creator: recovered,
-    _createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
+  // TODO : fetch board and check if user can contribute
+  return db
+    .doc(`boards/${value.board}`)
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        throw new Error("This board does not exist");
+      }
 
-  // use recovered address to create a new board
-  const doc = db.collection("proposals").doc();
+      const docData = doc.data();
 
-  doc.set(update);
+      if (
+        docData.accessControl === "anyone" ||
+        (docData.accessControl === "allowList" &&
+          (docData.approvedContributors.includes(recovered) ||
+            docData.creator === recovered))
+      ) {
+        const update = Object.assign({}, value, {
+          creator: recovered,
+          signature,
+          _createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
 
-  return doc.id;
+        // use recovered address to create a new board
+        const doc = db.collection("proposals").doc();
+
+        doc.set(update);
+
+        return doc.id;
+      }
+    });
 });
 
 exports.upvoteProposal = functions.https.onCall((data) => {
@@ -100,16 +155,34 @@ exports.upvoteProposal = functions.https.onCall((data) => {
 
   let callback = () => Promise.resolve();
 
-  return doc
-    .get()
+  return [
+    db.doc(`boards/${value.board}`).get(),
+    db.doc(`boards/${value.proposal}`).get(),
+  ]
+    .then(([board, proposal]) => {
+      if (!board.exists || !proposal.exists) {
+        throw new Error("This board/proposal does not exist");
+      }
+
+      const boardData = board.data();
+
+      if (
+        boardData.accessControl !== "anyone" &&
+        !boardData.approvedContributors.includes(recovered) &&
+        boardData.creator !== recovered
+      ) {
+        throw new Error("You don't have access to propose on this board");
+      }
+    })
+    .then(doc.get)
     .then((resDoc) => {
       console.log({ exists: resDoc.exists, upvote: value.upvote });
 
       if (resDoc.exists && !value.upvote) {
-        console.log(`Deleting...`);
+        console.log("Deleting...");
         return doc.delete();
       } else if (value.upvote) {
-        console.log(`Creating...`);
+        console.log("Creating...");
         // create the doc
         const update = Object.assign({}, value, {
           creator: recovered,
