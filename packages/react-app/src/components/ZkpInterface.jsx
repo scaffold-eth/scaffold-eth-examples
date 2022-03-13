@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button, Tabs, Divider, Result, Typography, message } from "antd";
 import ReactJson from 'react-json-view';
+import {
+  parseGroth16ToSolidityCalldata,
+  parsePlonkToSolidityCalldata
+} from "../helpers";
 const snarkjs = require("snarkjs");
 
 const { TabPane } = Tabs;
@@ -9,11 +13,14 @@ const { Text } = Typography;
 
 export default function ZkpInterface({
   inputFields,
+  protocol,
   wasm,
   zkey,
   vkey,
   scVerifyFunc,
 }) {
+
+  if (!protocol) protocol = "groth16";
 
   const [proofInputs, setProofInputs] = useState(inputFields);
 
@@ -23,7 +30,7 @@ export default function ZkpInterface({
   const [verResult, setVerResult] = useState();
   const [scVerResult, setScVerReesult] = useState();
 
-  function parseSolidityCalldata(prf, sgn) {
+  async function parseSolidityCalldata(prf, sgn) {
     // let i = [];
     // while (i[i.length-1] != -1) {
     //    i.push(str.indexOf('"', i[i.length-1]+1));
@@ -59,9 +66,12 @@ export default function ZkpInterface({
   async function proveInputs() {
 
     console.log("Calculating Proof! ...")
-    const { proof, publicSignals } = await snarkjs.groth16.fullProve(proofInputs, wasm, zkey);
-    // const calldataString = await snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
-    const calldata = parseSolidityCalldata(proof, publicSignals);
+
+    const { proof, publicSignals } = await snarkjs[protocol].fullProve(proofInputs, wasm, zkey);
+
+    let calldata;
+    if (protocol === "groth16") calldata = parseGroth16ToSolidityCalldata(proof, publicSignals);
+    if (protocol === "plonk") calldata = await parsePlonkToSolidityCalldata(proof, publicSignals);
 
     setVerResult(undefined);
     setScVerReesult(undefined);
@@ -72,7 +82,7 @@ export default function ZkpInterface({
     console.log(publicSignals);
     setSignals(publicSignals);
 
-    console.log(calldata)
+    console.log("solidity calldata", calldata)
     setSolidityCalldata(calldata);
   }
 
@@ -80,7 +90,7 @@ export default function ZkpInterface({
     if (!vkey) {
       vkey = await snarkjs.zKey.exportVerificationKey(zkey);
     }
-    const verified = await snarkjs.groth16.verify(vkey, signals, proof);
+    const verified = await snarkjs[protocol].verify(vkey, signals, proof);
     return verified;
   }
 

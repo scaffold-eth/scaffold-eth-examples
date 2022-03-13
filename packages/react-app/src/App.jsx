@@ -295,6 +295,7 @@ function App(props) {
             */}
 
             <ZkpInterface
+              protocol={"groth16"}
               inputFields={
                 {
                   x: "1764",
