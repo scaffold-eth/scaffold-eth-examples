@@ -151,7 +151,7 @@ function App(props) {
   const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
 
   // Load in your local 📝 contract and read a value from it:
-  const readContracts = useContractLoader(localProvider, contractConfig);
+  const readContracts = useContractLoader(localProvider, contractConfig, localChainId);
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
@@ -247,6 +247,8 @@ function App(props) {
     }
   }, [loadWeb3Modal]);
 
+  console.log("contracts config:", contractConfig)
+
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
   return (
@@ -294,79 +296,45 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
-            <ZkpInterface
-              protocol={"groth16"}
-              inputFields={
-                {
-                  x: "1764",
-                  hash: "15893827533473716138720882070731822975159228540693753428689375377280130954696"
-                }
+          <ZkpInterface
+            protocol={"groth16"}
+            inputFields={
+              {
+                x: "1764",
+                hash: "15893827533473716138720882070731822975159228540693753428689375377280130954696"
               }
-              wasm={wasm}
-              zkey={zkey}
-              scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyInitProof : null}
-            />
+            }
+            wasm={wasm}
+            zkey={zkey}
+            scVerifyFunc={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyInitProof : null}
+          />
 
-            <Contract
-              name="YourContract"
-              price={price}
-              signer={userSigner}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-              contractConfig={contractConfig}
-            />
-          </Route>
-          <Route path="/hints">
-            <Hints
-              address={address}
-              yourLocalBalance={yourLocalBalance}
-              mainnetProvider={mainnetProvider}
-              price={price}
-            />
-          </Route>
-          <Route path="/exampleui">
-            <ZkHashUI
-              protocol="groth16"
-              wasm={wasm}
-              zkey={zkey}
-              scVerifyFn={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProof : null}
-            />
-            {/*<ExampleUI
-              address={address}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-              purpose={purpose}
-            />
-          </Route>
-          <Route path="/mainnetdai">
-            <Contract
-              name="DAI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.DAI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-              contractConfig={contractConfig}
-              chainId={1}
-            />
-            {/*
-            <Contract
-              name="UNI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.UNI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-              config={contractsConfig}
-            />
-            */}
+          <Contract
+            name="YourContract"
+            price={price}
+            signer={userSigner}
+            provider={localProvider}
+            chainId={localChainId}
+            address={address}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+          />
+        </Route>
+        <Route path="/hints">
+          <Hints
+            address={address}
+            yourLocalBalance={yourLocalBalance}
+            mainnetProvider={mainnetProvider}
+            price={price}
+          />
+        </Route>
+        <Route path="/exampleui">
+          <ZkHashUI
+            protocol="groth16"
+            wasm={wasm}
+            zkey={zkey}
+            scVerifyFn={readContracts && readContracts.YourContract ? readContracts.YourContract.verifyProof : null}
+          />
         </Route>
         <Route path="/subgraph">
           <Subgraph

@@ -109,56 +109,23 @@ module.exports = {
 
       */
     },
-
-    // rinkeby: {
-    //   url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA_KEY}`,
-    //   accounts: [`${process.env.RINKEBY_DEPLOYER_PRIV_KEY}`],
-    // },
-    // kovan: {
-    //   url: `https://rinkeby.infura.io/v3/${process.env.KOVAN_INFURA_KEY}`,
-    //   accounts: [`${process.env.KOVAN_DEPLOYER_PRIV_KEY}`],
-    // },
-    // mainnet: {
-    //   url: `https://mainnet.infura.io/v3/${process.env.MAINNET_INFURA_KEY}`,
-    //   accounts: [`${process.env.MAINNET_DEPLOYER_PRIV_KEY}`],
-    // },
-    // ropsten: {
-    //   url: `https://ropsten.infura.io/v3/${process.env.ROPSTEN_INFURA_KEY}`,
-    //   accounts: [`${process.env.ROPSTEN_DEPLOYER_PRIV_KEY}`],
-    // },
-    // goerli: {
-    //   url: `https://goerli.infura.io/v3/${process.env.GOERLI_INFURA_KEY}`,
-    //   accounts: [`${process.env.GOERLI_DEPLOYER_PRIV_KEY}`],
-    // },
-    // xdai: {
-    //   url: 'https://dai.poa.network',
-    //   gasPrice: 1000000000,
-    //   accounts: [`${process.env.XDAI_DEPLOYER_PRIV_KEY}`],
-    // },
-
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
-
       //    url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/eth/rinkeby", // <---- YOUR MORALIS ID! (not limited to infura)
-
       accounts: {
         mnemonic: mnemonic(),
       },
     },
     kovan: {
       url: "https://kovan.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
-
       //    url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/eth/kovan", // <---- YOUR MORALIS ID! (not limited to infura)
-
       accounts: {
         mnemonic: mnemonic(),
       },
     },
     mainnet: {
       url: "https://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
-
       //      url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXXXX/eth/mainnet", // <---- YOUR MORALIS ID! (not limited to infura)
-
       gasPrice: mainnetGwei * 1000000000,
       accounts: {
         mnemonic: mnemonic(),
@@ -166,18 +133,14 @@ module.exports = {
     },
     ropsten: {
       url: "https://ropsten.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
-
       //      url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXXXX/eth/ropsten",// <---- YOUR MORALIS ID! (not limited to infura)
-
       accounts: {
         mnemonic: mnemonic(),
       },
     },
     goerli: {
       url: "https://goerli.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad", // <---- YOUR INFURA ID! (or it won't work)
-
       //      url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXXXX/eth/goerli", // <---- YOUR MORALIS ID! (not limited to infura)
-
       accounts: {
         mnemonic: mnemonic(),
       },
@@ -204,15 +167,17 @@ module.exports = {
       },
     },
     polygon: {
-      url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXx/polygon/mainnet", // <---- YOUR MORALIS ID! (not limited to infura)
-      gasPrice: 1000000000,
+      url: "https://polygon-rpc.com",
+      // url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXx/polygon/mainnet", // <---- YOUR MORALIS ID! (not limited to infura)
+      gasPrice: 3200000000,
       accounts: {
         mnemonic: mnemonic(),
       },
     },
     mumbai: {
-      url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/polygon/mumbai", // <---- YOUR MORALIS ID! (not limited to infura)
-      gasPrice: 1000000000,
+      url: "https://rpc-mumbai.maticvigil.com",
+      // url: "https://speedy-nodes-nyc.moralis.io/XXXXXXXXXXXXXXXXXXXXXXX/polygon/mumbai", // <---- YOUR MORALIS ID! (not limited to infura)
+      gasPrice: 3200000000,
       accounts: {
         mnemonic: mnemonic(),
       },
@@ -372,7 +337,10 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: "DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW",
+    apiKey: {
+      mainnet: "DNXJA8RX2Q3VZ4URQIWP7Z68CJXQZSC6AW",
+      // add other network's API key here
+    },
   },
   circom: {
     inputBasePath: "./circuits/",
@@ -390,61 +358,6 @@ function debug(text) {
   }
 }
 
-// async function circomTemplate({ zkeys }, hre) {
-//   const snarkjsTemplate = resolve.sync("snarkjs/templates/verifier_groth16.sol");
-//
-//   for (const zkey of zkeys) {
-//     const verifierSol = await hre.snarkjs.zKey.exportSolidityVerifier(zkey, snarkjsTemplate);
-//     const verifierPath = path.join(hre.config.paths.sources, `${zkey.name.charAt(0).toUpperCase() + zkey.name.slice(1)}Verifier.sol`);
-//     fs.writeFileSync(verifierPath, verifierSol);
-//   }
-// }
-//
-// async function circomTemplate({ zkeys }, hre) {
-//   const verifierTemplatePath = resolve.sync("hardhat-circom/src/Verifier.sol.template");
-//
-//   let finalSol = "";
-//   for (const zkey of zkeys) {
-//     const userTemplate = `
-//     function ${zkey.name}VerifyingKey() internal pure returns (VerifyingKey memory vk) {
-//       vk.alfa1 = Pairing.G1Point(<%vk_alpha1%>);
-//       vk.beta2 = Pairing.G2Point(<%vk_beta2%>);
-//       vk.gamma2 = Pairing.G2Point(<%vk_gamma2%>);
-//       vk.delta2 = Pairing.G2Point(<%vk_delta2%>);
-//       vk.IC = new Pairing.G1Point[](<%vk_ic_length%>);
-//     <%vk_ic_pts%>
-//     }
-//
-//     function verify${zkey.name.charAt(0).toUpperCase() + zkey.name.slice(1)}Proof(
-//         uint256[2] memory a,
-//         uint256[2][2] memory b,
-//         uint256[2] memory c,
-//         uint256[<%vk_input_length%>] memory input
-//     ) internal view returns (bool) {
-//         uint256[] memory inputValues = new uint256[](input.length);
-//         for (uint256 i = 0; i < input.length; i++) {
-//             inputValues[i] = input[i];
-//         }
-//         return verifyProof(a, b, c, inputValues, ${zkey.name}VerifyingKey());
-//     }
-//     `;
-//
-//     // strings are opened as relative path files, so turn into an array of bytes
-//     const circuitSol = await snarkjs.zKey.exportSolidityVerifier(zkey, new TextEncoder().encode(userTemplate));
-//
-//     finalSol = finalSol.concat(circuitSol);
-//   }
-//
-//   const verifier = path.join(hre.config.paths.sources, "Verifier.sol");
-//
-//   const warning = "// THIS FILE IS GENERATED BY HARDHAT-CIRCOM. DO NOT EDIT THIS FILE.\n\n";
-//   const template = warning +  fs.readFileSync(verifierTemplatePath).toString();
-//
-//   fs.mkdirSync(path.dirname(verifier), { recursive: true });
-//
-//   fs.writeFileSync(verifier, template.replace(/<%full_circuit%>/g, finalSol));
-// }
-//
 // async function circomTemplate({ zkeys }, hre) {
 //   const myGroth16Template = await fs.readSync(path.resolve("./my_verifier_groth16.sol"), "utf8");
 //   const myPlonkTemplate = await fs.readSync(path.resolve("./my_verifier_plonk.sol"), "utf8");
