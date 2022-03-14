@@ -45,11 +45,21 @@ packages
 |   │   └── <NEW_CIRCUIT>
 |   |       ├── circuit.circom
 |   |       └── input.json
+│   ├── circuit.config.toml
 |   └── powersOfTau28_hez_final_15.ptau
 ├── react-app
 ├── services
 └── subgraph
 ```
+
+We decide what snark protocol our circuits will use in the `circuit.config.toml` file. Circom currently supports both `groth16` and `plonk` snarks. You'll find `default = "groth16"` in the config file, this defaults every circuit to be compiled as a `groth16` snark, you can change this to `plonk` if you'd like, or you can specify on a per circuit basis by declaring the name of the circuit you would like to deviate from the default. Like this:
+
+```toml
+default = "groth16"
+init = "plonk"
+```
+
+If you change the protocol after running `yarn circom` you will need to run it again to recompile your circuit.
 
 You've probably noticed `powersOfTau28_hez_final_15.ptau`, this file is needed to compile out circuits. See [hardhat-circom](https://github.com/projectsophon/hardhat-circom) and [snarkjs](https://github.com/iden3/snarkjs) for more details. You may need to replace this file if you will be compiling fairly large circuits.
 
@@ -57,10 +67,9 @@ You've probably noticed `powersOfTau28_hez_final_15.ptau`, this file is needed t
 
 We'll use the `yarn circom` command to compile our circuits.
 
-A smart contract verifier will be created and published into our `packages/hardhat/contracts` directory.
+Smart contract verifier contracts will be created and published into the `packages/hardhat/contracts` directory for each of your circuits.
 
-
-Everything else we will need to generate our zero knowledge proofs will then be published into `packages/react-app/public/circuits` after `yarn deploy`ing, these are our `r1cs`, `wasm`, and `zkey` files (another copy of these files will remain in `packages/hardhat/client`, but we want to use them in the frontend).
+Everything else you will need to generate our zero knowledge proofs will then be published into `packages/react-app/public/circuits` after `yarn deploy`ing, these are our `r1cs`, `wasm`, and `zkey` files (another copy of these files will remain in `packages/hardhat/client`, but we want to use them in the frontend).
 
 # Frontend
 
@@ -85,6 +94,7 @@ You may also want to scroll down to see the contract's verify function. It takes
 The frontend is powered by the `ZkpInterface` component. It needs to be fed a few properties in order to function properly.
 
 - `inputFields`: An object containing the circuit's default input signals, you can reuse the `input.json` from earlier.
+- `protocol`: The snark protocol our proofs will be using.
 - `zkey`: The circuit's zkey file.
 - `wasm`: The circuit's wasm file.
 - `vkey`: (optional) A verification key used to verify the the generated proof. If this is not provided the interface will generate one for you.
