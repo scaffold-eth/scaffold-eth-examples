@@ -92,7 +92,7 @@ export default function Address(props) {
     <div className="inline-flex items-center justify-center">
       <span style={{ verticalAlign: "middle", display: "inline-flex" }}>
         <Blockies
-          className={props.short && "rounded-full mr-1"}
+          className="mr-1"
           seed={address.toLowerCase()}
           size={8}
           scale={props.fontSize ? props.fontSize / 7 : 4}
