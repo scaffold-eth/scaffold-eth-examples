@@ -35,6 +35,7 @@ coverage
 # production
 build
 # yarn / eslint
+yarn.lock
 .yarn/cache
 .yarn/install-state.gz
 .yarn/build-state.yml
@@ -52,6 +53,7 @@ artifacts
 # misc
 .DS_Store
 .env*
+env.js
 
 # debug
 npm-debug.log*
