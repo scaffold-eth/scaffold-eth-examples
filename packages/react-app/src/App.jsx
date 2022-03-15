@@ -1,6 +1,6 @@
 import Portis from "@portis/web3";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Alert, Button, Col, Menu, Row, List } from "antd";
+import { Alert, Button, Col, Menu, Row, List, Radio, Input, Card } from "antd";
 import "antd/dist/antd.css";
 import Authereum from "authereum";
 import {
@@ -53,7 +53,9 @@ const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
 const targetNetwork = NETWORKS.kovan; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetL2Network = NETWORKS.kovanOptimism;
 
+console.log("targetNetwork", targetNetwork);
 // 😬 Sorry for all the console logging
 const DEBUG = true;
 const NETWORKCHECK = true;
@@ -79,10 +81,8 @@ const mainnetInfura = navigator.onLine
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_ID
 // 🏠 Your local provider is usually pointed at your local blockchain
 const localProviderUrl = targetNetwork.rpcUrl;
-// as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
-const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
-if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
-const localProvider = new ethers.providers.StaticJsonRpcProvider(localProviderUrlFromEnv);
+if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrl);
+const localProvider = new ethers.providers.StaticJsonRpcProvider(localProviderUrl);
 
 // 🔭 block explorer URL
 const blockExplorer = targetNetwork.blockExplorer;
@@ -192,6 +192,7 @@ function App(props) {
   const gasPrice = useGasPrice(targetNetwork, "fast");
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProviderAndSigner = useUserProviderAndSigner(injectedProvider, localProvider);
+  console.log("🔥 userProviderAndSigner:", userProviderAndSigner);
   const userSigner = userProviderAndSigner.signer;
 
   useEffect(() => {
@@ -204,8 +205,10 @@ function App(props) {
     getAddress();
   }, [userSigner]);
 
+  const [lp, setLp] = useState();
+
   // You can warn the user if you would like them to be on a specific network
-  const localChainId = localProvider && localProvider._network && localProvider._network.chainId;
+  const localChainId = lp && lp._network && lp._network.chainId;
   const selectedChainId =
     userSigner && userSigner.provider && userSigner.provider._network && userSigner.provider._network.chainId;
 
@@ -243,14 +246,6 @@ function App(props) {
     console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
   });
 
-  // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
-    "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-  ]);
-
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
-
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
@@ -280,7 +275,6 @@ function App(props) {
       console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
       console.log("📝 readContracts", readContracts);
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
       console.log("🔐 writeContracts", writeContracts);
     }
   }, [
@@ -441,80 +435,6 @@ function App(props) {
     );
   }
 
-  const [crossChainMessenger, setCrossChainMessenger] = useState();
-  useEffect(() => {
-    if (!userSigner || !selectedChainId) {
-      return;
-    }
-
-    console.log(userSigner);
-    const crossChainMessenger = new CrossChainMessenger({
-      l1SignerOrProvider: userSigner,
-      l2SignerOrProvider: userSigner,
-      l1ChainId: selectedChainId,
-    });
-    setCrossChainMessenger(crossChainMessenger);
-  }, [userSigner, selectedChainId]);
-
-  const [deposits, setDeposits] = useState([]);
-  useEffect(() => {
-    if (!crossChainMessenger || !address) {
-      return;
-    }
-
-    const getDeposits = async () => {
-      const deposits = await crossChainMessenger.getDepositsByAddress(address);
-      console.log("deposits", deposits);
-      setDeposits(deposits);
-    };
-
-    getDeposits();
-  }, [crossChainMessenger, address]);
-
-  const [withdrawals, setWithdrawals] = useState([]);
-  useEffect(() => {
-    if (!crossChainMessenger || !address) {
-      return;
-    }
-
-    const getWithdrawals = async () => {
-      const wd = await crossChainMessenger.getWithdrawalsByAddress(address);
-      console.log("withdrawals", wd);
-      setWithdrawals(wd);
-    };
-
-    getWithdrawals();
-  }, [crossChainMessenger, yourLocalBalance]);
-
-  const [challengePeriodSeconds, setChallengePeriodSeconds] = useState(0);
-  useEffect(() => {
-    if (!crossChainMessenger) {
-      return;
-    }
-
-    const getChallengePeriodSeconds = async () => {
-      const challengePeriodSeconds = await crossChainMessenger.getChallengePeriodSeconds();
-      console.log("challengePeriodSeconds", challengePeriodSeconds);
-      setChallengePeriodSeconds(challengePeriodSeconds);
-    };
-
-    getChallengePeriodSeconds();
-  }, [crossChainMessenger]);
-
-  const depositEth = async () => {
-    if (crossChainMessenger) {
-      const result = await crossChainMessenger.depositETH(ethers.utils.parseEther(".01"));
-      console.log("depositEth", result);
-    }
-  };
-
-  const withdrawEth = async () => {
-    if (crossChainMessenger) {
-      const result = await crossChainMessenger.withdrawETH(ethers.utils.parseEther(".01"));
-      console.log("withdrawEth", result);
-    }
-  };
-
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -529,143 +449,35 @@ function App(props) {
               }}
               to="/"
             >
-              YourContract
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/hints">
-            <Link
-              onClick={() => {
-                setRoute("/hints");
-              }}
-              to="/hints"
-            >
-              Hints
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/exampleui">
-            <Link
-              onClick={() => {
-                setRoute("/exampleui");
-              }}
-              to="/exampleui"
-            >
-              ExampleUI
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/mainnetdai">
-            <Link
-              onClick={() => {
-                setRoute("/mainnetdai");
-              }}
-              to="/mainnetdai"
-            >
-              Mainnet DAI
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/subgraph">
-            <Link
-              onClick={() => {
-                setRoute("/subgraph");
-              }}
-              to="/subgraph"
-            >
-              Subgraph
+              Optimism Bridge
             </Link>
           </Menu.Item>
         </Menu>
 
         <Switch>
           <Route exact path="/">
-            <OptimismBridge
-              address={address}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-            ></OptimismBridge>
-            {/* <button onClick={depositEth}>Deposit eth!</button>
-            <button onClick={withdrawEth}>Withdraw eth!</button>
-            <div>Challenge Period: {challengePeriodSeconds} seconds</div>
-            <h2>Deposits:</h2>
-            <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
-              <List
-                bordered
-                dataSource={deposits}
-                renderItem={item => {
-                  return (
-                    <List.Item key={item.transactionHash}>
-                      <Address address={item.from} ensProvider={mainnetProvider} fontSize={16} />
-                      <Balance balance={item.amount} provider={localProvider} price={price} />
-                    </List.Item>
-                  );
-                }}
-              />
-            </div> */}
-            {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
-            {/* <Contract
-              name="YourContract"
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <OptimismBridge
+                address={address}
+                balance={yourLocalBalance}
+                price={price}
+                userSigner={userSigner}
+                mainnetProvider={mainnetProvider}
+                localProvider={localProvider}
+                targetNetwork={targetNetwork}
+                readContracts={readContracts}
+              ></OptimismBridge>
+            </div>
+          </Route>
+          <Route exact path="/contract">
+            <Contract
+              name="PGF"
               price={price}
               signer={userSigner}
               provider={localProvider}
               address={address}
               blockExplorer={blockExplorer}
               contractConfig={contractConfig}
-            /> */}
-          </Route>
-          <Route path="/hints">
-            <Hints
-              address={address}
-              yourLocalBalance={yourLocalBalance}
-              mainnetProvider={mainnetProvider}
-              price={price}
-            />
-          </Route>
-          <Route path="/exampleui">
-            <ExampleUI
-              address={address}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              price={price}
-              tx={tx}
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-              purpose={purpose}
-            />
-          </Route>
-          <Route path="/mainnetdai">
-            <Contract
-              name="DAI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.DAI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-              contractConfig={contractConfig}
-              chainId={1}
-            />
-            {/*
-            <Contract
-              name="UNI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.UNI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-            />
-            */}
-          </Route>
-          <Route path="/subgraph">
-            <Subgraph
-              subgraphUri={props.subgraphUri}
-              tx={tx}
-              writeContracts={writeContracts}
-              mainnetProvider={mainnetProvider}
             />
           </Route>
         </Switch>

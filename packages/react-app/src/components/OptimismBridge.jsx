@@ -2,74 +2,101 @@ import { useEffect, useState } from "react";
 import { utils, ethers } from "ethers";
 import { NETWORKS } from "../constants";
 import { Address, Balance } from "../components";
-import { List } from "antd";
+import { Button, Card, Input, List } from "antd";
 import { CrossChainMessenger } from "@eth-optimism/sdk";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import { useBalance } from "eth-hooks";
 
-const targetL1 = NETWORKS.kovan;
+// const targetL1 = NETWORKS.kovan;
 const targetL2 = NETWORKS.kovanOptimism;
+const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
 
-export default function OptimismBridge({ address, userSigner, mainnetProvider, localProvider }) {
-  const price = useExchangeEthPrice(targetL1, mainnetProvider);
-
-  const [l1Provider, setL1Provider] = useState();
-  const [l2Provider, setL2Provider] = useState();
-  useEffect(() => {
-    setL1Provider(userSigner);
-    setL2Provider(new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl));
-  }, [userSigner]);
+export default function OptimismBridge({
+  address,
+  balance,
+  userSigner,
+  mainnetProvider,
+  localProvider,
+  targetNetwork,
+  readContracts,
+}) {
+  const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
 
   const [crossChainMessenger, setCrossChainMessenger] = useState();
   useEffect(() => {
-    if (!l1Provider || !l2Provider) {
+    if (!userSigner) {
       return;
     }
 
     const crossChainMessenger = new CrossChainMessenger({
-      l1SignerOrProvider: l1Provider,
+      l1SignerOrProvider: userSigner,
       l2SignerOrProvider: l2Provider.getSigner(),
-      l1ChainId: targetL1.chainId,
+      l1ChainId: targetNetwork.chainId,
     });
 
     setCrossChainMessenger(crossChainMessenger);
-  }, [l1Provider, l2Provider]);
+  }, [userSigner]);
 
   const [deposits, setDeposits] = useState([]);
   useEffect(() => {
     if (!crossChainMessenger || !address) {
       return;
     }
-
+    let isSubscribed = false;
     const getDeposits = async () => {
+      isSubscribed = true;
       const deposits = await crossChainMessenger.getDepositsByAddress(address);
-      console.log("deposits", deposits);
-      setDeposits(deposits);
+
+      if (isSubscribed) {
+        setDeposits(deposits);
+      }
     };
 
     getDeposits();
-  }, [crossChainMessenger, address]);
 
-  const l2Balance = useBalance(l2Provider, address);
-  const [withdrawals, setWithdrawals] = useState([]);
+    return () => (isSubscribed = false);
+  }, [crossChainMessenger, balance]);
+
+  const [tokenBalance, setTokenBalance] = useState(0);
   useEffect(() => {
-    if (!crossChainMessenger || !address) {
-      return;
-    }
+    if (!readContracts) return;
 
-    const getWithdrawals = async () => {
-      const wd = await crossChainMessenger.getWithdrawalsByAddress(address);
-      console.log("withdrawals", wd);
-      setWithdrawals(wd);
+    const getTokenBalance = async () => {
+      const tokenBalance = await readContracts.PGF?.balanceOf(address);
+      setTokenBalance(tokenBalance);
     };
+    getTokenBalance();
+  }, [address]);
 
-    getWithdrawals();
-  }, [crossChainMessenger, l2Balance]);
+  // const l2Balance = useBalance(l2Provider, address);
+  // const [withdrawals, setWithdrawals] = useState([]);
+  // useEffect(() => {
+  //   if (!crossChainMessenger || !address) {
+  //     return;
+  //   }
 
+  //   const getWithdrawals = async () => {
+  //     const wd = await crossChainMessenger.getWithdrawalsByAddress(address);
+  //     console.log("withdrawals", wd);
+  //     setWithdrawals(wd);
+  //   };
+
+  //   getWithdrawals();
+  // }, [crossChainMessenger, l2Balance]);
+
+  const [depositAmount, setDepositAmount] = useState();
   const depositEth = async () => {
     if (crossChainMessenger) {
-      const result = await crossChainMessenger.depositETH(ethers.utils.parseEther(".01"));
+      const result = await crossChainMessenger.depositETH(ethers.utils.parseEther(depositAmount));
       console.log("depositEth", result);
+      setDepositAmount("");
+    }
+  };
+
+  const [depositTokenAmount, setDeposittokenAmount] = useState();
+  const depositToken = async () => {
+    if (crossChainMessenger) {
+      const result = await crossChainMessenger.approveERC20(readContracts.PGF.Address);
     }
   };
 
@@ -81,19 +108,41 @@ export default function OptimismBridge({ address, userSigner, mainnetProvider, l
   };
 
   return (
-    <div>
-      <button onClick={depositEth}>Deposit eth!</button>
-      <button onClick={withdrawEth}>Withdraw eth!</button>
-      <Balance address={address} provider={l2Provider} price={price} />
-      <h2>Deposits:</h2>
-      <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      <Card title={`From ${targetNetwork.name}`} style={{ width: 300 }}>
+        <Input
+          style={{ width: "100px" }}
+          placeholder="0.0"
+          value={depositAmount}
+          onChange={e => setDepositAmount(e.target.value)}
+        />
+        <Button type="primary" onClick={depositEth} disabled={!depositAmount}>
+          Deposit
+        </Button>
+        <Input
+          style={{ width: "100px" }}
+          placeholder="0.0"
+          value={depositAmount}
+          onChange={e => setDepositAmount(e.target.value)}
+        />
+        <Button type="primary" onClick={depositEth} disabled={!depositAmount}>
+          Deposit
+        </Button>
+      </Card>
+      ↓
+      <Card title={`To ${targetL2.name}`} style={{ width: 300 }}>
+        Current Balance:
+        <Balance address={address} provider={l2Provider} price={price} />
+      </Card>
+      <h4 style={{ marginTop: 25 }}>Deposits:</h4>
+      <div style={{ width: 500, paddingBottom: 32 }}>
         <List
           bordered
           dataSource={deposits}
           renderItem={item => {
             return (
               <List.Item key={item.transactionHash}>
-                <Address address={item.from} ensProvider={mainnetProvider} fontSize={16} />
+                <Address address={item.to} ensProvider={mainnetProvider} fontSize={16} />
                 <Balance balance={item.amount} provider={localProvider} price={price} />
               </List.Item>
             );
