@@ -1,11 +1,8 @@
-# 🏗 Scaffold-ETH
+# 🏗 Polygon State Sync 
 
-> everything you need to build on Ethereum! 🚀
+> A showcase of the state sync mechanic for building cross chain apps on polygon!
 
-🧪 Quickly experiment with Solidity using a frontend that adapts to your smart contract:
-
-![image](https://user-images.githubusercontent.com/2653167/124158108-c14ca380-da56-11eb-967e-69cde37ca8eb.png)
-
+For a walkthrough on how to use this [Click here!](https://mirror.xyz/blindnabler.eth/Z4I7x9gIOMGqZTIvrPr3eBIQwhO92fKRWK2pp9qJHsQ)
 
 # 🏄‍♂️ Quick Start
 
@@ -14,15 +11,15 @@ Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://class
 > clone/fork 🏗 scaffold-eth:
 
 ```bash
-git clone https://github.com/austintgriffith/scaffold-eth.git
+git clone https://github.com/scaffold-eth/scaffold-eth-examples.git
 ```
 
 > install and start your 👷‍ Hardhat chain:
 
 ```bash
 cd scaffold-eth
+git checkout polygon-bridge-test
 yarn install
-yarn chain
 ```
 
 > in a second terminal window, start your 📱 frontend:

@@ -10,13 +10,7 @@ contract YourContractChild is FxBaseChildTunnel {
     address public latestRootMessageSender;
     bytes public latestData;
 
-  string public purpose;
-
-  //hello
-
-  function parseData() public view returns(string memory) {
-    return abi.decode(latestData, (string));
-  }
+    string public purpose;
 
   constructor(address _fxChild) FxBaseChildTunnel(_fxChild) {
   }

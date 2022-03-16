@@ -8,18 +8,11 @@ contract YourContractRoot is FxBaseRootTunnel {
 
   constructor(address _checkpointManager, address _fxRoot) FxBaseRootTunnel(_checkpointManager, _fxRoot) {
   }
-
-  // Waddap
-
   function setChildPurpose(string memory newPurpose) public {
       _sendMessageToChild(abi.encode(newPurpose));
   }
   
 
   function _processMessageFromChild(bytes memory data) internal override {
-  }
-
-  function sendMessageToChild(bytes memory message) public {
-      _sendMessageToChild(message);
   }
 }
