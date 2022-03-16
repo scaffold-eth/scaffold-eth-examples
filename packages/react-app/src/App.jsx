@@ -30,7 +30,8 @@ import { ExampleUI, Hints, Subgraph } from "./views";
 import { CrossChainMessenger } from "@eth-optimism/sdk";
 import { Address, Balance } from "./components";
 import { utils } from "ethers";
-import OptimismBridge from "./components/OptimismBridge";
+import Deposit from "./components/Optimism/Deposit";
+import Withdraw from "./components/Optimism/Withdraw";
 const { ethers } = require("ethers");
 /*
     Welcome to 🏗 scaffold-eth !
@@ -52,8 +53,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.kovan; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-const targetL2Network = NETWORKS.kovanOptimism;
+const targetNetwork = NETWORKS.kovanOptimism; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 console.log("targetNetwork", targetNetwork);
 // 😬 Sorry for all the console logging
@@ -449,25 +449,45 @@ function App(props) {
               }}
               to="/"
             >
-              Optimism Bridge
+              Deposit
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/withdraw">
+            <Link
+              onClick={() => {
+                setRoute("/withdraw");
+              }}
+              to="/withdraw"
+            >
+              Withdraw
             </Link>
           </Menu.Item>
         </Menu>
 
         <Switch>
           <Route exact path="/">
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <OptimismBridge
-                address={address}
-                balance={yourLocalBalance}
-                price={price}
-                userSigner={userSigner}
-                mainnetProvider={mainnetProvider}
-                localProvider={localProvider}
-                targetNetwork={targetNetwork}
-                readContracts={readContracts}
-              ></OptimismBridge>
-            </div>
+            <Deposit
+              address={address}
+              balance={yourLocalBalance}
+              price={price}
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              localProvider={localProvider}
+              targetNetwork={targetNetwork}
+              readContracts={readContracts}
+            ></Deposit>
+          </Route>
+          <Route exact path="/withdraw">
+            <Withdraw
+              address={address}
+              balance={yourLocalBalance}
+              price={price}
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              localProvider={localProvider}
+              targetNetwork={targetNetwork}
+              readContracts={readContracts}
+            ></Withdraw>
           </Route>
           <Route exact path="/contract">
             <Contract
