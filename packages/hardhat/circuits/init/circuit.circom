@@ -1,7 +1,9 @@
-include "../../node_modules/circomlib/circuits/mimcsponge.circom"
+pragma circom 2.0.0;
+
+include "../../node_modules/circomlib/circuits/mimcsponge.circom";
 
 template Main() {
-  signal private input x;
+  signal input x;
   signal input hash;
 
   signal output out;
@@ -15,4 +17,4 @@ template Main() {
   out === hash;
 }
 
-component main = Main();
+component main {public [hash]} = Main();

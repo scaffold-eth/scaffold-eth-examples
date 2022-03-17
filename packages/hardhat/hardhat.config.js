@@ -64,6 +64,7 @@ function circuits() {
       let protocol = config[name] || config.default;
       circuits[index] = {
         name: name,
+        version: 2,
         protocol: protocol,
         circuit: `${name}/circuit.circom`,
         input: `${name}/input.json`,
