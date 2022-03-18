@@ -1,7 +1,8 @@
-import { SyncOutlined } from "@ant-design/icons";
-import { utils } from "ethers";
 import { Button, Card, DatePicker, Divider, Input, Progress, Slider, Spin, Switch } from "antd";
 import React, { useState } from "react";
+import { utils } from "ethers";
+import { SyncOutlined } from "@ant-design/icons";
+
 import { Address, Balance, Events } from "../components";
 
 export default function ExampleUI({
@@ -14,8 +15,14 @@ export default function ExampleUI({
   tx,
   readContracts,
   writeContracts,
+  blockExplorer,
 }) {
   const [newPurpose, setNewPurpose] = useState("loading...");
+  const [userHandle, setUserHandle] = useState(null);
+  const [profileURI, setProfileURI] = useState(null);
+  const [profileID, setProfileID] = useState(null);
+  const [txHash, setTxHash] = useState(null);
+  const [txStatus, setTxStatus] = useState(null);
 
   return (
     <div>
@@ -23,7 +30,89 @@ export default function ExampleUI({
         ⚙️ Here is an example UI that displays and sets the purpose in your smart contract:
       */}
       <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
-        <h2>Example UI:</h2>
+        <h2>Lens Example UI:</h2>
+        <Divider />
+        <h3>Create Profile</h3>
+        <div style={{ margin: 8 }}>
+        Handle: 
+        <Input 
+          placeholder="Enter unique handle"
+          onChange={e => {
+              setUserHandle(e.target.value);
+            }}
+          />
+        Profile Image URI: 
+        <Input 
+          placeholder="Enter IPFS URI" 
+          onChange={e => {
+              setProfileURI(e.target.value);
+            }}
+          /> 
+        <Button
+            style={{ marginTop: 8 }}
+            onClick={async () => {
+              /* look how you call setPurpose on your contract: */
+              /* notice how you pass a call back for tx updates too */
+              const inputStruct = {
+                to: address,
+                handle: userHandle,
+                imageURI: profileURI,
+                followModule: "0x0000000000000000000000000000000000000000",
+                followModuleData: [],
+                followNFTURI:'',
+              };
+              const result = tx(writeContracts.ProfileCreationProxy.proxyCreateProfile(inputStruct), update => {
+                console.log("📡 Transaction Update:", update);
+                setTxHash(update.hash);
+                if (update && (update.status === "confirmed" || update.status === 1)) {
+                  console.log(" 🍾 Transaction " + update.hash + " finished!");
+                  setTxStatus("Successfull");
+                }
+              });
+              console.log("awaiting metamask/web3 confirm result...", result);
+              console.log(await result);
+            }}
+        > Submit
+        </Button>  
+        </div>
+        <Divider />
+        <h3>Follow Profile</h3>
+        User Profile ID: 
+        <Input 
+        onChange={e => {
+              setProfileID(e.target.value);
+          }}
+        /> 
+        <Button
+            style={{ marginTop: 8 }}
+            onClick={async () => {
+              /* look how you call setPurpose on your contract: */
+              /* notice how you pass a call back for tx updates too */
+              const result = tx(writeContracts.LensHubProxy.follow([profileID],[[]]), update => {
+                console.log("📡 Transaction Update:", update);
+                setTxHash(update.hash);
+                if (update && (update.status === "confirmed" || update.status === 1)) {
+                  console.log(" 🍾 Transaction " + update.hash + " finished!");
+                  setTxStatus("Successfull");
+                }
+              });
+              console.log("awaiting metamask/web3 confirm result...", result);
+              console.log(await result);
+            }}
+        > Follow
+        </Button> 
+
+        <Divider />
+        <h3>Txn Details</h3>
+        <div style={{ margin: 8 }}>
+        {txHash ? (<a target="_blank" href={"https://mumbai.polygonscan.com/tx/" + txHash}>Txn Hash</a>) : "Txn Hash"}
+        <br></br>
+        Txn Status: {txStatus}
+        </div>
+      </div>
+
+      <div style={{ border: "1px solid #cccccc", padding: 16, width: 400, margin: "auto", marginTop: 64 }}>
+        <h2>Other Example UI:</h2>
         <h4>purpose: {purpose}</h4>
         <Divider />
         <div style={{ margin: 8 }}>

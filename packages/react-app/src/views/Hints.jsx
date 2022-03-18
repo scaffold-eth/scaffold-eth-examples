@@ -1,8 +1,9 @@
-import { utils } from "ethers";
 import { Select } from "antd";
 import React, { useState } from "react";
-import { Address, AddressInput } from "../components";
+import { utils } from "ethers";
+
 import { useTokenList } from "eth-hooks/dapps/dex";
+import { Address, AddressInput } from "../components";
 
 const { Option } = Select;
 
@@ -15,6 +16,32 @@ export default function Hints({ yourLocalBalance, mainnetProvider, price, addres
 
   return (
     <div>
+      <div style={{ margin: 32 }}>
+        <span style={{ marginRight: 8 }}>👷</span>
+        Checkout the <b>documentation</b> for Lens Protocol <a target="_blank" href="https://docs.lens.dev/docs/what-is-lens">here</a> and for Scaffold-ETH <a target="_blank" href="https://docs.scaffoldeth.io/scaffold-eth/">here.</a>
+      </div>
+      <div style={{ margin: 32 }}>
+        <span style={{ marginRight: 8 }}>👷</span>
+        Edit the <b>Lens contract ABI</b> in
+        <span
+          className="highlight"
+          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
+        >
+          packages/react-app/src/contracts/external_contracts.js
+        </span>
+      </div>
+
+      <div style={{ margin: 32 }}>
+        <span style={{ marginRight: 8 }}>🎛</span>
+        Edit your <b>frontend</b> in
+        <span
+          className="highlight"
+          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
+        >
+          packages/reactapp/src/App.js
+        </span>
+      </div>
+
       <div style={{ margin: 32 }}>
         <span style={{ marginRight: 8 }}>👷</span>
         Edit your <b>contract</b> in
@@ -45,17 +72,6 @@ export default function Hints({ yourLocalBalance, mainnetProvider, price, addres
           style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
         >
           packages/react-app/src/contracts/
-        </span>
-      </div>
-
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🎛</span>
-        Edit your <b>frontend</b> in
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/reactapp/src/App.js
         </span>
       </div>
 
@@ -113,7 +129,7 @@ export default function Hints({ yourLocalBalance, mainnetProvider, price, addres
           optionFilterProp="children"
         >
           {listOfTokens.map(token => (
-            <Option key={token.symbol} value={token.symbol}>
+            <Option key={token.address + "_" + token.symbol} value={token.symbol}>
               {token.symbol}
             </Option>
           ))}
