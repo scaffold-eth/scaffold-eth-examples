@@ -58,7 +58,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.0",
     "searchico": "^1.2.1",
-    "snarkjs": "0.4.7",
+    "snarkjs": "^0.4.15",
     "walletlink": "^2.1.5",
     "web3modal": "^1.9.1"
   },
