@@ -52,11 +52,16 @@ packages
 └── subgraph
 ```
 
-We decide what snark protocol our circuits will use in the `circuit.config.toml` file. Circom currently supports both `groth16` and `plonk` snarks. You'll find `default = "groth16"` in the config file, this defaults every circuit to be compiled as a `groth16` snark, you can change this to `plonk` if you'd like, or you can specify on a per circuit basis by declaring the name of the circuit you would like to deviate from the default. Like this:
+We decide what snark protocol or compiler versions our circuits will use in the `circuit.config.toml` file. Circom currently supports both `groth16` and `plonk` snarks, and compiler versions `1` and `2`. You'll find `default = "groth16"` in the config file, this defaults every circuit to be compiled as a `groth16` snark, you can change this to `plonk` if you'd like, or you can specify on a per circuit basis by declaring the name of the circuit you would like to deviate from the default. Like this:
 
 ```toml
+[protocol]
 default = "groth16"
 init = "plonk"
+
+[compiler]
+default = 2
+init = 1
 ```
 
 If you change the protocol after running `yarn circom` you will need to run it again to recompile your circuit.
