@@ -61,10 +61,11 @@ function circuits() {
     const config = toml.parse(fs.readFileSync("./circuits/circuit.config.toml", "utf-8"));
 
     circuitNames.forEach((name, index) => {
-      let protocol = config[name] || config.default;
+      let protocol = config.protocol[name] || config.protocol.default;
+      let compiler = config.compiler[name] || config.compiler.default;
       circuits[index] = {
         name: name,
-        version: 2,
+        version: compiler,
         protocol: protocol,
         circuit: `${name}/circuit.circom`,
         input: `${name}/input.json`,
