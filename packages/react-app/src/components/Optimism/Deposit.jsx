@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { NETWORKS } from "../../constants";
 import { Address, Balance } from "..";
 import { Alert, Button, Card, Input, List } from "antd";
-import { CrossChainMessenger } from "@eth-optimism/sdk";
+import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import { useBalance } from "eth-hooks";
 
@@ -16,23 +16,23 @@ const l2TokenAddress = "0x0671cA24c73806aB08961Fd97b51A87d12e121E0";
 export default function Deposit({
   address,
   balance,
-  userSigner,
   mainnetProvider,
   localProvider,
   targetNetwork,
   readContracts,
+  signer,
 }) {
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
 
   const [crossChainMessenger, setCrossChainMessenger] = useState();
   useEffect(() => {
-    if (!userSigner) {
+    if (!signer) {
       return;
     }
 
     try {
       const crossChainMessenger = new CrossChainMessenger({
-        l1SignerOrProvider: userSigner,
+        l1SignerOrProvider: signer,
         l2SignerOrProvider: l2Provider.getSigner(),
         l1ChainId: targetNetwork.chainId,
       });
@@ -40,7 +40,7 @@ export default function Deposit({
     } catch (e) {
       console.log("error", e);
     }
-  }, [userSigner]);
+  }, [signer]);
 
   const [deposits, setDeposits] = useState([]);
   useEffect(() => {
@@ -62,6 +62,50 @@ export default function Deposit({
 
     return () => (isSubscribed = false);
   }, [crossChainMessenger, balance]);
+
+  const [withdrawTxs, setWithdrawTxs] = useState([]);
+  useEffect(() => {
+    if (!crossChainMessenger) {
+      return;
+    }
+
+    let isSubscribed = false;
+    const getWithdraws = async () => {
+      isSubscribed = true;
+      const wd = await crossChainMessenger.getWithdrawalsByAddress(address);
+      console.log("Withdraws", wd);
+      if (isSubscribed) {
+        setWithdrawTxs(wd);
+      }
+    };
+
+    getWithdraws();
+
+    return () => (isSubscribed = false);
+  }, [crossChainMessenger, address]);
+
+  const [withdrawMessages, setwithdrawMessages] = useState([]);
+  useEffect(() => {
+    const getMessages = async () => {
+      const withdrawMessages = [];
+      for (const wd of withdrawTxs) {
+        const messages = await crossChainMessenger.getMessagesByTransaction(wd, { direction: 1 });
+        const message = messages[0]; // assuming only 1 for now
+        const status = await crossChainMessenger.getMessageStatus(message);
+        withdrawMessages.push({
+          id: wd.transactionHash,
+          to: wd.to,
+          amount: wd.amount,
+          status,
+          message,
+        });
+      }
+      console.log("Withdraw Messages", withdrawMessages);
+      setwithdrawMessages(withdrawMessages);
+    };
+
+    getMessages();
+  }, [withdrawTxs]);
 
   const [tokenBalance, setTokenBalance] = useState(0);
   useEffect(() => {
@@ -107,11 +151,19 @@ export default function Deposit({
     }
   };
 
+  const finalizeMessage = async message => {
+    if (crossChainMessenger) {
+      // const m = await crossChainMessenger.getMessagesByTransaction(message, { direction: 1 });
+      // const status = await crossChainMessenger.getMessageStatus(m[0]);
+      // console.log("status", status);
+      const result = await crossChainMessenger.finalizeMessage(message);
+      console.log(result);
+    }
+  };
+
   let alert = "";
-  if (targetNetwork.chainId !== NETWORKS.kovan.chainId) {
-    alert = (
-      <Alert style={{ marginTop: "20px" }} message="Switch targetNetwork to Kovan to deposit to L2" type="error" />
-    );
+  if (signer?.provider?._network?.chainId !== NETWORKS.kovan.chainId) {
+    alert = <Alert style={{ marginTop: "20px" }} message="Switch to Kovan to deposit to L2" type="error" />;
   }
   return (
     <div
@@ -140,6 +192,25 @@ export default function Deposit({
         Current Balance:
         <Balance address={address} provider={l2Provider} price={price} />
       </Card>
+      <h4 style={{ marginTop: 25 }}>Withdraws:</h4>
+      <div style={{ width: 500, paddingBottom: 32 }}>
+        <List
+          bordered
+          dataSource={withdrawMessages}
+          renderItem={item => {
+            return (
+              <List.Item key={item.id}>
+                <Address address={item.to} ensProvider={mainnetProvider} fontSize={16} />
+                <Balance balance={item.amount} provider={localProvider} price={price} />
+                <span>{item.status}</span>
+                <Button type="primary" disabled={item.status !== 4} onClick={() => finalizeMessage(item.message)}>
+                  Finalize
+                </Button>
+              </List.Item>
+            );
+          }}
+        />
+      </div>
       <h4 style={{ marginTop: 25 }}>Deposits:</h4>
       <div style={{ width: 500, paddingBottom: 32 }}>
         <List
