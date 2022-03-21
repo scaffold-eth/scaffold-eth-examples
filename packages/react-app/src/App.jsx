@@ -3,14 +3,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { Alert, Button, Col, Menu, Row, List, Radio, Input, Card } from "antd";
 import "antd/dist/antd.css";
 import Authereum from "authereum";
-import {
-  useBalance,
-  useContractLoader,
-  useContractReader,
-  useGasPrice,
-  useOnBlock,
-  useUserProviderAndSigner,
-} from "eth-hooks";
+import { useBalance, useGasPrice, useOnBlock, useUserProviderAndSigner } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import Fortmatic from "fortmatic";
 import React, { useCallback, useEffect, useState } from "react";
@@ -25,11 +18,6 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
-// import Hints from "./Hints";
-import { ExampleUI, Hints, Subgraph } from "./views";
-import { CrossChainMessenger } from "@eth-optimism/sdk";
-import { Address, Balance } from "./components";
-import { utils } from "ethers";
 import Deposit from "./components/Optimism/Deposit";
 import Withdraw from "./components/Optimism/Withdraw";
 const { ethers } = require("ethers");
@@ -53,7 +41,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.kovanOptimism; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.kovan; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 console.log("targetNetwork", targetNetwork);
 // 😬 Sorry for all the console logging
@@ -231,15 +219,15 @@ function App(props) {
   const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
 
   // Load in your local 📝 contract and read a value from it:
-  const readContracts = useContractLoader(localProvider, contractConfig);
+  // const readContracts = useContractLoader(localProvider, contractConfig);
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
-  const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
+  // const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
   // If you want to bring in the mainnet DAI contract it would look like:
-  const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
+  // const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
   // If you want to call a function on a new block
   useOnBlock(mainnetProvider, () => {
@@ -255,17 +243,7 @@ function App(props) {
   // 🧫 DEBUG 👨🏻‍🔬
   //
   useEffect(() => {
-    if (
-      DEBUG &&
-      mainnetProvider &&
-      address &&
-      selectedChainId &&
-      yourLocalBalance &&
-      yourMainnetBalance &&
-      readContracts &&
-      writeContracts &&
-      mainnetContracts
-    ) {
+    if (DEBUG && mainnetProvider && address && selectedChainId && yourLocalBalance && yourMainnetBalance) {
       console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
       console.log("🌎 mainnetProvider", mainnetProvider);
       console.log("🏠 localChainId", localChainId);
@@ -273,20 +251,8 @@ function App(props) {
       console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
       console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
       console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
-      console.log("📝 readContracts", readContracts);
-      console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("🔐 writeContracts", writeContracts);
     }
-  }, [
-    mainnetProvider,
-    address,
-    selectedChainId,
-    yourLocalBalance,
-    yourMainnetBalance,
-    readContracts,
-    writeContracts,
-    mainnetContracts,
-  ]);
+  }, [mainnetProvider, address, selectedChainId, yourLocalBalance, yourMainnetBalance]);
 
   let networkDisplay = "";
   if (NETWORKCHECK && localChainId && selectedChainId && localChainId !== selectedChainId) {
@@ -402,8 +368,10 @@ function App(props) {
 
   const [route, setRoute] = useState();
   useEffect(() => {
-    setRoute(window.location.pathname);
-  }, [setRoute]);
+    const path = window.location.pathname;
+    setRoute(path);
+    console.log("🚀 route", path);
+  }, [route]);
 
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
@@ -474,19 +442,17 @@ function App(props) {
               mainnetProvider={mainnetProvider}
               localProvider={localProvider}
               targetNetwork={targetNetwork}
-              readContracts={readContracts}
+              signer={userProviderAndSigner.signer}
             ></Deposit>
           </Route>
           <Route exact path="/withdraw">
             <Withdraw
               address={address}
-              balance={yourLocalBalance}
               price={price}
               userSigner={userSigner}
               mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
               targetNetwork={targetNetwork}
-              readContracts={readContracts}
+              signer={userProviderAndSigner.signer}
             ></Withdraw>
           </Route>
           <Route exact path="/contract">

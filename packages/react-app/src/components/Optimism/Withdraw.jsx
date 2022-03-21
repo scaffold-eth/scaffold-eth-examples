@@ -9,20 +9,16 @@ import { CrossChainMessenger } from "@eth-optimism/sdk";
 const targetL1 = NETWORKS.kovan;
 const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
 
-export default function Withdraw({
-  address,
-  balance,
-  userSigner,
-  mainnetProvider,
-  localProvider,
-  targetNetwork,
-  signer,
-}) {
+const invalidSignerForTargetNetwork = signer => {
+  return !signer || signer?.provider?._network?.chainId !== NETWORKS.kovanOptimism.chainId;
+};
+
+export default function Withdraw({ address, userSigner, mainnetProvider, targetNetwork, signer }) {
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
 
   const [crossChainMessenger, setCrossChainMessenger] = useState();
   useEffect(() => {
-    if (!userSigner) {
+    if (invalidSignerForTargetNetwork(signer)) {
       return;
     }
 
@@ -47,11 +43,11 @@ export default function Withdraw({
   };
 
   let alert = "";
-  if (signer?.provider?._network?.chainId !== NETWORKS.kovanOptimism.chainId) {
+  if (invalidSignerForTargetNetwork(signer)) {
     alert = (
       <Alert
         style={{ marginTop: "20px" }}
-        message="Switch targetNetwork to kovanOptimism to withdraw to L2"
+        message="Switch provider network to Optimistic Kovan to withdraw to L1"
         type="error"
       />
     );

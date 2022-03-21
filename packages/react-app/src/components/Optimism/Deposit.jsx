@@ -10,23 +10,16 @@ import { useBalance } from "eth-hooks";
 const targetL2 = NETWORKS.kovanOptimism;
 const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
 
-// TODO: ERC20 deposit
-const l2TokenAddress = "0x0671cA24c73806aB08961Fd97b51A87d12e121E0";
+const invalidSignerForTargetNetwork = signer => {
+  return !signer || signer?.provider?._network?.chainId !== NETWORKS.kovan.chainId;
+};
 
-export default function Deposit({
-  address,
-  balance,
-  mainnetProvider,
-  localProvider,
-  targetNetwork,
-  readContracts,
-  signer,
-}) {
+export default function Deposit({ address, balance, mainnetProvider, localProvider, targetNetwork, signer }) {
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
 
   const [crossChainMessenger, setCrossChainMessenger] = useState();
   useEffect(() => {
-    if (!signer) {
+    if (invalidSignerForTargetNetwork(signer)) {
       return;
     }
 
@@ -72,6 +65,7 @@ export default function Deposit({
     let isSubscribed = false;
     const getWithdraws = async () => {
       isSubscribed = true;
+      console.log("getting withdraws");
       const wd = await crossChainMessenger.getWithdrawalsByAddress(address);
       console.log("Withdraws", wd);
       if (isSubscribed) {
@@ -107,17 +101,6 @@ export default function Deposit({
     getMessages();
   }, [withdrawTxs]);
 
-  const [tokenBalance, setTokenBalance] = useState(0);
-  useEffect(() => {
-    if (!readContracts) return;
-
-    const getTokenBalance = async () => {
-      const tokenBalance = await readContracts.PGF?.balanceOf(address);
-      setTokenBalance(tokenBalance);
-    };
-    getTokenBalance();
-  }, [address]);
-
   const [depositAmount, setDepositAmount] = useState();
   const depositEth = async () => {
     if (crossChainMessenger) {
@@ -127,43 +110,18 @@ export default function Deposit({
     }
   };
 
-  const [tokenDepositAmount, setTokenDepositAmount] = useState();
-  const depositERC20 = async () => {
-    if (crossChainMessenger) {
-      try {
-        const l1TokenAddress = readContracts.PGF.address;
-        const approveResult = await crossChainMessenger.approveERC20(
-          l1TokenAddress,
-          l2TokenAddress,
-          ethers.utils.parseEther(tokenDepositAmount),
-        );
-        console.log(approveResult);
-
-        const result = await crossChainMessenger.depositERC20(
-          l1TokenAddress,
-          l2TokenAddress,
-          ethers.utils.parseEther(tokenDepositAmount),
-        );
-        console.log(approveResult);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-
   const finalizeMessage = async message => {
     if (crossChainMessenger) {
-      // const m = await crossChainMessenger.getMessagesByTransaction(message, { direction: 1 });
-      // const status = await crossChainMessenger.getMessageStatus(m[0]);
-      // console.log("status", status);
       const result = await crossChainMessenger.finalizeMessage(message);
-      console.log(result);
+      console.log("finalize result", result);
     }
   };
 
   let alert = "";
-  if (signer?.provider?._network?.chainId !== NETWORKS.kovan.chainId) {
-    alert = <Alert style={{ marginTop: "20px" }} message="Switch to Kovan to deposit to L2" type="error" />;
+  if (invalidSignerForTargetNetwork(signer)) {
+    alert = (
+      <Alert style={{ marginTop: "20px" }} message="Switch provider network to Kovan to deposit to L2" type="error" />
+    );
   }
   return (
     <div
