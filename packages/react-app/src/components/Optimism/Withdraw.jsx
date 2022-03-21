@@ -9,7 +9,15 @@ import { CrossChainMessenger } from "@eth-optimism/sdk";
 const targetL1 = NETWORKS.kovan;
 const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
 
-export default function Withdraw({ address, balance, userSigner, mainnetProvider, localProvider, targetNetwork }) {
+export default function Withdraw({
+  address,
+  balance,
+  userSigner,
+  mainnetProvider,
+  localProvider,
+  targetNetwork,
+  signer,
+}) {
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
 
   const [crossChainMessenger, setCrossChainMessenger] = useState();
@@ -21,7 +29,7 @@ export default function Withdraw({ address, balance, userSigner, mainnetProvider
     try {
       const crossChainMessenger = new CrossChainMessenger({
         l1SignerOrProvider: l1Provider,
-        l2SignerOrProvider: userSigner,
+        l2SignerOrProvider: signer,
         l1ChainId: targetL1.chainId,
       });
       setCrossChainMessenger(crossChainMessenger);
@@ -29,28 +37,6 @@ export default function Withdraw({ address, balance, userSigner, mainnetProvider
       console.log("error", e);
     }
   }, [userSigner]);
-
-  const [withdraws, setWithdraws] = useState([]);
-  useEffect(() => {
-    if (!crossChainMessenger) {
-      return;
-    }
-
-    let isSubscribed = false;
-    const getWithdraws = async () => {
-      isSubscribed = true;
-      const wd = await crossChainMessenger.getWithdrawalsByAddress(address);
-      console.log("Withdraws", wd);
-
-      if (isSubscribed) {
-        setWithdraws(wd);
-      }
-    };
-
-    getWithdraws();
-
-    return () => (isSubscribed = false);
-  }, [crossChainMessenger, address]);
 
   const [withdrawAmount, setWithdrawAmount] = useState();
   const withdrawEth = async () => {
@@ -61,7 +47,7 @@ export default function Withdraw({ address, balance, userSigner, mainnetProvider
   };
 
   let alert = "";
-  if (targetNetwork.chainId !== NETWORKS.kovanOptimism.chainId) {
+  if (signer?.provider?._network?.chainId !== NETWORKS.kovanOptimism.chainId) {
     alert = (
       <Alert
         style={{ marginTop: "20px" }}
@@ -98,21 +84,6 @@ export default function Withdraw({ address, balance, userSigner, mainnetProvider
           Withdraw
         </Button>
       </Card>
-      <h4 style={{ marginTop: 25 }}>Withdraws:</h4>
-      <div style={{ width: 500, paddingBottom: 32 }}>
-        <List
-          bordered
-          dataSource={withdraws}
-          renderItem={item => {
-            return (
-              <List.Item key={item.transactionHash}>
-                <Address address={item.to} ensProvider={mainnetProvider} fontSize={16} />
-                <Balance balance={item.amount} provider={localProvider} price={price} />
-              </List.Item>
-            );
-          }}
-        />
-      </div>
     </div>
   );
 }
