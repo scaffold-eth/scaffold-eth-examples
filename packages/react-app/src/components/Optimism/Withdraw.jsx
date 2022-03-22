@@ -9,6 +9,9 @@ import { CrossChainMessenger } from "@eth-optimism/sdk";
 const targetL1 = NETWORKS.kovan;
 const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
 
+const targetL2 = NETWORKS.kovanOptimism;
+const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
+
 const invalidSignerForTargetNetwork = signer => {
   return !signer || signer?.provider?._network?.chainId !== NETWORKS.kovanOptimism.chainId;
 };
@@ -39,6 +42,7 @@ export default function Withdraw({ address, userSigner, mainnetProvider, targetN
     if (crossChainMessenger) {
       const result = await crossChainMessenger.withdrawETH(ethers.utils.parseEther(withdrawAmount));
       console.log("withdrawEth", result);
+      setWithdrawAmount("");
     }
   };
 
@@ -69,14 +73,16 @@ export default function Withdraw({ address, userSigner, mainnetProvider, targetN
         <Balance address={address} provider={l1Provider} price={price} />
       </Card>
       ↑
-      <Card title={`From ${targetNetwork.name}`} style={{ width: 300 }}>
+      <Card title={`From ${targetL2.name}`} style={{ width: 300 }}>
+        Current Balance:
+        <Balance address={address} provider={l2Provider} price={price} />
         <Input
           style={{ width: "100px" }}
           placeholder="0.0"
           value={withdrawAmount}
           onChange={e => setWithdrawAmount(e.target.value)}
         />
-        <Button type="primary" onClick={withdrawEth} disabled={!withdrawAmount}>
+        <Button style={{ margin: 5 }} type="primary" onClick={withdrawEth} disabled={!withdrawAmount}>
           Withdraw
         </Button>
       </Card>

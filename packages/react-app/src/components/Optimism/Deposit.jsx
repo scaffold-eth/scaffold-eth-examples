@@ -5,7 +5,10 @@ import { Address, Balance } from "..";
 import { Alert, Button, Card, Input, List } from "antd";
 import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
-import { useBalance } from "eth-hooks";
+import { useBalance, useOnBlock } from "eth-hooks";
+
+const targetL1 = NETWORKS.kovan;
+const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
 
 const targetL2 = NETWORKS.kovanOptimism;
 const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
@@ -14,8 +17,24 @@ const invalidSignerForTargetNetwork = signer => {
   return !signer || signer?.provider?._network?.chainId !== NETWORKS.kovan.chainId;
 };
 
+const getWithdrawTxs = async (crossChainMessenger, address) => {
+  if (!crossChainMessenger) {
+    return [];
+  }
+  return await crossChainMessenger.getWithdrawalsByAddress(address);
+};
+
+const getDepositTxs = async (crossChainMessenger, address) => {
+  if (!crossChainMessenger) {
+    return [];
+  }
+
+  return await crossChainMessenger.getDepositsByAddress(address);
+};
+
 export default function Deposit({ address, balance, mainnetProvider, localProvider, targetNetwork, signer }) {
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
+  const l2Balance = useBalance(l2Provider, address);
 
   const [crossChainMessenger, setCrossChainMessenger] = useState();
   useEffect(() => {
@@ -27,7 +46,7 @@ export default function Deposit({ address, balance, mainnetProvider, localProvid
       const crossChainMessenger = new CrossChainMessenger({
         l1SignerOrProvider: signer,
         l2SignerOrProvider: l2Provider.getSigner(),
-        l1ChainId: targetNetwork.chainId,
+        l1ChainId: targetL1.chainId,
       });
       setCrossChainMessenger(crossChainMessenger);
     } catch (e) {
@@ -43,7 +62,7 @@ export default function Deposit({ address, balance, mainnetProvider, localProvid
     let isSubscribed = false;
     const getDeposits = async () => {
       isSubscribed = true;
-      const deposits = await crossChainMessenger.getDepositsByAddress(address);
+      const deposits = await getDepositTxs(crossChainMessenger, address);
       console.log("Deposits", deposits);
 
       if (isSubscribed) {
@@ -56,18 +75,27 @@ export default function Deposit({ address, balance, mainnetProvider, localProvid
     return () => (isSubscribed = false);
   }, [crossChainMessenger, balance]);
 
+  useOnBlock(l1Provider, () => {
+    const getWithdraws = async () => {
+      const wd = await getWithdrawTxs(crossChainMessenger, address);
+      setWithdrawTxs(wd);
+    };
+
+    const getDeposits = async () => {
+      const deposits = await getDepositTxs(crossChainMessenger, address);
+      setDeposits(deposits);
+    };
+
+    getWithdraws();
+    getDeposits();
+  });
+
   const [withdrawTxs, setWithdrawTxs] = useState([]);
   useEffect(() => {
-    if (!crossChainMessenger) {
-      return;
-    }
-
     let isSubscribed = false;
     const getWithdraws = async () => {
       isSubscribed = true;
-      console.log("getting withdraws");
-      const wd = await crossChainMessenger.getWithdrawalsByAddress(address);
-      console.log("Withdraws", wd);
+      const wd = await getWithdrawTxs(crossChainMessenger, address);
       if (isSubscribed) {
         setWithdrawTxs(wd);
       }
@@ -123,6 +151,7 @@ export default function Deposit({ address, balance, mainnetProvider, localProvid
       <Alert style={{ marginTop: "20px" }} message="Switch provider network to Kovan to deposit to L2" type="error" />
     );
   }
+
   return (
     <div
       style={{
@@ -134,55 +163,71 @@ export default function Deposit({ address, balance, mainnetProvider, localProvid
       }}
     >
       {alert}
-      <Card title={`From ${targetNetwork.name}`} style={{ width: 300, marginTop: "20px" }}>
+      <Card title={`From ${targetL1.name}`} style={{ width: 300, marginTop: "20px" }}>
+        Current Balance:
+        <Balance address={address} provider={l1Provider} price={price} />
         <Input
           style={{ width: "100px" }}
           placeholder="0.0"
           value={depositAmount}
           onChange={e => setDepositAmount(e.target.value)}
         />
-        <Button type="primary" onClick={depositEth} disabled={!depositAmount}>
+        <Button style={{ margin: 5 }} type="primary" onClick={depositEth} disabled={!depositAmount}>
           Deposit
         </Button>
       </Card>
       ↓
       <Card title={`To ${targetL2.name}`} style={{ width: 300 }}>
         Current Balance:
-        <Balance address={address} provider={l2Provider} price={price} />
+        <Balance balance={l2Balance} price={price} />
       </Card>
-      <h4 style={{ marginTop: 25 }}>Withdraws:</h4>
-      <div style={{ width: 500, paddingBottom: 32 }}>
-        <List
-          bordered
-          dataSource={withdrawMessages}
-          renderItem={item => {
-            return (
-              <List.Item key={item.id}>
-                <Address address={item.to} ensProvider={mainnetProvider} fontSize={16} />
-                <Balance balance={item.amount} provider={localProvider} price={price} />
-                <span>{item.status}</span>
-                <Button type="primary" disabled={item.status !== 4} onClick={() => finalizeMessage(item.message)}>
-                  Finalize
-                </Button>
-              </List.Item>
-            );
-          }}
-        />
-      </div>
-      <h4 style={{ marginTop: 25 }}>Deposits:</h4>
-      <div style={{ width: 500, paddingBottom: 32 }}>
-        <List
-          bordered
-          dataSource={deposits}
-          renderItem={item => {
-            return (
-              <List.Item key={item.transactionHash}>
-                <Address address={item.to} ensProvider={mainnetProvider} fontSize={16} />
-                <Balance balance={item.amount} provider={localProvider} price={price} />
-              </List.Item>
-            );
-          }}
-        />
+      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 20 }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <h4 style={{ marginTop: 25 }}>Deposits:</h4>
+          <div style={{ width: 450, paddingBottom: 32 }}>
+            <List
+              bordered
+              dataSource={deposits}
+              renderItem={item => {
+                return (
+                  <List.Item key={item.transactionHash}>
+                    <Address address={item.to} ensProvider={mainnetProvider} fontSize={16} />
+                    <Balance balance={item.amount} provider={localProvider} price={price} />
+                  </List.Item>
+                );
+              }}
+            />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <h4 style={{ marginTop: 25 }}>Withdraws:</h4>
+          <div style={{ width: 500, paddingBottom: 32 }}>
+            <List
+              bordered
+              dataSource={withdrawMessages}
+              renderItem={item => {
+                return (
+                  <List.Item key={item.id} style={{ display: "flex", flexDirection: "column" }}>
+                    <div
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                    >
+                      <Address address={item.to} ensProvider={mainnetProvider} fontSize={16} />
+                      <Balance balance={item.amount} provider={localProvider} price={price} />
+                    </div>
+                    <div
+                      style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                    >
+                      <span>{MessageStatus[item.status]}</span>
+                      <Button type="primary" disabled={item.status !== 4} onClick={() => finalizeMessage(item.message)}>
+                        Finalize
+                      </Button>
+                    </div>
+                  </List.Item>
+                );
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
