@@ -1,96 +1,20 @@
-# 🏗 Scaffold-ETH
+# 🏗 Scaffold-ETH & Optimism SDK
 
-> everything you need to build on Ethereum! 🚀
+This demonstrates how to use the [@eth-optimism/sdk](https://www.npmjs.com/package/@eth-optimism/sdk) to deposit ETH from L1 to Optimism, and how to withdraw it out of Optimism back to L1.
 
-🧪 Quickly experiment with Solidity using a frontend that adapts to your smart contract:
+We'll use Kovan for our L1 testnet, and Optimism Kovan for our L2 testnet, so make sure you have some Kovan ETH in your wallet.
 
-![image](https://user-images.githubusercontent.com/2653167/124158108-c14ca380-da56-11eb-967e-69cde37ca8eb.png)
-
-
-# 🏄‍♂️ Quick Start
-
-Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
-
-> clone/fork 🏗 scaffold-eth:
+> install and start the app:
 
 ```bash
-git clone https://github.com/austintgriffith/scaffold-eth.git
-```
-
-> install and start your 👷‍ Hardhat chain:
-
-```bash
-cd scaffold-eth
 yarn install
-yarn chain
-```
-
-> in a second terminal window, start your 📱 frontend:
-
-```bash
-cd scaffold-eth
 yarn start
 ```
 
-> in a third terminal window, 🛰 deploy your contract:
+There's no contracts to deploy, the SDK will handle all of the contract interaction for us.
 
-```bash
-cd scaffold-eth
-yarn deploy
-```
+When the app starts, make sure you log in with Metamask, and select Kovan as the network. On the Deposit tab, you should see your L1 and L2 balance, and any previous Deposits/Withdraws that have been made. Enter in an amount of ETH to transfer to Optimism and hit "Deposit". After you confirm the transaction, you should see a new Deposit event listed, and your L2 balance should reflect the new deposited amount.
 
-🔏 Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
+Switch to the Withdraw tab. Make sure to switch your provider to the Optimistic Kovan network. Your L1 and L2 balances should be shown. Now you can withdraw some ETH back to L1. On mainnet, the withdraw time period is 7 days, but on testnet it's fast. The withdraw time period allows verifiers to review transactions for any fraud.
 
-📝 Edit your frontend `App.jsx` in `packages/react-app/src`
-
-💼 Edit your deployment scripts in `packages/hardhat/deploy`
-
-📱 Open http://localhost:3000 to see the app
-
-# 📚 Documentation
-
-Documentation, tutorials, challenges, and many more resources, visit: [docs.scaffoldeth.io](https://docs.scaffoldeth.io)
-
-# 🔭 Learning Solidity
-
-📕 Read the docs: https://docs.soliditylang.org
-
-📚 Go through each topic from [solidity by example](https://solidity-by-example.org) editing `YourContract.sol` in **🏗 scaffold-eth**
-
-- [Primitive Data Types](https://solidity-by-example.org/primitives/)
-- [Mappings](https://solidity-by-example.org/mapping/)
-- [Structs](https://solidity-by-example.org/structs/)
-- [Modifiers](https://solidity-by-example.org/function-modifier/)
-- [Events](https://solidity-by-example.org/events/)
-- [Inheritance](https://solidity-by-example.org/inheritance/)
-- [Payable](https://solidity-by-example.org/payable/)
-- [Fallback](https://solidity-by-example.org/fallback/)
-
-📧 Learn the [Solidity globals and units](https://solidity.readthedocs.io/en/v0.6.6/units-and-global-variables.html)
-
-# 🛠 Buidl
-
-Check out all the [active branches](https://github.com/austintgriffith/scaffold-eth/branches/active), [open issues](https://github.com/austintgriffith/scaffold-eth/issues), and join/fund the 🏰 [BuidlGuidl](https://BuidlGuidl.com)!
-
-  
- - 🚤  [Follow the full Ethereum Speed Run](https://medium.com/@austin_48503/%EF%B8%8Fethereum-dev-speed-run-bd72bcba6a4c)
-
-
- - 🎟  [Create your first NFT](https://github.com/austintgriffith/scaffold-eth/tree/simple-nft-example)
- - 🥩  [Build a staking smart contract](https://github.com/austintgriffith/scaffold-eth/tree/challenge-1-decentralized-staking)
- - 🏵  [Deploy a token and vendor](https://github.com/austintgriffith/scaffold-eth/tree/challenge-2-token-vendor)
- - 🎫  [Extend the NFT example to make a "buyer mints" marketplace](https://github.com/austintgriffith/scaffold-eth/tree/buyer-mints-nft)
- - 🎲  [Learn about commit/reveal](https://github.com/austintgriffith/scaffold-eth/tree/commit-reveal-with-frontend)
- - ✍️  [Learn how ecrecover works](https://github.com/austintgriffith/scaffold-eth/tree/signature-recover)
- - 👩‍👩‍👧‍👧  [Build a multi-sig that uses off-chain signatures](https://github.com/austintgriffith/scaffold-eth/tree/meta-multi-sig)
- - ⏳  [Extend the multi-sig to stream ETH](https://github.com/austintgriffith/scaffold-eth/tree/streaming-meta-multi-sig)
- - ⚖️  [Learn how a simple DEX works](https://medium.com/@austin_48503/%EF%B8%8F-minimum-viable-exchange-d84f30bd0c90)
- - 🦍  [Ape into learning!](https://github.com/austintgriffith/scaffold-eth/tree/aave-ape)
-
-# 💬 Support Chat
-
-Join the telegram [support chat 💬](https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA) to ask questions and find others building with 🏗 scaffold-eth!
-
----
-
-🙏 Please check out our [Gitcoin grant](https://gitcoin.co/grants/2851/scaffold-eth) too!
+Once the withdraw period has passed, you'll still need to claim the ETH that you withdrew. To do this, go back to the Deposit tab (make sure you switch your provder network back to Kovan). You should see your Withdraw even show up in the list, along with the status. If the withdraw period has passed, you should be able to claim the ETH (status will be "READY_FOR_RELAY"). Click the finalize button, and the ETH should now bin your wallet on L1.
