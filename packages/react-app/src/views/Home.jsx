@@ -31,7 +31,7 @@ function Home({ typedSigner, mainnetProvider }) {
   }, []);
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col mx-4">
       <div className="flex flex-1 flex-row justify-between items-center">
         <h1 className="text-lg font-semibold p-0 m-0">Idea Boards</h1>
         <div className="inline-flex flex-row">
@@ -45,7 +45,7 @@ function Home({ typedSigner, mainnetProvider }) {
       <div className="mt-12">
         <Row gutter={[16, 16]}>
           {boards.map((board, i) => (
-            <Col className="mb-3" span={8} key={`${board.name}-${i}`}>
+            <Col className="mb-3" span={8} xs={24} md={8} key={`${board.name}-${i}`}>
               <Link to={`/board/${board.id}`}>
                 <Card bordered hoverable title={null}>
                   <div className="flex flex-1 mb-2">
