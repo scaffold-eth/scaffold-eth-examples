@@ -13,39 +13,39 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
     setIsCreating(true);
     console.log(boardInfo);
 
-    // try {
-    //   // The data to sign
-    //   const value = {
-    //     accessControl: accessType,
-    //     approvedContributors: [],
-    //     ...boardInfo,
-    //     createdAt: Date.now(),
-    //   };
+    try {
+      // The data to sign
+      const value = {
+        accessControl: accessType,
+        approvedContributors: [],
+        ...boardInfo,
+        createdAt: Date.now(),
+      };
 
-    //   const signature = await typedSigner(
-    //     {
-    //       Board: [
-    //         { name: "name", type: "string" },
-    //         { name: "description", type: "string" },
-    //         { name: "accessControl", type: "string" },
-    //         { name: "approvedContributors", type: "address[]" },
-    //         { name: "createdAt", type: "uint256" },
-    //       ],
-    //     },
-    //     value,
-    //   );
+      const signature = await typedSigner(
+        {
+          Board: [
+            { name: "name", type: "string" },
+            { name: "description", type: "string" },
+            { name: "accessControl", type: "string" },
+            { name: "approvedContributors", type: "address[]" },
+            { name: "createdAt", type: "uint256" },
+          ],
+        },
+        value,
+      );
 
-    //   const createBoard = firebase.functions.httpsCallable("createBoard");
+      const createBoard = firebase.functions.httpsCallable("createBoard");
 
-    //   // send value and signature to backend for validation
-    //   await createBoard({ value, signature });
+      // send value and signature to backend for validation
+      await createBoard({ value, signature });
 
-    //   // TODO : handle return value here
-    //   form.resetFields();
-    //   closeModal();
-    // } catch (error) {
-    //   console.log(error);
-    // }
+      // TODO : handle return value here
+      form.resetFields();
+      closeModal();
+    } catch (error) {
+      console.log(error);
+    }
 
     setIsCreating(false);
   };
