@@ -155,10 +155,10 @@ exports.upvoteProposal = functions.https.onCall((data) => {
 
   let callback = () => Promise.resolve();
 
-  return [
+  return Promise.all([
     db.doc(`boards/${value.board}`).get(),
-    db.doc(`boards/${value.proposal}`).get(),
-  ]
+    db.doc(`proposals/${value.proposal}`).get(),
+  ])
     .then(([board, proposal]) => {
       if (!board.exists || !proposal.exists) {
         throw new Error("This board/proposal does not exist");
@@ -174,7 +174,7 @@ exports.upvoteProposal = functions.https.onCall((data) => {
         throw new Error("You don't have access to propose on this board");
       }
     })
-    .then(doc.get)
+    .then(() => doc.get())
     .then((resDoc) => {
       console.log({ exists: resDoc.exists, upvote: value.upvote });
 
@@ -193,5 +193,9 @@ exports.upvoteProposal = functions.https.onCall((data) => {
       }
     })
     .then(callback)
-    .then(() => doc.id);
+    .then(() => doc.id)
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
 });
