@@ -47,6 +47,8 @@ exports.createBoard = functions.https.onCall((data) => {
         { name: "description", type: "string" },
         { name: "accessControl", type: "string" },
         { name: "approvedContributors", type: "address[]" },
+        { name: "voterControl", type: "string" },
+        { name: "approvedVoters", type: "address[]" },
         { name: "createdAt", type: "uint256" },
       ],
     },
@@ -165,10 +167,21 @@ exports.upvoteProposal = functions.https.onCall((data) => {
       }
 
       const boardData = board.data();
+      const {
+        accessControl = "allowList",
+        voterControl = "asAccessControl",
+        approvedContributors = [],
+        approvedVoters = [],
+      } = boardData;
+
+      const approvedActors =
+        voterControl === "asAccessControl"
+          ? approvedContributors
+          : approvedVoters;
 
       if (
-        boardData.accessControl !== "anyone" &&
-        !boardData.approvedContributors.includes(recovered) &&
+        accessControl !== "anyone" &&
+        !approvedActors.includes(recovered) &&
         boardData.creator !== recovered
       ) {
         throw new Error("You don't have access to propose on this board");
