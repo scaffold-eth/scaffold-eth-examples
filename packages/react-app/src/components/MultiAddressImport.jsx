@@ -16,44 +16,51 @@ export default function MultiAddressInput(props) {
   const handleNewAddresses = async e => {
     e && e.preventDefault();
     setProcessing(true);
-    const processedList = (
-      await Promise.all(
-        rawValue
-          .replace(/(?:\r\n|\r|\n)/g, ",")
-          .split(",")
-          .map(async pAddress => {
-            let tpAddress = pAddress.trim();
 
-            if (ethers.utils.isAddress(tpAddress)) {
-              tpAddress = ethers.utils.getAddress(tpAddress);
-            }
+    try {
+      const processedList = (
+        await Promise.all(
+          rawValue
+            .replace(/(?:\r\n|\r|\n)/g, ",")
+            .split(",")
+            .map(async pAddress => {
+              let tpAddress = pAddress.trim();
 
-            if (tpAddress.includes(".")) {
-              try {
-                tpAddress = await ensProvider.resolveName(tpAddress);
-              } catch (error) {
-                console.log(error);
-                tpAddress = "";
+              if (ethers.utils.isAddress(tpAddress)) {
+                tpAddress = ethers.utils.getAddress(tpAddress);
               }
-            }
 
-            console.log({ pAddress, tpAddress });
+              if (tpAddress.includes(".")) {
+                try {
+                  tpAddress = await ensProvider.resolveName(tpAddress);
+                } catch (error) {
+                  console.log(error);
+                  tpAddress = "";
+                }
+              }
 
-            return tpAddress;
-          }),
-      )
-    ).filter(i => i.length > 0);
+              console.log({ pAddress, tpAddress });
 
-    const newValues = [...new Set([...value, ...processedList])];
+              return tpAddress;
+            }),
+        )
+      ).filter(i => i && i.length > 0);
 
-    setValue(newValues);
-    setRawValue("");
+      const newValues = [...new Set([...value, ...processedList])];
+
+      setValue(newValues);
+      setRawValue("");
+
+      if (onChange) {
+        onChange?.(newValues);
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     setProcessing(false);
 
-    if (onChange) {
-      onChange?.(newValues);
-    }
+    e?.target?.focus();
   };
 
   const deleteFromIndex = i => {
