@@ -78,7 +78,7 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
           <Input.TextArea size={size} placeholder="Board description..." autoSize={{ minRows: 1, maxRows: 4 }} />
         </Form.Item>
 
-        <Form.Item name="accessControl" label="Access Control for proposals" rules={[{ required: true }]}>
+        <Form.Item name="accessControl" label="Access Control for contributors" rules={[{ required: true }]}>
           <Select size={size} onChange={setAccessType} placeholder="Select contributor access level...">
             <Select.Option value="anyone">Anyone can contribute</Select.Option>
             <Select.Option value="allowList">Specific addresses can contribute</Select.Option>
@@ -100,7 +100,7 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
 
         <Collapse bordered={false}>
           <Collapse.Panel header="Advanced setup..." key="1">
-            <Form.Item name="voterControl" label="Approved voters" rules={[{ required: false }]}>
+            <Form.Item name="voterControl" label="Access control for voters" rules={[{ required: false }]}>
               <Select size={size} onChange={setVoterType} placeholder="Select voters access level...">
                 <Select.Option value="asAccessControl">Same as proposals rule</Select.Option>
                 <Select.Option value="voterAllowList">Specific addresses can vote</Select.Option>
