@@ -6,6 +6,19 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
+const validateBalance = (address, eoa) => {
+  const provider = new ethers.providers.StaticJsonRpcProvider(
+    "https://rpc.scaffoldeth.io:48544"
+  );
+
+  const ABI = ["function balanceOf(address owner) view returns (uint256)"];
+
+  const tokenContract = new ethers.Contract(address, ABI, provider);
+  return tokenContract
+    .balanceOf(eoa)
+    .then((balance) => balance.gt(ethers.BigNumber.from("0")));
+};
+
 const handleRecovery = (types, value, signature) => {
   return ethers.utils.verifyTypedData(
     {
@@ -25,13 +38,37 @@ exports.createBoard = functions.https.onCall((data) => {
 
   // TODO : Validate value fields here
 
+  const addressValidator = (param, expected) => (v) => {
+    return param === expected ? ethers.utils.isAddress(v) : true;
+  };
+
   const schema = yup.object().shape({
     name: yup.string().min("5"),
     description: yup.string().min("10"),
-    accessControl: yup.string().matches(/(anyone|allowList)/),
+    accessControl: yup.string().matches(/(anyone|allowList|tokenHolders)/),
+    voterControl: yup
+      .string()
+      .matches(/(asAccessControl|voterAllowList|voterTokenHolders)/),
     approvedContributors: yup
       .array()
-      .min(value.accessControl === "allowList" ? 1 : 0),
+      .min(value.accessControl !== "anyone" ? 0 : 1),
+    approvedVoters: yup
+      .array()
+      .min(value.voterControl !== "asAccessControl" ? 0 : 1),
+    contributorTokenHolders: yup
+      .string()
+      .test(
+        "is-address",
+        "${path} is not address",
+        addressValidator(value.accessControl, "tokenHolders")
+      ),
+    voterTokenHolders: yup
+      .string()
+      .test(
+        "is-address",
+        "${path} is not address",
+        addressValidator(value.voterControl, "voterTokenHolders")
+      ),
     createdAt: yup
       .number()
       .min(Date.now() - 2 * 60 * 1000)
@@ -47,6 +84,8 @@ exports.createBoard = functions.https.onCall((data) => {
         { name: "description", type: "string" },
         { name: "accessControl", type: "string" },
         { name: "approvedContributors", type: "address[]" },
+        { name: "contributorTokenHolders", type: "address" },
+        { name: "voterTokenHolders", type: "address" },
         { name: "voterControl", type: "string" },
         { name: "approvedVoters", type: "address[]" },
         { name: "createdAt", type: "uint256" },
@@ -113,24 +152,39 @@ exports.addNewProposal = functions.https.onCall((data) => {
       const docData = doc.data();
 
       if (
-        docData.accessControl === "anyone" ||
-        (docData.accessControl === "allowList" &&
-          (docData.approvedContributors.includes(recovered) ||
-            docData.creator === recovered))
+        docData.accessControl === "allowList" &&
+        (docData.approvedContributors.includes(recovered) ||
+          docData.creator === recovered)
       ) {
-        const update = Object.assign({}, value, {
-          creator: recovered,
-          signature,
-          _createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-        // use recovered address to create a new board
-        const doc = db.collection("proposals").doc();
-
-        doc.set(update);
-
-        return doc.id;
+        return Promise.resolve(true);
       }
+
+      if (docData.accessControl === "tokenHolders") {
+        // validate if signer has this token balance > 0
+        return validateBalance(docData.contributorTokenHolders, recovered);
+      }
+
+      if (docData.accessControl === "anyone") {
+        // carry on, nothing to see here
+        return Promise.resolve(true);
+      }
+
+      // throw error if this function doesn't exist before this line
+      throw new Error("Access denied to this board");
+    })
+    .then(() => {
+      const update = Object.assign({}, value, {
+        creator: recovered,
+        signature,
+        _createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // use recovered address to create a new board
+      const doc = db.collection("proposals").doc();
+
+      doc.set(update);
+
+      return doc.id;
     });
 });
 
@@ -180,12 +234,24 @@ exports.upvoteProposal = functions.https.onCall((data) => {
           : approvedVoters;
 
       if (
-        accessControl !== "anyone" &&
-        !approvedActors.includes(recovered) &&
-        boardData.creator !== recovered
+        accessControl === "allowList" &&
+        (approvedActors.includes(recovered) || boardData.creator === recovered)
       ) {
-        throw new Error("You don't have access to propose on this board");
+        return Promise.resolve(true);
       }
+
+      if (accessControl === "tokenHolders") {
+        // validate if signer has this token balance > 0
+        return validateBalance(boardData.voterTokenHolders, recovered);
+      }
+
+      if (accessControl === "anyone") {
+        // carry on, nothing to see here
+        return Promise.resolve(true);
+      }
+
+      // throw an error if this function doesn't exit here
+      throw new Error("You don't have access to propose on this board");
     })
     .then(() => doc.get())
     .then((resDoc) => {

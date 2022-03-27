@@ -5,11 +5,13 @@ import { LikeOutlined, LikeFilled } from "@ant-design/icons";
 import { Address } from "../components";
 import { firebase } from "../utils";
 import classnames from "classnames";
+import { ethers } from "ethers";
 
-export default function Board({ typedSigner, mainnetProvider, address }) {
+export default function Board({ typedSigner, mainnetProvider, address, mainnetContracts }) {
   const { boardId } = useParams();
   const [addingNewProposal, setaddingNewProposal] = useState(false);
   const [boardInfo, setBoardInfo] = useState({});
+  const [contributors, setContributors] = useState([]);
   const [newProposal, setNewProposal] = useState("");
   const [proposals, setProposals] = useState([]);
   const [myUpvotes, setMyupvotes] = useState([]);
@@ -89,11 +91,31 @@ export default function Board({ typedSigner, mainnetProvider, address }) {
         throw new Error("Invalid board");
       }
 
-      setBoardInfo({ ...doc.data(), id: doc.id });
+      const data = doc.data();
+
+      setBoardInfo({ ...data, id: doc.id });
+      setContributors([...new Set([...contributors, ...data.approvedContributors])]);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const loadUserContributor = async () => {
+    const tokenContract = mainnetContracts.ERC20.attach(boardInfo.contributorTokenHolders);
+    const balance = await tokenContract.balanceOf(address);
+
+    console.log(balance);
+
+    if (balance.gt(ethers.BigNumber.from("0"))) {
+      setContributors([...new Set([...contributors, address])]);
+    }
+  };
+
+  useEffect(() => {
+    if (boardInfo.id && mainnetContracts.ERC20 && boardInfo.accessControl === "tokenHolders") {
+      loadUserContributor();
+    }
+  }, [boardInfo, mainnetContracts]);
 
   // listen for new proposals
   useEffect(() => {
@@ -187,9 +209,7 @@ export default function Board({ typedSigner, mainnetProvider, address }) {
       </div>
 
       <div className="flex flex-1 mt-8 flex-col w-full max-w-2xl mx-auto">
-        {(boardInfo?.accessControl === "anyone" ||
-          (boardInfo?.accessControl === "allowList" &&
-            (boardInfo?.approvedContributors?.includes(address) || boardInfo?.creator === address))) && (
+        {(contributors?.includes(address) || boardInfo?.creator === address) && (
           <div>
             <Input.TextArea
               placeholder="Add your giga idea..."

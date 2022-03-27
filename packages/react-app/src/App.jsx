@@ -87,7 +87,7 @@ function App(props) {
 
   // load all your providers
   const localProvider = useStaticJsonRPC([
-    process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : targetNetwork.rpcUrl,
+    process?.env?.REACT_APP_PROVIDER ? process?.env?.REACT_APP_PROVIDER : targetNetwork.rpcUrl,
   ]);
   const mainnetProvider = useStaticJsonRPC(providers);
 
@@ -154,6 +154,11 @@ function App(props) {
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
+
+  // EXTERNAL CONTRACT EXAMPLE:
+  //
+  // If you want to bring in the mainnet DAI contract it would look like:
+  const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
   // If you want to call a function on a new block
   useOnBlock(mainnetProvider, () => {
@@ -231,6 +236,7 @@ function App(props) {
               readContracts={readContracts}
               writeContracts={writeContracts}
               mainnetProvider={mainnetProvider}
+              mainnetContracts={mainnetContracts}
               yourLocalBalance={yourLocalBalance}
             />
           </Route>

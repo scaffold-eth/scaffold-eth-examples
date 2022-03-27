@@ -1,6 +1,6 @@
 import { Modal, Form, Input, Select, Collapse } from "antd";
 import React, { useState } from "react";
-import { MultiAddressImport } from "../components";
+import { MultiAddressImport, TokenSelect } from "../components";
 import { firebase } from "../utils";
 
 export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...props }) {
@@ -14,6 +14,10 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
     setIsCreating(true);
     console.log(boardInfo);
 
+    /**
+     * TODO : load the tokens if any and get the decimals / multiply each minBalance requirement to get true value.
+     **/
+
     try {
       // The data to sign
       const value = {
@@ -21,6 +25,8 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
         approvedContributors: [],
         voterControl: voterType,
         approvedVoters: [],
+        contributorTokenHolders: "",
+        voterTokenHolders: "",
         ...boardInfo,
         createdAt: Date.now(),
       };
@@ -32,6 +38,8 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
             { name: "description", type: "string" },
             { name: "accessControl", type: "string" },
             { name: "approvedContributors", type: "address[]" },
+            { name: "contributorTokenHolders", type: "address" },
+            { name: "voterTokenHolders", type: "address" },
             { name: "voterControl", type: "string" },
             { name: "approvedVoters", type: "address[]" },
             { name: "createdAt", type: "uint256" },
@@ -60,6 +68,7 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
       title="Create a new board"
       centered
       {...props}
+      width={700}
       onCancel={closeModal}
       onOk={() => form.submit()}
       confirmLoading={isCreating}
@@ -82,11 +91,24 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
           <Select size={size} onChange={setAccessType} placeholder="Select contributor access level...">
             <Select.Option value="anyone">Anyone can contribute</Select.Option>
             <Select.Option value="allowList">Specific addresses can contribute</Select.Option>
-            <Select.Option value="token" disabled>
-              Specific token holders <span className="italic">(coming soon)</span>
-            </Select.Option>
+            <Select.Option value="tokenHolders">Specific token holders</Select.Option>
           </Select>
         </Form.Item>
+
+        {accessType === "tokenHolders" && (
+          <Form.Item
+            label="Contributor token address"
+            className="w-full flex"
+            name="contributorTokenHolders"
+            rules={[{ required: true }]}
+          >
+            <TokenSelect
+              size={size}
+              placeholder="Approved contributor token address..."
+              localProvider={mainnetProvider}
+            />
+          </Form.Item>
+        )}
 
         {accessType === "allowList" && (
           <Form.Item name="approvedContributors" label="Approved contributors" rules={[{ required: true }]}>
@@ -104,11 +126,24 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
               <Select size={size} onChange={setVoterType} placeholder="Select voters access level...">
                 <Select.Option value="asAccessControl">Same as proposals rule</Select.Option>
                 <Select.Option value="voterAllowList">Specific addresses can vote</Select.Option>
-                <Select.Option value="token" disabled>
-                  Specific token holders <span className="italic">(coming soon)</span>
-                </Select.Option>
+                <Select.Option value="voterTokenHolders">Specific token holders</Select.Option>
               </Select>
             </Form.Item>
+
+            {voterType === "voterTokenHolders" && (
+              <Form.Item
+                className="w-full flex"
+                name="voterTokenHolders"
+                rules={[{ required: true }]}
+                label="Voter token address"
+              >
+                <TokenSelect
+                  size={size}
+                  localProvider={mainnetProvider}
+                  placeholder="Approved voter token address..."
+                />
+              </Form.Item>
+            )}
 
             {voterType === "voterAllowList" && (
               <Form.Item name="approvedVoters" label="Approved voters" rules={[{ required: true }]}>
