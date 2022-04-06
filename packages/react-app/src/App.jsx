@@ -26,7 +26,7 @@ import externalContracts from "./contracts/external_contracts";
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
 // import Hints from "./Hints";
-import { ExampleUI, Hints, Subgraph } from "./views";
+import { ExampleUI, Hints, Subgraph, Home } from "./views";
 
 const { ethers } = require("ethers");
 /*
@@ -452,7 +452,17 @@ function App(props) {
               }}
               to="/"
             >
-              YourContract
+              Notepad
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/debug">
+            <Link
+              onClick={() => {
+                setRoute("/debug");
+              }}
+              to="/debug"
+            >
+              Debug
             </Link>
           </Menu.Item>
           <Menu.Item key="/hints">
@@ -499,6 +509,15 @@ function App(props) {
 
         <Switch>
           <Route exact path="/">
+            <Home
+              tx={tx}
+              address={address}
+              yourLocalBalance={yourLocalBalance}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+            />
+          </Route>
+          <Route exact path="/debug">
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
@@ -506,7 +525,7 @@ function App(props) {
             */}
 
             <Contract
-              name="YourContract"
+              name="Notepad"
               price={price}
               signer={userSigner}
               provider={localProvider}
