@@ -1,6 +1,11 @@
-# 🏗 Scaffold-ETH
+# 🏗 Delayed Function Execution - The Scheduled Smart Contract Execution Problem
 
-> everything you need to build on Ethereum! 🚀
+> This repo demonstrates a typical workaround for the inability to set a timer on-chain in Ethereum. In this demonstration you can 
+> create a task that can be fulfilled by anyone at a certain block height. This requires proper incentives, otherwise nobody would
+> bother to trigger the task for you. The incentive will have to cover the executor's gas fees or it isn't really an incentive.
+> Now in the real world this wouldn't rely on people clicking buttons on a front end and instead would be several nodes setup to
+> look for and execute tasks when incentives align properly but this is just a quick demonstration of the existing dilemma to get
+> people thinking about new methodologies.
 
 🧪 Quickly experiment with Solidity using a frontend that adapts to your smart contract:
 
@@ -38,6 +43,16 @@ yarn start
 cd scaffold-eth-examples
 yarn deploy
 ```
+
+> now you can create a new scheduled task by filling out `setScheduledTask`. Start by entering the block height at which you 
+> want your function executed at. Then fill out the functionToCall parameter. Enter `setPurpose(string)` to use the existing
+> setPurpose function and enter the string you wish to set it as in the next input box. Finally, set the transaction value
+> parameter to whatever you want the incentive to be for the executor.
+
+> Now to pose as the executor you will need to interact with the smart contract until the blockheight you specified for your
+> task is reached. Then you can trigger fulfillTask with the correct index of the task you added (0 if you want to execute the
+> first task). You should now see the "purpose" has been changed to what you specified when you created the task and you should
+> see your balance go up according to the incentive.
 
 🔏 Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
 
