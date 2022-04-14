@@ -12,14 +12,25 @@ import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import WalletLink from "walletlink";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
+import {
+  Account,
+  Contract,
+  Deposit,
+  ERC20Deposit,
+  ERC20Withdraw,
+  Faucet,
+  GasGauge,
+  Header,
+  Ramp,
+  ThemeSwitch,
+  Withdraw,
+} from "./components";
 import { INFURA_ID, NETWORK, NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
-import Deposit from "./components/Optimism/Deposit";
-import Withdraw from "./components/Optimism/Withdraw";
+import { useContractLoader } from "eth-hooks";
 const { ethers } = require("ethers");
 /*
     Welcome to 🏗 scaffold-eth !
@@ -222,7 +233,7 @@ function App(props) {
   // const readContracts = useContractLoader(localProvider, contractConfig);
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
-  // const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
+  const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -430,6 +441,26 @@ function App(props) {
               Withdraw
             </Link>
           </Menu.Item>
+          <Menu.Item key="/erc20-deposit">
+            <Link
+              onClick={() => {
+                setRoute("/erc20-deposit");
+              }}
+              to="/erc20-deposit"
+            >
+              ERC20 Deposit
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/erc20-withdraw">
+            <Link
+              onClick={() => {
+                setRoute("/erc20-withdraw");
+              }}
+              to="/erc20-withdraw"
+            >
+              ERC20 Withdraw
+            </Link>
+          </Menu.Item>
         </Menu>
 
         <Switch>
@@ -454,6 +485,12 @@ function App(props) {
               targetNetwork={targetNetwork}
               signer={userProviderAndSigner.signer}
             ></Withdraw>
+          </Route>
+          <Route exact path="/erc20-deposit">
+            <ERC20Deposit writeContracts={writeContracts} tx={tx} signer={userProviderAndSigner.signer}></ERC20Deposit>
+          </Route>
+          <Route exact path="/erc20-withdraw">
+            <ERC20Withdraw></ERC20Withdraw>
           </Route>
           <Route exact path="/contract">
             <Contract

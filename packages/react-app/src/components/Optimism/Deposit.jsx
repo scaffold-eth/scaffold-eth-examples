@@ -138,6 +138,16 @@ export default function Deposit({ address, balance, mainnetProvider, localProvid
     }
   };
 
+  // TODO: just for testing, move this to another component
+  const approveERC20 = async () => {
+    const l1Token = "0x6F8529A55b06848EDef72d9CF5454BeA7c5ce2E5";
+    const l2Token = "0x117cFd9060525452db4A34d51c0b3b7599087f05";
+    if (crossChainMessenger) {
+      const result = await crossChainMessenger.approveERC20(l1Token, l2Token, 100);
+      console.log("approveERC20", result);
+    }
+  };
+
   const finalizeMessage = async message => {
     if (crossChainMessenger) {
       const result = await crossChainMessenger.finalizeMessage(message);
@@ -162,6 +172,7 @@ export default function Deposit({ address, balance, mainnetProvider, localProvid
         gap: "0.5rem",
       }}
     >
+      <Button onClick={approveERC20}>Approve ERC20</Button>
       {alert}
       <Card title={`From ${targetL1.name}`} style={{ width: 300, marginTop: "20px" }}>
         Current Balance:
