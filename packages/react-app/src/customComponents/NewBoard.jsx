@@ -25,8 +25,8 @@ export default function NewBoard({ typedSigner, mainnetProvider, closeModal, ...
         approvedContributors: [],
         voterControl: voterType,
         approvedVoters: [],
-        contributorTokenHolders: "",
-        voterTokenHolders: "",
+        contributorTokenHolders: "0x0000000000000000000000000000000000000000",
+        voterTokenHolders: "0x0000000000000000000000000000000000000000",
         ...boardInfo,
         createdAt: Date.now(),
       };
