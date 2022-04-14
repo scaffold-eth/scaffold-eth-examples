@@ -51,10 +51,15 @@ exports.createBoard = functions.https.onCall((data) => {
       .matches(/(asAccessControl|voterAllowList|voterTokenHolders)/),
     approvedContributors: yup
       .array()
-      .min(value.accessControl !== "anyone" ? 0 : 1),
+      .min(value.accessControl !== "tokenHolders" ? 0 : 1),
     approvedVoters: yup
       .array()
-      .min(value.voterControl !== "asAccessControl" ? 0 : 1),
+      .min(
+        value.voterControl === "asAccessControl" &&
+          value.accessControl !== "tokenHolders"
+          ? 0
+          : 1
+      ),
     contributorTokenHolders: yup
       .string()
       .test(
