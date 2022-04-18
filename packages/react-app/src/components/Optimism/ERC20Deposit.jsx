@@ -1,67 +1,115 @@
 import { useEffect, useState } from "react";
-import { Button, Input, Spin } from "antd";
+import { ethers } from "ethers";
+import { NETWORKS } from "../../constants";
+import { Address, Balance } from "..";
+import { Alert, Button, Card, Input, List } from "antd";
+import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
+import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
+import { useBalance, useOnBlock } from "eth-hooks";
 
-export default function ERC20Deposit({ writeContracts, tx, signer }) {
-  const [l1TokenAddress, setL1TokenAddress] = useState("");
-  const [l2TokenAddress, setL2TokenAddress] = useState("");
+const targetL1 = NETWORKS.kovan;
+const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
 
-  const [deployState, setDeployState] = useState("NOT_STARTED");
-  let l2DeployView = <></>;
-  switch (deployState) {
-    case "NOT_STARTED":
-      l2DeployView = <></>;
-      break;
-    case "DEPLOYING":
-      l2DeployView = <Spin />;
-      break;
-    case "DEPLOYED":
-      l2DeployView = <Input value={l2TokenAddress} />;
-      break;
-  }
+const targetL2 = NETWORKS.kovanOptimism;
+const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
 
-  const deployToL2 = async () => {
-    setDeployState("DEPLOYING");
-    console.log(writeContracts);
-    const result = await tx(writeContracts.L2TokenFactory.createStandardL2Token(l1TokenAddress, "GOLD", "GLD"));
-    console.log(result);
-    if (!result || result.code === 4001) {
-      setDeployState("NOT_STARTED");
+const invalidSignerForTargetNetwork = signer => {
+  return !signer || signer?.provider?._network?.chainId !== NETWORKS.kovan.chainId;
+};
+
+export default function ERC20Deposit({ balance, address, targetNetwork, mainnetProvider, signer, readContracts }) {
+  const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
+
+  const [l1Balance, setL1Balance] = useState();
+  useEffect(() => {
+    const getTokenBalance = async () => {
+      if (!readContracts.PGF) return;
+      const balance = await readContracts.PGF?.balanceOf(address);
+      setL1Balance(balance);
+    };
+    getTokenBalance();
+  }, [balance, readContracts]);
+
+  const [crossChainMessenger, setCrossChainMessenger] = useState();
+  useEffect(() => {
+    if (invalidSignerForTargetNetwork(signer)) {
       return;
     }
 
-    const receipt = await result.wait();
-    console.log(receipt);
+    try {
+      const crossChainMessenger = new CrossChainMessenger({
+        l1SignerOrProvider: signer,
+        l2SignerOrProvider: l2Provider.getSigner(),
+        l1ChainId: targetL1.chainId,
+      });
+      setCrossChainMessenger(crossChainMessenger);
+    } catch (e) {
+      console.log("error", e);
+    }
+  }, [signer]);
 
-    const args = receipt.events.find(({ event }) => event === "StandardL2TokenCreated").args;
-
-    // Get the L2 token address from the emmited event and log
-    const address = args._l2Token;
-    setL2TokenAddress(address);
-    setDeployState("DEPLOYED");
-    console.log("L2StandardERC20 deployed to:", l2TokenAddress);
+  const [depositAmount, setDepositAmount] = useState();
+  const depositToken = async () => {
+    const l1Token = "0xE47ed24f39d5B0A0C6CCf77B5637Bf1d88218D29";
+    const l2Token = "0xDb9888b842408B0b8eFa1f5477bD9F351754999E";
+    if (crossChainMessenger) {
+      await approveERC20(l1Token, l2Token);
+      const result = await crossChainMessenger.depositERC20(l1Token, l2Token, ethers.utils.parseEther(depositAmount));
+      console.log("deposit token", result);
+      setDepositAmount("");
+    }
   };
 
+  const approveERC20 = async (l1Token, l2Token) => {
+    if (crossChainMessenger) {
+      const result = await crossChainMessenger.approveERC20(l1Token, l2Token, ethers.utils.parseEther(depositAmount));
+      console.log("approveERC20", result);
+    }
+  };
+
+  let alert = "";
+  if (invalidSignerForTargetNetwork(signer)) {
+    alert = (
+      <Alert style={{ marginTop: "20px" }} message="Switch provider network to Kovan to deposit to L2" type="error" />
+    );
+  }
+
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "15px",
-          width: "500px",
-        }}
-      >
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "0.5rem",
+      }}
+    >
+      {alert}
+      <Card title={`From ${targetL1.name}`} style={{ width: 300, marginTop: "20px" }}>
+        <div>Current Balance: {ethers.utils.formatEther(l1Balance ?? 0)}</div>
         <Input
-          placeholder="L1 Token Address"
-          value={l1TokenAddress}
-          onChange={e => setL1TokenAddress(e.target.value)}
+          style={{ width: "100px" }}
+          placeholder="0.0"
+          value={depositAmount}
+          onChange={e => setDepositAmount(e.target.value)}
         />
-        <Button type="primary" onClick={deployToL2}>
-          Deploy to L2
+        <Button style={{ margin: 5 }} type="primary" onClick={depositToken} disabled={!depositAmount}>
+          Approve and Deposit
         </Button>
-        {l2DeployView}
-      </div>
+      </Card>
+
+      <Card title={`From ${targetL2.name}`} style={{ width: 300, marginTop: "20px" }}>
+        <div>Current Balance: {ethers.utils.formatEther(l1Balance ?? 0)}</div>
+        <Input
+          style={{ width: "100px" }}
+          placeholder="0.0"
+          value={depositAmount}
+          onChange={e => setDepositAmount(e.target.value)}
+        />
+        <Button style={{ margin: 5 }} type="primary" onClick={depositToken} disabled={!depositAmount}>
+          Approve and Deposit
+        </Button>
+      </Card>
     </div>
   );
 }

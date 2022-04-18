@@ -848,6 +848,10 @@ module.exports = {
         address: "0x4200000000000000000000000000000000000012",
         abi: TOKENFACTORYABI,
       },
+      L2Token: {
+        address: "0xDb9888b842408B0b8eFa1f5477bD9F351754999E",
+        abi: ERC20ABI,
+      },
     },
   },
 };

@@ -16,6 +16,7 @@ import {
   Account,
   Contract,
   Deposit,
+  ERC20Deploy,
   ERC20Deposit,
   ERC20Withdraw,
   Faucet,
@@ -230,7 +231,7 @@ function App(props) {
   const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
 
   // Load in your local 📝 contract and read a value from it:
-  // const readContracts = useContractLoader(localProvider, contractConfig);
+  const readContracts = useContractLoader(localProvider, contractConfig);
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
@@ -441,6 +442,16 @@ function App(props) {
               Withdraw
             </Link>
           </Menu.Item>
+          <Menu.Item key="/erc20-deploy">
+            <Link
+              onClick={() => {
+                setRoute("/erc20-deploy");
+              }}
+              to="/erc20-deploy"
+            >
+              ERC20 Deploy
+            </Link>
+          </Menu.Item>
           <Menu.Item key="/erc20-deposit">
             <Link
               onClick={() => {
@@ -459,6 +470,16 @@ function App(props) {
               to="/erc20-withdraw"
             >
               ERC20 Withdraw
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/debug">
+            <Link
+              onClick={() => {
+                setRoute("/debug");
+              }}
+              to="/debug"
+            >
+              Debug
             </Link>
           </Menu.Item>
         </Menu>
@@ -486,13 +507,33 @@ function App(props) {
               signer={userProviderAndSigner.signer}
             ></Withdraw>
           </Route>
+          <Route exact path="/erc20-deploy">
+            <ERC20Deploy writeContracts={writeContracts} tx={tx}></ERC20Deploy>
+          </Route>
           <Route exact path="/erc20-deposit">
-            <ERC20Deposit writeContracts={writeContracts} tx={tx} signer={userProviderAndSigner.signer}></ERC20Deposit>
+            <ERC20Deposit
+              address={address}
+              balance={yourLocalBalance}
+              mainnetProvider={mainnetProvider}
+              targetNetwork={targetNetwork}
+              signer={userProviderAndSigner.signer}
+              readContracts={readContracts}
+            ></ERC20Deposit>
           </Route>
           <Route exact path="/erc20-withdraw">
-            <ERC20Withdraw></ERC20Withdraw>
+            <ERC20Withdraw
+              address={address}
+              balance={yourLocalBalance}
+              price={price}
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              targetNetwork={targetNetwork}
+              signer={userProviderAndSigner.signer}
+              readContracts={readContracts}
+              contractConfig={contractConfig}
+            ></ERC20Withdraw>
           </Route>
-          <Route exact path="/contract">
+          <Route exact path="/debug">
             <Contract
               name="PGF"
               price={price}

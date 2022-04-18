@@ -20,5 +20,6 @@ export { default as Wallet } from "./Wallet";
 export { default as L2Bridge } from "./L2Bridge";
 export { default as Deposit } from "./Optimism/Deposit";
 export { default as Withdraw } from "./Optimism/Withdraw";
+export { default as ERC20Deploy } from "./Optimism/ERC20Deploy";
 export { default as ERC20Deposit } from "./Optimism/ERC20Deposit";
 export { default as ERC20Withdraw } from "./Optimism/ERC20Withdraw";
