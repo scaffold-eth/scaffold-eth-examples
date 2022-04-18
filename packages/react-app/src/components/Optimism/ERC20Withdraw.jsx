@@ -1,25 +1,20 @@
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { NETWORKS } from "../../constants";
-import { Address, Balance } from "..";
 import { Alert, Button, Card, Input, List } from "antd";
-import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
-import { CrossChainMessenger } from "@eth-optimism/sdk";
 import { useContractLoader } from "eth-hooks";
+import { invalidSignerForTargetNetwork } from "./utils";
+import { NETWORKS } from "../../constants";
 
-const targetL1 = NETWORKS.kovan;
-const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
-
-const targetL2 = NETWORKS.kovanOptimism;
-const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
-
-const invalidSignerForTargetNetwork = signer => {
-  return !signer || signer?.provider?._network?.chainId !== NETWORKS.kovanOptimism.chainId;
-};
-
-export default function ERC20Withdraw({ balance, address, userSigner, signer, contractConfig }) {
+export default function ERC20Withdraw({
+  balance,
+  address,
+  signer,
+  contractConfig,
+  crossChainMessenger,
+  l2Provider,
+  targetL2,
+}) {
   const readContracts = useContractLoader(l2Provider, contractConfig);
-  const [crossChainMessenger, setCrossChainMessenger] = useState();
   const [tokenBalance, setTokenBalance] = useState();
   useEffect(() => {
     const getTokenBalance = async () => {
@@ -29,23 +24,6 @@ export default function ERC20Withdraw({ balance, address, userSigner, signer, co
     };
     getTokenBalance();
   }, [balance, readContracts]);
-
-  useEffect(() => {
-    if (invalidSignerForTargetNetwork(signer)) {
-      return;
-    }
-
-    try {
-      const crossChainMessenger = new CrossChainMessenger({
-        l1SignerOrProvider: l1Provider,
-        l2SignerOrProvider: signer,
-        l1ChainId: targetL1.chainId,
-      });
-      setCrossChainMessenger(crossChainMessenger);
-    } catch (e) {
-      console.log("error", e);
-    }
-  }, [userSigner]);
 
   const [withdrawAmount, setWithdrawAmount] = useState();
   const withdrawToken = async () => {
@@ -59,7 +37,7 @@ export default function ERC20Withdraw({ balance, address, userSigner, signer, co
   };
 
   let alert = "";
-  if (invalidSignerForTargetNetwork(signer)) {
+  if (invalidSignerForTargetNetwork(signer, NETWORKS.kovanOptimism)) {
     alert = (
       <Alert
         style={{ marginTop: "20px" }}
@@ -81,7 +59,7 @@ export default function ERC20Withdraw({ balance, address, userSigner, signer, co
     >
       {alert}
       <Card title={`From ${targetL2.name}`} style={{ width: 300 }}>
-        <div>Current Balance: {ethers.utils.formatEther(tokenBalance ?? 0)}</div>
+        <div>{`Current Balance on ${targetL2.name}: ${ethers.utils.formatEther(tokenBalance ?? 0)}`}</div>
         <Input
           style={{ width: "100px" }}
           placeholder="0.0"

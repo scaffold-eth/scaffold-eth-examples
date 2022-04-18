@@ -6,108 +6,29 @@ import { Alert, Button, Card, Input, List } from "antd";
 import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import { useBalance, useOnBlock } from "eth-hooks";
+import { invalidSignerForTargetNetwork } from "./utils";
 
-const targetL1 = NETWORKS.kovan;
-const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
-
-const targetL2 = NETWORKS.kovanOptimism;
-const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
-
-const invalidSignerForTargetNetwork = signer => {
-  return !signer || signer?.provider?._network?.chainId !== NETWORKS.kovan.chainId;
-};
-
-const getWithdrawTxs = async (crossChainMessenger, address) => {
-  if (!crossChainMessenger) {
-    return [];
-  }
-  return await crossChainMessenger.getWithdrawalsByAddress(address);
-};
-
-const getDepositTxs = async (crossChainMessenger, address) => {
-  if (!crossChainMessenger) {
-    return [];
-  }
-
-  return await crossChainMessenger.getDepositsByAddress(address);
-};
-
-export default function Deposit({ address, balance, mainnetProvider, localProvider, targetNetwork, signer }) {
+export default function Deposit({
+  address,
+  mainnetProvider,
+  localProvider,
+  targetNetwork,
+  signer,
+  crossChainMessenger,
+  deposits,
+  withdrawTxs,
+  targetL1,
+  targetL2,
+  l1Provider,
+  l2Provider,
+}) {
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
   const l2Balance = useBalance(l2Provider, address);
 
-  const [crossChainMessenger, setCrossChainMessenger] = useState();
-  useEffect(() => {
-    if (invalidSignerForTargetNetwork(signer)) {
-      return;
-    }
-
-    try {
-      const crossChainMessenger = new CrossChainMessenger({
-        l1SignerOrProvider: signer,
-        l2SignerOrProvider: l2Provider.getSigner(),
-        l1ChainId: targetL1.chainId,
-      });
-      setCrossChainMessenger(crossChainMessenger);
-    } catch (e) {
-      console.log("error", e);
-    }
-  }, [signer]);
-
-  const [deposits, setDeposits] = useState([]);
-  useEffect(() => {
-    if (!crossChainMessenger || !address) {
-      return;
-    }
-    let isSubscribed = false;
-    const getDeposits = async () => {
-      isSubscribed = true;
-      const deposits = await getDepositTxs(crossChainMessenger, address);
-      console.log("Deposits", deposits);
-
-      if (isSubscribed) {
-        setDeposits(deposits);
-      }
-    };
-
-    getDeposits();
-
-    return () => (isSubscribed = false);
-  }, [crossChainMessenger, balance]);
-
-  useOnBlock(l1Provider, () => {
-    const getWithdraws = async () => {
-      const wd = await getWithdrawTxs(crossChainMessenger, address);
-      setWithdrawTxs(wd);
-    };
-
-    const getDeposits = async () => {
-      const deposits = await getDepositTxs(crossChainMessenger, address);
-      setDeposits(deposits);
-    };
-
-    getWithdraws();
-    getDeposits();
-  });
-
-  const [withdrawTxs, setWithdrawTxs] = useState([]);
-  useEffect(() => {
-    let isSubscribed = false;
-    const getWithdraws = async () => {
-      isSubscribed = true;
-      const wd = await getWithdrawTxs(crossChainMessenger, address);
-      if (isSubscribed) {
-        setWithdrawTxs(wd);
-      }
-    };
-
-    getWithdraws();
-
-    return () => (isSubscribed = false);
-  }, [crossChainMessenger, address]);
-
   const [withdrawMessages, setwithdrawMessages] = useState([]);
   useEffect(() => {
+    if (invalidSignerForTargetNetwork(signer, NETWORKS.kovan)) return;
+
     const getMessages = async () => {
       const withdrawMessages = [];
       for (const wd of withdrawTxs) {
@@ -146,7 +67,7 @@ export default function Deposit({ address, balance, mainnetProvider, localProvid
   };
 
   let alert = "";
-  if (invalidSignerForTargetNetwork(signer)) {
+  if (invalidSignerForTargetNetwork(signer, NETWORKS.kovan)) {
     alert = (
       <Alert style={{ marginTop: "20px" }} message="Switch provider network to Kovan to deposit to L2" type="error" />
     );
