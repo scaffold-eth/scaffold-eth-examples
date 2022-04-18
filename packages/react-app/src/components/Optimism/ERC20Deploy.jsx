@@ -42,25 +42,31 @@ export default function ERC20Deploy({ writeContracts, tx }) {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "15px",
-          width: "500px",
-        }}
-      >
-        <Input
-          placeholder="L1 Token Address"
-          value={l1TokenAddress}
-          onChange={e => setL1TokenAddress(e.target.value)}
-        />
-        <Button type="primary" onClick={deployToL2}>
-          Deploy to L2
-        </Button>
-        {l2DeployView}
+    <div style={{ margin: 15 }}>
+      <p style={{ margin: "auto", wordBreak: "break-word", maxWidth: "75vw" }}>
+        Deploy an ERC20 onto Optimism with the corresponding L1 address. This uses the Optimism StandardTokenFactory
+        contract, and deploys a new instance of the L2StandardERC20 contract.
+      </p>
+      <div style={{ margin: 15, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "15px",
+            width: "500px",
+          }}
+        >
+          <Input
+            placeholder="L1 Token Address"
+            value={l1TokenAddress}
+            onChange={e => setL1TokenAddress(e.target.value)}
+          />
+          <Button type="primary" onClick={deployToL2}>
+            Deploy to L2
+          </Button>
+          {l2DeployView}
+        </div>
       </div>
     </div>
   );
