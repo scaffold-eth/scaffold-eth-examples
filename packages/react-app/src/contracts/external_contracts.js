@@ -783,6 +783,50 @@ const DAIABI = [
     type: "function",
   },
 ];
+const TOKENFACTORYABI = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "_l1Token",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "_l2Token",
+        type: "address",
+      },
+    ],
+    name: "StandardL2TokenCreated",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_l1Token",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "_name",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_symbol",
+        type: "string",
+      },
+    ],
+    name: "createStandardL2Token",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
 
 // Mainnet DAI, Optimism and Arbitrium Rollup Contracts with local addresses
 module.exports = {
@@ -794,6 +838,18 @@ module.exports = {
       },
       UNI: {
         address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        abi: ERC20ABI,
+      },
+    },
+  },
+  69: {
+    contracts: {
+      L2TokenFactory: {
+        address: "0x4200000000000000000000000000000000000012",
+        abi: TOKENFACTORYABI,
+      },
+      L2Token: {
+        address: "0xDb9888b842408B0b8eFa1f5477bD9F351754999E",
         abi: ERC20ABI,
       },
     },

@@ -18,7 +18,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   // Getting a previously deployed contract
   const YourToken = await ethers.getContract("PGF", deployer);
-  await YourToken.transfer("YOUR ADDRESS", ethers.utils.parseEther("100"));
+
   /*  await YourContract.setPurpose("Hello");
 
     To take ownership of yourContract using the ownable library uncomment next line and add the

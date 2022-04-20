@@ -3,7 +3,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { Alert, Button, Col, Menu, Row, List, Radio, Input, Card } from "antd";
 import "antd/dist/antd.css";
 import Authereum from "authereum";
-import { useBalance, useGasPrice, useOnBlock, useUserProviderAndSigner } from "eth-hooks";
+import { useBalance, useGasPrice, useOnBlock, useOnRepetition, useUserProviderAndSigner } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import Fortmatic from "fortmatic";
 import React, { useCallback, useEffect, useState } from "react";
@@ -12,15 +12,30 @@ import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import WalletLink from "walletlink";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch } from "./components";
+import {
+  Account,
+  Contract,
+  Deposit,
+  DepositTxs,
+  ERC20Deploy,
+  ERC20Deposit,
+  ERC20Withdraw,
+  Faucet,
+  GasGauge,
+  Header,
+  Ramp,
+  ThemeSwitch,
+  Withdraw,
+  WithdrawTxs,
+} from "./components";
 import { INFURA_ID, NETWORK, NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor } from "./helpers";
-import Deposit from "./components/Optimism/Deposit";
-import Withdraw from "./components/Optimism/Withdraw";
+import { useContractLoader } from "eth-hooks";
 const { ethers } = require("ethers");
+import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
 /*
     Welcome to 🏗 scaffold-eth !
 
@@ -42,6 +57,13 @@ const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
 const targetNetwork = NETWORKS.kovan; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+
+const targetL1 = NETWORKS.kovan;
+const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
+
+const targetL2 = NETWORKS.kovanOptimism;
+const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
+const l2TokenAddress = "0xDb9888b842408B0b8eFa1f5477bD9F351754999E";
 
 console.log("targetNetwork", targetNetwork);
 // 😬 Sorry for all the console logging
@@ -219,10 +241,10 @@ function App(props) {
   const contractConfig = { deployedContracts: deployedContracts || {}, externalContracts: externalContracts || {} };
 
   // Load in your local 📝 contract and read a value from it:
-  // const readContracts = useContractLoader(localProvider, contractConfig);
+  const readContracts = useContractLoader(localProvider, contractConfig);
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
-  // const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
+  const writeContracts = useContractLoader(userSigner, contractConfig, localChainId);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -403,6 +425,93 @@ function App(props) {
     );
   }
 
+  const getDepositTxs = async (crossChainMessenger, address) => {
+    if (!crossChainMessenger) {
+      return [];
+    }
+
+    return await crossChainMessenger.getDepositsByAddress(address);
+  };
+
+  const getWithdrawTxs = async (crossChainMessenger, address) => {
+    if (!crossChainMessenger) {
+      return [];
+    }
+
+    return await crossChainMessenger.getWithdrawalsByAddress(address);
+  };
+
+  const [crossChainMessenger, setCrossChainMessenger] = useState(null);
+  useEffect(() => {
+    const chainId = userSigner?.provider?.network?.chainId;
+    if (!chainId) return;
+    if (chainId === targetL1.chainId) {
+      setCrossChainMessenger(
+        new CrossChainMessenger({
+          l1SignerOrProvider: userSigner,
+          l2SignerOrProvider: l2Provider,
+          l1ChainId: targetL1.chainId,
+        }),
+      );
+    } else if (chainId === targetL2.chainId) {
+      setCrossChainMessenger(
+        new CrossChainMessenger({
+          l1SignerOrProvider: l1Provider,
+          l2SignerOrProvider: userSigner,
+          l1ChainId: targetL1.chainId,
+        }),
+      );
+    } else {
+      setCrossChainMessenger(null);
+    }
+  }, [userSigner]);
+
+  const [deposits, setDeposits] = useState([]);
+  useEffect(() => {
+    if (!crossChainMessenger || !address) {
+      return;
+    }
+    const getDeposits = async () => {
+      const deposits = await getDepositTxs(crossChainMessenger, address);
+      console.log("Deposits", deposits);
+
+      setDeposits(deposits);
+    };
+    getDeposits();
+  }, [crossChainMessenger, yourLocalBalance]);
+
+  const [withdrawTxs, setWithdrawTxs] = useState([]);
+  useEffect(() => getDepositsAndWithdraws(), [yourLocalBalance]);
+  useOnRepetition(() => getDepositsAndWithdraws(), {
+    pollTime: 45000,
+    provider: l1Provider,
+  });
+
+  const getDepositsAndWithdraws = async () => {
+    if (!crossChainMessenger) return;
+
+    const getWithdraws = async () => {
+      const wd = await getWithdrawTxs(crossChainMessenger, address);
+      console.log("withdraws", wd);
+      setWithdrawTxs(wd);
+    };
+
+    const getDeposits = async () => {
+      const deposits = await getDepositTxs(crossChainMessenger, address);
+      setDeposits(deposits);
+    };
+
+    getWithdraws();
+    getDeposits();
+  };
+
+  const [l1TokenAddress, setL1TokenAddress] = useState();
+  useEffect(() => {
+    if (readContracts?.PGF) {
+      setL1TokenAddress(readContracts.PGF.address);
+    }
+  }, [readContracts.PGF]);
+
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -430,32 +539,94 @@ function App(props) {
               Withdraw
             </Link>
           </Menu.Item>
+          <Menu.Item key="/erc20-deploy">
+            <Link
+              onClick={() => {
+                setRoute("/erc20-deploy");
+              }}
+              to="/erc20-deploy"
+            >
+              ERC20 Deploy
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/erc20-deposit">
+            <Link
+              onClick={() => {
+                setRoute("/erc20-deposit");
+              }}
+              to="/erc20-deposit"
+            >
+              ERC20 Deposit
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/erc20-withdraw">
+            <Link
+              onClick={() => {
+                setRoute("/erc20-withdraw");
+              }}
+              to="/erc20-withdraw"
+            >
+              ERC20 Withdraw
+            </Link>
+          </Menu.Item>
+          <Menu.Item key="/debug">
+            <Link
+              onClick={() => {
+                setRoute("/debug");
+              }}
+              to="/debug"
+            >
+              Debug
+            </Link>
+          </Menu.Item>
         </Menu>
 
         <Switch>
           <Route exact path="/">
             <Deposit
               address={address}
-              balance={yourLocalBalance}
-              price={price}
-              userSigner={userSigner}
               mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
               targetNetwork={targetNetwork}
-              signer={userProviderAndSigner.signer}
+              crossChainMessenger={crossChainMessenger}
+              l1Provider={l1Provider}
+              l2Provider={l2Provider}
             ></Deposit>
           </Route>
           <Route exact path="/withdraw">
             <Withdraw
               address={address}
-              price={price}
-              userSigner={userSigner}
               mainnetProvider={mainnetProvider}
               targetNetwork={targetNetwork}
-              signer={userProviderAndSigner.signer}
+              crossChainMessenger={crossChainMessenger}
+              l1Provider={l1Provider}
+              l2Provider={l2Provider}
             ></Withdraw>
           </Route>
-          <Route exact path="/contract">
+          <Route exact path="/erc20-deploy">
+            <ERC20Deploy writeContracts={writeContracts} tx={tx}></ERC20Deploy>
+          </Route>
+          <Route exact path="/erc20-deposit">
+            <ERC20Deposit
+              address={address}
+              balance={yourLocalBalance}
+              readContracts={readContracts}
+              crossChainMessenger={crossChainMessenger}
+              l1TokenAddress={l1TokenAddress}
+              l2TokenAddress={l2TokenAddress}
+            ></ERC20Deposit>
+          </Route>
+          <Route exact path="/erc20-withdraw">
+            <ERC20Withdraw
+              address={address}
+              balance={yourLocalBalance}
+              contractConfig={contractConfig}
+              crossChainMessenger={crossChainMessenger}
+              l2Provider={l2Provider}
+              l1TokenAddress={l1TokenAddress}
+              l2TokenAddress={l2TokenAddress}
+            ></ERC20Withdraw>
+          </Route>
+          <Route exact path="/debug">
             <Contract
               name="PGF"
               price={price}
@@ -469,7 +640,23 @@ function App(props) {
         </Switch>
       </BrowserRouter>
 
-      <ThemeSwitch />
+      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 20 }}>
+        <DepositTxs
+          price={price}
+          deposits={deposits}
+          mainnetProvider={mainnetProvider}
+          localProvider={localProvider}
+        ></DepositTxs>
+        <WithdrawTxs
+          price={price}
+          deposits={deposits}
+          mainnetProvider={mainnetProvider}
+          localProvider={localProvider}
+          withdrawTxs={withdrawTxs}
+          crossChainMessenger={crossChainMessenger}
+        ></WithdrawTxs>
+        <ThemeSwitch />
+      </div>
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>

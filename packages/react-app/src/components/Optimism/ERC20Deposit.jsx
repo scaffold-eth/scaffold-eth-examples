@@ -3,28 +3,47 @@ import { ethers } from "ethers";
 import { NETWORKS } from "../../constants";
 import { Address, Balance } from "..";
 import { Alert, Button, Card, Input, List } from "antd";
+import { CrossChainMessenger, MessageStatus } from "@eth-optimism/sdk";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import { useBalance, useOnBlock } from "eth-hooks";
 import { invalidSignerForTargetNetwork } from "./utils";
 
-export default function Deposit({
+export default function ERC20Deposit({
+  balance,
   address,
-  mainnetProvider,
-  targetNetwork,
+  readContracts,
   crossChainMessenger,
-  l1Provider,
-  l2Provider,
+  l1TokenAddress,
+  l2TokenAddress,
 }) {
-  const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
-  const l1Balance = useBalance(l1Provider, address);
-  const l2Balance = useBalance(l2Provider, address);
+  const [l1Balance, setL1Balance] = useState();
+  useEffect(() => {
+    const getTokenBalance = async () => {
+      if (!readContracts.PGF) return;
+      const balance = await readContracts.PGF?.balanceOf(address);
+      setL1Balance(balance);
+    };
+    getTokenBalance();
+  }, [balance, readContracts]);
 
   const [depositAmount, setDepositAmount] = useState();
-  const depositEth = async () => {
+  const depositToken = async () => {
     if (crossChainMessenger) {
-      const result = await crossChainMessenger.depositETH(ethers.utils.parseEther(depositAmount));
-      console.log("depositEth", result);
+      await approveERC20(l1TokenAddress, l2TokenAddress);
+      const result = await crossChainMessenger.depositERC20(
+        l1TokenAddress,
+        l2TokenAddress,
+        ethers.utils.parseEther(depositAmount),
+      );
+      console.log("deposit token", result);
       setDepositAmount("");
+    }
+  };
+
+  const approveERC20 = async (l1Token, l2Token) => {
+    if (crossChainMessenger) {
+      const result = await crossChainMessenger.approveERC20(l1Token, l2Token, ethers.utils.parseEther(depositAmount));
+      console.log("approveERC20", result);
     }
   };
 
@@ -47,22 +66,16 @@ export default function Deposit({
     >
       {alert}
       <Card title="From Kovan" style={{ width: 300, marginTop: "20px" }}>
-        Current Balance:
-        <Balance balance={l1Balance} price={price} />
+        <div>{`Current Balance on Kovan: ${ethers.utils.formatEther(l1Balance ?? 0)}`}</div>
         <Input
           style={{ width: "100px" }}
           placeholder="0.0"
           value={depositAmount}
           onChange={e => setDepositAmount(e.target.value)}
         />
-        <Button style={{ margin: 5 }} type="primary" onClick={depositEth} disabled={!depositAmount}>
-          Deposit
+        <Button style={{ margin: 5 }} type="primary" onClick={depositToken} disabled={!depositAmount}>
+          Approve and Deposit
         </Button>
-      </Card>
-      ↓
-      <Card title="To Optimistic Kovan" style={{ width: 300 }}>
-        Current Balance:
-        <Balance balance={l2Balance} price={price} />
       </Card>
     </div>
   );
