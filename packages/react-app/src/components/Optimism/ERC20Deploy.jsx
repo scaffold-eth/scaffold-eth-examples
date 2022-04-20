@@ -20,25 +20,30 @@ export default function ERC20Deploy({ writeContracts, tx }) {
   }
 
   const deployToL2 = async () => {
-    setDeployState("DEPLOYING");
-    console.log(writeContracts);
-    const result = await tx(writeContracts.L2TokenFactory.createStandardL2Token(l1TokenAddress, "GOLD", "GLD"));
-    console.log(result);
-    if (!result || result.code === 4001) {
+    try {
+      setDeployState("DEPLOYING");
+      console.log(writeContracts);
+      const result = await tx(writeContracts.L2TokenFactory.createStandardL2Token(l1TokenAddress, "GOLD", "GLD"));
+      console.log(result);
+      if (!result || result.code === 4001) {
+        setDeployState("NOT_STARTED");
+        return;
+      }
+
+      const receipt = await result.wait();
+      console.log(receipt);
+
+      const args = receipt.events.find(({ event }) => event === "StandardL2TokenCreated").args;
+
+      // Get the L2 token address from the emmited event and log
+      const address = args._l2Token;
+      setL2TokenAddress(address);
+      setDeployState("DEPLOYED");
+      console.log("L2StandardERC20 deployed to:", l2TokenAddress);
+    } catch (error) {
+      console.log(error);
       setDeployState("NOT_STARTED");
-      return;
     }
-
-    const receipt = await result.wait();
-    console.log(receipt);
-
-    const args = receipt.events.find(({ event }) => event === "StandardL2TokenCreated").args;
-
-    // Get the L2 token address from the emmited event and log
-    const address = args._l2Token;
-    setL2TokenAddress(address);
-    setDeployState("DEPLOYED");
-    console.log("L2StandardERC20 deployed to:", l2TokenAddress);
   };
 
   return (
