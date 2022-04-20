@@ -11,13 +11,10 @@ import { invalidSignerForTargetNetwork } from "./utils";
 export default function ERC20Deposit({
   balance,
   address,
-  targetNetwork,
-  mainnetProvider,
-  signer,
   readContracts,
   crossChainMessenger,
-  targetL1,
-  targetL2,
+  l1TokenAddress,
+  l2TokenAddress,
 }) {
   const [l1Balance, setL1Balance] = useState();
   useEffect(() => {
@@ -31,11 +28,13 @@ export default function ERC20Deposit({
 
   const [depositAmount, setDepositAmount] = useState();
   const depositToken = async () => {
-    const l1Token = "0xE47ed24f39d5B0A0C6CCf77B5637Bf1d88218D29";
-    const l2Token = "0xDb9888b842408B0b8eFa1f5477bD9F351754999E";
     if (crossChainMessenger) {
-      await approveERC20(l1Token, l2Token);
-      const result = await crossChainMessenger.depositERC20(l1Token, l2Token, ethers.utils.parseEther(depositAmount));
+      await approveERC20(l1TokenAddress, l2TokenAddress);
+      const result = await crossChainMessenger.depositERC20(
+        l1TokenAddress,
+        l2TokenAddress,
+        ethers.utils.parseEther(depositAmount),
+      );
       console.log("deposit token", result);
       setDepositAmount("");
     }
@@ -49,7 +48,7 @@ export default function ERC20Deposit({
   };
 
   let alert = "";
-  if (invalidSignerForTargetNetwork(signer, NETWORKS.kovan)) {
+  if (invalidSignerForTargetNetwork(crossChainMessenger, NETWORKS.kovan)) {
     alert = (
       <Alert style={{ marginTop: "20px" }} message="Switch provider network to Kovan to deposit to L2" type="error" />
     );
@@ -66,8 +65,8 @@ export default function ERC20Deposit({
       }}
     >
       {alert}
-      <Card title={`From ${targetL1.name}`} style={{ width: 300, marginTop: "20px" }}>
-        <div>{`Current Balance on ${targetL1.name}: ${ethers.utils.formatEther(l1Balance ?? 0)}`}</div>
+      <Card title="From Kovan" style={{ width: 300, marginTop: "20px" }}>
+        <div>{`Current Balance on Kovan: ${ethers.utils.formatEther(l1Balance ?? 0)}`}</div>
         <Input
           style={{ width: "100px" }}
           placeholder="0.0"

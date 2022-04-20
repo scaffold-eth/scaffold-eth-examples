@@ -16,6 +16,7 @@ import {
   Account,
   Contract,
   Deposit,
+  DepositTxs,
   ERC20Deploy,
   ERC20Deposit,
   ERC20Withdraw,
@@ -25,6 +26,7 @@ import {
   Ramp,
   ThemeSwitch,
   Withdraw,
+  WithdrawTxs,
 } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
@@ -61,6 +63,7 @@ const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
 
 const targetL2 = NETWORKS.kovanOptimism;
 const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
+const l2TokenAddress = "0xDb9888b842408B0b8eFa1f5477bD9F351754999E";
 
 console.log("targetNetwork", targetNetwork);
 // 😬 Sorry for all the console logging
@@ -422,42 +425,6 @@ function App(props) {
     );
   }
 
-  const [l1ToL2Messenger, setl1ToL2Messenger] = useState(null);
-  useEffect(() => {
-    const signer = userProviderAndSigner.signer;
-    if (!signer) return;
-
-    try {
-      const crossChainMessenger = new CrossChainMessenger({
-        l1SignerOrProvider: signer,
-        l2SignerOrProvider: l2Provider,
-        l1ChainId: targetL1.chainId,
-      });
-      console.log("l1 to l2 messenger", crossChainMessenger);
-      setl1ToL2Messenger(crossChainMessenger);
-    } catch (e) {
-      console.log("error", e);
-    }
-  }, [userProviderAndSigner.signer]);
-
-  const [l2ToL1Messenger, setL2toL1Messenger] = useState(null);
-  useEffect(() => {
-    const signer = userProviderAndSigner.signer;
-    if (!signer) return;
-
-    try {
-      const crossChainMessenger = new CrossChainMessenger({
-        l1SignerOrProvider: l1Provider,
-        l2SignerOrProvider: signer,
-        l1ChainId: targetL1.chainId,
-      });
-      console.log("l2 to l1 messenger", crossChainMessenger);
-      setL2toL1Messenger(crossChainMessenger);
-    } catch (e) {
-      console.log("error", e);
-    }
-  }, [userProviderAndSigner.signer]);
-
   const getDepositTxs = async (crossChainMessenger, address) => {
     if (!crossChainMessenger) {
       return [];
@@ -474,48 +441,76 @@ function App(props) {
     return await crossChainMessenger.getWithdrawalsByAddress(address);
   };
 
+  const [crossChainMessenger, setCrossChainMessenger] = useState(null);
+  useEffect(() => {
+    const chainId = userSigner?.provider?.network?.chainId;
+    if (!chainId) return;
+    if (chainId === targetL1.chainId) {
+      setCrossChainMessenger(
+        new CrossChainMessenger({
+          l1SignerOrProvider: userSigner,
+          l2SignerOrProvider: l2Provider,
+          l1ChainId: targetL1.chainId,
+        }),
+      );
+    } else if (chainId === targetL2.chainId) {
+      setCrossChainMessenger(
+        new CrossChainMessenger({
+          l1SignerOrProvider: l1Provider,
+          l2SignerOrProvider: userSigner,
+          l1ChainId: targetL1.chainId,
+        }),
+      );
+    } else {
+      setCrossChainMessenger(null);
+    }
+  }, [userSigner]);
+
   const [deposits, setDeposits] = useState([]);
   useEffect(() => {
-    if (!l1ToL2Messenger || !address) {
+    if (!crossChainMessenger || !address) {
       return;
     }
-    let isSubscribed = false;
     const getDeposits = async () => {
-      isSubscribed = true;
-      const deposits = await getDepositTxs(l1ToL2Messenger, address);
+      const deposits = await getDepositTxs(crossChainMessenger, address);
       console.log("Deposits", deposits);
 
-      if (isSubscribed) {
-        setDeposits(deposits);
-      }
+      setDeposits(deposits);
     };
-
     getDeposits();
-
-    return () => (isSubscribed = false);
-  }, [l1ToL2Messenger, yourLocalBalance]);
+  }, [crossChainMessenger, yourLocalBalance]);
 
   const [withdrawTxs, setWithdrawTxs] = useState([]);
   useEffect(() => getDepositsAndWithdraws(), [yourLocalBalance]);
   useOnRepetition(() => getDepositsAndWithdraws(), {
-    pollTime: 20000,
+    pollTime: 45000,
     provider: l1Provider,
   });
 
   const getDepositsAndWithdraws = async () => {
+    if (!crossChainMessenger) return;
+
     const getWithdraws = async () => {
-      const wd = await getWithdrawTxs(l1ToL2Messenger, address);
+      const wd = await getWithdrawTxs(crossChainMessenger, address);
+      console.log("withdraws", wd);
       setWithdrawTxs(wd);
     };
 
     const getDeposits = async () => {
-      const deposits = await getDepositTxs(l1ToL2Messenger, address);
+      const deposits = await getDepositTxs(crossChainMessenger, address);
       setDeposits(deposits);
     };
 
     getWithdraws();
     getDeposits();
   };
+
+  const [l1TokenAddress, setL1TokenAddress] = useState();
+  useEffect(() => {
+    if (readContracts?.PGF) {
+      setL1TokenAddress(readContracts.PGF.address);
+    }
+  }, [readContracts.PGF]);
 
   return (
     <div className="App">
@@ -591,14 +586,8 @@ function App(props) {
             <Deposit
               address={address}
               mainnetProvider={mainnetProvider}
-              localProvider={localProvider}
               targetNetwork={targetNetwork}
-              signer={userProviderAndSigner.signer}
-              crossChainMessenger={l1ToL2Messenger}
-              deposits={deposits}
-              withdrawTxs={withdrawTxs}
-              targetL1={targetL1}
-              targetL2={targetL2}
+              crossChainMessenger={crossChainMessenger}
               l1Provider={l1Provider}
               l2Provider={l2Provider}
             ></Deposit>
@@ -606,12 +595,11 @@ function App(props) {
           <Route exact path="/withdraw">
             <Withdraw
               address={address}
-              price={price}
-              userSigner={userSigner}
               mainnetProvider={mainnetProvider}
               targetNetwork={targetNetwork}
-              signer={userProviderAndSigner.signer}
-              crossChainMessenger={l2ToL1Messenger}
+              crossChainMessenger={crossChainMessenger}
+              l1Provider={l1Provider}
+              l2Provider={l2Provider}
             ></Withdraw>
           </Route>
           <Route exact path="/erc20-deploy">
@@ -621,28 +609,21 @@ function App(props) {
             <ERC20Deposit
               address={address}
               balance={yourLocalBalance}
-              mainnetProvider={mainnetProvider}
-              targetNetwork={targetNetwork}
-              signer={userProviderAndSigner.signer}
               readContracts={readContracts}
-              crossChainMessenger={l1ToL2Messenger}
-              targetL1={targetL1}
-              targetL2={targetL2}
+              crossChainMessenger={crossChainMessenger}
+              l1TokenAddress={l1TokenAddress}
+              l2TokenAddress={l2TokenAddress}
             ></ERC20Deposit>
           </Route>
           <Route exact path="/erc20-withdraw">
             <ERC20Withdraw
               address={address}
               balance={yourLocalBalance}
-              price={price}
-              mainnetProvider={mainnetProvider}
-              targetNetwork={targetNetwork}
-              signer={userProviderAndSigner.signer}
-              readContracts={readContracts}
               contractConfig={contractConfig}
-              crossChainMessenger={l2ToL1Messenger}
+              crossChainMessenger={crossChainMessenger}
               l2Provider={l2Provider}
-              targetL2={targetL2}
+              l1TokenAddress={l1TokenAddress}
+              l2TokenAddress={l2TokenAddress}
             ></ERC20Withdraw>
           </Route>
           <Route exact path="/debug">
@@ -659,7 +640,23 @@ function App(props) {
         </Switch>
       </BrowserRouter>
 
-      <ThemeSwitch />
+      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 20 }}>
+        <DepositTxs
+          price={price}
+          deposits={deposits}
+          mainnetProvider={mainnetProvider}
+          localProvider={localProvider}
+        ></DepositTxs>
+        <WithdrawTxs
+          price={price}
+          deposits={deposits}
+          mainnetProvider={mainnetProvider}
+          localProvider={localProvider}
+          withdrawTxs={withdrawTxs}
+          crossChainMessenger={crossChainMessenger}
+        ></WithdrawTxs>
+        <ThemeSwitch />
+      </div>
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>

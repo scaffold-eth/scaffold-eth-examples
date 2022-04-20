@@ -5,18 +5,16 @@ import { Address, Balance } from "..";
 import { Alert, Button, Card, Input, List } from "antd";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import { useBalance } from "eth-hooks";
+import { invalidSignerForTargetNetwork } from "./utils";
 
-const targetL1 = NETWORKS.kovan;
-const l1Provider = new ethers.providers.JsonRpcProvider(targetL1.rpcUrl);
-
-const targetL2 = NETWORKS.kovanOptimism;
-const l2Provider = new ethers.providers.StaticJsonRpcProvider(targetL2.rpcUrl);
-
-const invalidSignerForTargetNetwork = signer => {
-  return !signer || signer?.provider?._network?.chainId !== NETWORKS.kovanOptimism.chainId;
-};
-
-export default function Withdraw({ address, mainnetProvider, targetNetwork, signer, crossChainMessenger }) {
+export default function Withdraw({
+  address,
+  mainnetProvider,
+  targetNetwork,
+  crossChainMessenger,
+  l1Provider,
+  l2Provider,
+}) {
   const price = useExchangeEthPrice(targetNetwork, mainnetProvider);
   const l1Balance = useBalance(l1Provider, address);
   const l2Balance = useBalance(l2Provider, address);
@@ -31,7 +29,7 @@ export default function Withdraw({ address, mainnetProvider, targetNetwork, sign
   };
 
   let alert = "";
-  if (invalidSignerForTargetNetwork(signer)) {
+  if (invalidSignerForTargetNetwork(crossChainMessenger, NETWORKS.kovanOptimism)) {
     alert = (
       <Alert
         style={{ marginTop: "20px" }}
@@ -52,12 +50,12 @@ export default function Withdraw({ address, mainnetProvider, targetNetwork, sign
       }}
     >
       {alert}
-      <Card title={`To ${targetL1.name}`} style={{ width: 300, marginTop: "20px" }}>
+      <Card title="To Kovan" style={{ width: 300, marginTop: "20px" }}>
         Current Balance:
         <Balance balance={l1Balance} price={price} />
       </Card>
       ↑
-      <Card title={`From ${targetL2.name}`} style={{ width: 300 }}>
+      <Card title="From Optimistic Kovan" style={{ width: 300 }}>
         Current Balance:
         <Balance balance={l2Balance} price={price} />
         <Input
