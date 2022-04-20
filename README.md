@@ -1,22 +1,23 @@
 # 🏗 Scaffold-ETH - 🗳 Conviction Cloud
 
-This is the second iteration of a simple conviction voting system.
+This is the third iteration of a simple conviction voting system.
 
 The way conviction voting work is conceptually simple:
 
-* User approves and locks an ERC20 on behalf of some string (this is effectively the vote)
-* The longer the token is locked the more voting weight the string has.
+- User approves and locks an ERC20 on behalf of some string (this is effectively the vote)
+- The longer the token is locked the more voting weight the string has.
 
-In this example, a live convition cloud forms with the real-time votes. 
+In this example, a live convition cloud forms with the real-time votes.
 
-Users can withdraw their tokens at any time. 
+Users can withdraw their tokens at any time.
 
 The first iteration displayed a word-cloud with all the votes on it.
-This second iteration moves the conviction scora calculation on-chain, adds an exponential decay function used when users withdraw their votes[1], and adds a chart showing the forecasted conviction scores 10 days in the future:
+The second iteration moved the conviction score calculation on-chain, added an exponential decay function used when users withdraw their votes[1], and added a chart showing the forecasted conviction scores 10 days in the future.
+This third iteration mixes Quadratic Voting with Conviction Voting. You can read about the math behind this idea [here](https://danielesalatti.com/blog/conviction-voting/).
 
 ![Conviction Chart](https://user-images.githubusercontent.com/98137565/162845415-6936c3b7-ee37-4c9b-83fb-70030930b1ce.png)
 
-You can click "Go to tomorrow!" to move the clock of your *local* hardhat chain 24h in the future - this will allow you to simulate people
+You can click "Go to tomorrow!" to move the clock of your _local_ hardhat chain 24h in the future - this will allow you to simulate people
 voring and removing their votes over time.
 
 [1] Well, sort of: exponential decay is hard in Solidity, so for now I used a simple half-life calculation to approximate the exponential decay.
@@ -47,7 +48,7 @@ yarn start
 ```
 
 4. edit the file `packages/hardhat/deploy/00_deploy_your_token.js` by replacing the two ethereum addresses with your own.
-These will receive 10 GTC test tokens each
+   These will receive 10 GTC test tokens each
 
 5. in a third terminal window, 🛰 deploy your contracts:
 
@@ -73,7 +74,7 @@ You will now see your vote appear in a cloud...but it will not look like a cloud
 
 You can also switch account in Metamask (as long as the account has received some tokens when you deployed) and see the cloud change in real time when you cast votes from a separate window.
 
-You can click "Go to tomorrow!" to move the clock of your *local* hardhat chain 24h in the future - this will allow you to simulate people
+You can click "Go to tomorrow!" to move the clock of your _local_ hardhat chain 24h in the future - this will allow you to simulate people
 voring and removing their votes over time. Remember to restart your local chain between deployments to go back to today.
 
 Eventually you will see something like this:
@@ -83,7 +84,6 @@ Eventually you will see something like this:
 And the chart might look something like this:
 
 ![Conviction Chart](https://user-images.githubusercontent.com/98137565/162845415-6936c3b7-ee37-4c9b-83fb-70030930b1ce.png)
-
 
 # 📚 Documentation
 
@@ -110,20 +110,18 @@ Documentation, tutorials, challenges, and many more resources, visit: [docs.scaf
 
 Check out all the [active branches](https://github.com/scaffold-eth/scaffold-eth/branches/active), [open issues](https://github.com/scaffold-eth/scaffold-eth/issues), and join/fund the 🏰 [BuidlGuidl](https://BuidlGuidl.com)!
 
-  
- - 🚤  [Follow the full Ethereum Speed Run](https://medium.com/@austin_48503/%EF%B8%8Fethereum-dev-speed-run-bd72bcba6a4c)
+- 🚤 [Follow the full Ethereum Speed Run](https://medium.com/@austin_48503/%EF%B8%8Fethereum-dev-speed-run-bd72bcba6a4c)
 
-
- - 🎟  [Create your first NFT](https://github.com/scaffold-eth/scaffold-eth/tree/simple-nft-example)
- - 🥩  [Build a staking smart contract](https://github.com/scaffold-eth/scaffold-eth/tree/challenge-1-decentralized-staking)
- - 🏵  [Deploy a token and vendor](https://github.com/scaffold-eth/scaffold-eth/tree/challenge-2-token-vendor)
- - 🎫  [Extend the NFT example to make a "buyer mints" marketplace](https://github.com/scaffold-eth/scaffold-eth/tree/buyer-mints-nft)
- - 🎲  [Learn about commit/reveal](https://github.com/scaffold-eth/scaffold-eth/tree/commit-reveal-with-frontend)
- - ✍️  [Learn how ecrecover works](https://github.com/scaffold-eth/scaffold-eth/tree/signature-recover)
- - 👩‍👩‍👧‍👧  [Build a multi-sig that uses off-chain signatures](https://github.com/scaffold-eth/scaffold-eth/tree/meta-multi-sig)
- - ⏳  [Extend the multi-sig to stream ETH](https://github.com/scaffold-eth/scaffold-eth/tree/streaming-meta-multi-sig)
- - ⚖️  [Learn how a simple DEX works](https://medium.com/@austin_48503/%EF%B8%8F-minimum-viable-exchange-d84f30bd0c90)
- - 🦍  [Ape into learning!](https://github.com/scaffold-eth/scaffold-eth/tree/aave-ape)
+- 🎟 [Create your first NFT](https://github.com/scaffold-eth/scaffold-eth/tree/simple-nft-example)
+- 🥩 [Build a staking smart contract](https://github.com/scaffold-eth/scaffold-eth/tree/challenge-1-decentralized-staking)
+- 🏵 [Deploy a token and vendor](https://github.com/scaffold-eth/scaffold-eth/tree/challenge-2-token-vendor)
+- 🎫 [Extend the NFT example to make a "buyer mints" marketplace](https://github.com/scaffold-eth/scaffold-eth/tree/buyer-mints-nft)
+- 🎲 [Learn about commit/reveal](https://github.com/scaffold-eth/scaffold-eth/tree/commit-reveal-with-frontend)
+- ✍️ [Learn how ecrecover works](https://github.com/scaffold-eth/scaffold-eth/tree/signature-recover)
+- 👩‍👩‍👧‍👧 [Build a multi-sig that uses off-chain signatures](https://github.com/scaffold-eth/scaffold-eth/tree/meta-multi-sig)
+- ⏳ [Extend the multi-sig to stream ETH](https://github.com/scaffold-eth/scaffold-eth/tree/streaming-meta-multi-sig)
+- ⚖️ [Learn how a simple DEX works](https://medium.com/@austin_48503/%EF%B8%8F-minimum-viable-exchange-d84f30bd0c90)
+- 🦍 [Ape into learning!](https://github.com/scaffold-eth/scaffold-eth/tree/aave-ape)
 
 # 💌 P.S.
 
@@ -132,6 +130,7 @@ Check out all the [active branches](https://github.com/scaffold-eth/scaffold-eth
 📣 Make sure you update the `InfuraID` before you go to production. Huge thanks to [Infura](https://infura.io/) for our special account that fields 7m req/day!
 
 # 🏃💨 Speedrun Ethereum
+
 Register as a builder [here](https://speedrunethereum.com) and start on some of the challenges and build a portfolio.
 
 # 💬 Support Chat
