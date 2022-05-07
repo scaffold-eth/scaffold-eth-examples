@@ -16,13 +16,13 @@ Prerequisites:
 > clone/fork 🏗 scaffold-eth:
 
 ```bash
-git clone -b round-table https://github.com/scaffold-eth/scaffold-eth-examples.git
+git clone -b round-table https://github.com/scaffold-eth/scaffold-eth-examples.git round-table
 ```
 
 > Deploy cloud functions to firebase:
 
 ```bash
-cd scaffold-eth/packages/firebase
+cd round-table/packages/firebase
 firebase use # select your firebase project
 firebase deploy --only functions # deploy your functions
 ```
@@ -32,10 +32,9 @@ firebase deploy --only functions # deploy your functions
 > Start your 📱 frontend:
 
 ```bash
-cd scaffold-eth
+cd round-table
 yarn start
 ```
-
 
 📝 Edit your frontend `App.jsx` in `packages/react-app/src`
 
