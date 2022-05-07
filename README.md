@@ -16,7 +16,7 @@ Prerequisites:
 > clone/fork 🏗 scaffold-eth:
 
 ```bash
-git clone -b round-table https://github.com/scaffold-eth/scaffold-eth.git
+git clone -b round-table https://github.com/scaffold-eth/scaffold-eth-examples.git
 ```
 
 > Deploy cloud functions to firebase:
