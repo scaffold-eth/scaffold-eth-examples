@@ -125,10 +125,9 @@ exports.addNewProposal = functions.https.onCall((data) => {
   const schema = yup.object().shape({
     board: yup.string().min("5"),
     proposal: yup.string().min("5"),
-    createdAt: yup
-      .number()
-      .min(Date.now() - 2 * 60 * 1000)
-      .max(Date.now()), // within the past 2 minutes
+    createdAt: yup.number(),
+    // .min(Date.now() - 2 * 60 * 1000)
+    // .max(Date.now() * 2), // within the past 2 minutes
   });
 
   schema.validateSync(value);
