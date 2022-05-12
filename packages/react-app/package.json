@@ -46,6 +46,7 @@
     "isomorphic-fetch": "^3.0.0",
     "node-watch": "^0.7.1",
     "postcss": "^8.2.6",
+    "qrReact": "npm:qrcode.react@latest",
     "qrcode.react": "^1.0.0",
     "randomstring": "^1.2.2",
     "react": "^17.0.2",

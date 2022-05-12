@@ -29,7 +29,7 @@ import externalContracts from "./contracts/external_contracts";
 // contracts
 import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
-import { Home, Admin } from "./views";
+import { Home, Admin, Admission } from "./views";
 import { useStaticJsonRPC, useTypedSigner } from "./hooks";
 
 const { ethers } = require("ethers");
@@ -156,8 +156,8 @@ function App(props) {
   const typedSigner = useTypedSigner(userSigner, {
     name: "Some Event Ticket",
     version: "0.0.1",
-    chainId: targetNetwork?.chainId,
-    verifyingContract: readContracts?.YourContract?.address,
+    chainId: 1,
+    verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
   });
 
   const loadWeb3Modal = useCallback(async () => {
@@ -204,7 +204,10 @@ function App(props) {
       />
       <Menu style={{ textAlign: "center", marginTop: 40 }} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
-          <Link to="/">App Home</Link>
+          <Link to="/">Ticketing Home</Link>
+        </Menu.Item>
+        <Menu.Item key="/admission">
+          <Link to="/admission">Admission</Link>
         </Menu.Item>
         <Menu.Item key="/admin">
           <Link to="/admin">Admin</Link>
@@ -216,7 +219,6 @@ function App(props) {
 
       <Switch>
         <Route exact path="/">
-          {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
           <Home
             tx={tx}
             address={address}
@@ -226,8 +228,17 @@ function App(props) {
             writeContracts={writeContracts}
           />
         </Route>
+        <Route exact path="/admission">
+          <Admission
+            tx={tx}
+            address={address}
+            localProvider={localProvider}
+            typedSigner={typedSigner}
+            readContracts={readContracts}
+            writeContracts={writeContracts}
+          />
+        </Route>
         <Route exact path="/admin">
-          {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
           <Admin
             tx={tx}
             address={address}
