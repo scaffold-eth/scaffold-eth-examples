@@ -534,6 +534,7 @@ function App(props) {
               tx={tx}
               writeContracts={writeContracts}
               readContracts={readContracts}
+              injectedProvider={injectedProvider}
               purpose={purpose}
             />
           </Route>
