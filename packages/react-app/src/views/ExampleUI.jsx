@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Address, Balance, Events } from "../components";
 import CyberConnectFollowButton from "../components/CyberConnectFollowBtn";
 
-import { getIdentity, getConnections, getFollowStatus } from "../queries/cyberconnect";
+import { getIdentity, getFollowStatus } from "../queries/cyberconnect";
 
 export default function ExampleUI({
   purpose,
@@ -22,13 +22,13 @@ export default function ExampleUI({
   const [newPurpose, setNewPurpose] = useState("loading...");
   const demoAddr = "cyberlab.eth";
   const [identityInput, setIdentityInput] = useState(demoAddr);
-  const [connectionsInput, setConnectionsInput] = useState(demoAddr);
+
   const [followInput, setFollowInput] = useState(demoAddr);
   const [followAddr, setFollowAddr] = useState("");
 
   const [identity, setIdentity] = useState(null);
   const [searchedIdentity, setSearchedIdentity] = useState(null);
-  const [searchedConnections, setSearchedConnections] = useState(null);
+
   const [isFollowing, setIsFollowing] = useState(null);
 
   const fetchIdentity = async () => {
@@ -49,15 +49,6 @@ export default function ExampleUI({
     const res = await getIdentity({ address: identityInput });
     if (res) {
       setSearchedIdentity(res);
-    }
-  };
-
-  const searchConnectionsHandler = async () => {
-    if (!connectionsInput) return;
-
-    const res = await getConnections({ address: connectionsInput });
-    if (res) {
-      setSearchedConnections(res);
     }
   };
 
@@ -84,7 +75,7 @@ export default function ExampleUI({
           <h2>CyberConnect Example UI:</h2>
           <Divider />
           <div style={{ textAlign: "left", marginLeft: "10px" }}>
-            <h3>Your profile (identity):</h3>
+            <h3>Your Profile Identity:</h3>
             {identity && (
               <div>
                 <Row>
@@ -113,7 +104,7 @@ export default function ExampleUI({
         </div>
         <Divider />
         <div style={{ textAlign: "left", marginLeft: "10px" }}>
-          <h3>Search a profile:</h3>
+          <h3>Search a Profile Identity:</h3>
           <Input
             placeholder="Enter the address/ens you want to search.."
             onChange={e => setIdentityInput(e.target.value)}
@@ -144,27 +135,11 @@ export default function ExampleUI({
                 <Col span={6}>Following:</Col>
                 <Col span={18}>{searchedIdentity.followingCount}</Col>
               </Row>
-            </div>
-          )}
-        </div>
-        <Divider />
-        <div style={{ textAlign: "left", marginLeft: "10px" }}>
-          <h3>Search profile connections:</h3>
-          <Input
-            placeholder="Enter the address/ens you want to search.."
-            onChange={e => setConnectionsInput(e.target.value)}
-            value={connectionsInput}
-          />
-          <Button style={{ margin: "8px 0px" }} onClick={searchConnectionsHandler}>
-            Submit
-          </Button>
-          {searchedConnections && (
-            <div>
               <Row span={18} justify={"center"}>
-                <div style={{ paddingRight: "20px" }}>
+                <div style={{ padding: "20px" }}>
                   <h4>Followers</h4>
-                  {searchedConnections &&
-                    searchedConnections.followers?.list.map(user => {
+                  {searchedIdentity &&
+                    searchedIdentity.followers?.list.map(user => {
                       return (
                         <div key={user.address}>
                           <div>{user.domain || formatAddress(user.address)}</div>
@@ -172,10 +147,10 @@ export default function ExampleUI({
                       );
                     })}
                 </div>
-                <div style={{ paddingLeft: "20px" }}>
+                <div style={{ padding: "20px" }}>
                   <h4>Followings</h4>
-                  {searchedConnections &&
-                    searchedConnections.followings?.list.map(user => {
+                  {searchedIdentity &&
+                    searchedIdentity.followings?.list.map(user => {
                       return (
                         <div key={user.address}>
                           <div>{user.domain || formatAddress(user.address)}</div>
@@ -189,7 +164,7 @@ export default function ExampleUI({
         </div>
         <Divider />
         <div style={{ textAlign: "left", marginLeft: "10px" }}>
-          <h3>Follow/Unfollow a profile:</h3>
+          <h3>Follow/Unfollow a Profile:</h3>
           <Input
             placeholder="Enter the address/ens you want to follow/unfollow.."
             onChange={e => setFollowInput(e.target.value)}
@@ -207,14 +182,13 @@ export default function ExampleUI({
                 onSuccess={() => {
                   fetchIdentity();
                   searchIdentityHandler();
-                  searchConnectionsHandler();
+
                   searchFollowHandler();
                 }}
               />
             )}
           </div>
         </div>
-        <Divider />
         <Divider />
         <h2>Scaffold-eth Example UI:</h2>
         <h4>purpose: {purpose}</h4>

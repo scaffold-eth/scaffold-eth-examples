@@ -1,6 +1,7 @@
 # 🏗 Scaffold-ETH CyberConnect Starter Kit
 
 > everything you need to build with [CyberConnect](https://cyberconnect.me/) on Etherum! 🚀
+
 > 🧪 Quickly experiment with **CyberConnect API** using a frontend that adapts to your decentrialized identity:
 
 <!-- ![image](/packages/react-app/public/scaffold-eth-cyberconnect-starter-kit.png) -->

@@ -8,7 +8,7 @@ const client = new GraphQLClient(CYBERCONNECT_ENDPOINT);
 
 // You can add/remove fields in query
 export const GET_IDENTITY = gql`
-  query ($address: String!) {
+  query ($address: String!, $first: Int) {
     identity(address: $address) {
       address
       domain
@@ -18,13 +18,6 @@ export const GET_IDENTITY = gql`
       twitter {
         handle
       }
-    }
-  }
-`;
-
-export const GET_FOLLOWLIST = gql`
-  query ($address: String!, $first: Int) {
-    identity(address: $address) {
       followings(first: $first) {
         list {
           address
@@ -57,35 +50,8 @@ export async function getIdentity({ address }) {
 
   const res = await client.request(GET_IDENTITY, {
     address: address,
-  });
-
-  console.log("getIdentity: ----------", res);
-
-  if (res && res.identity) {
-    console.log("🧬🧬-CyberConnect-identity-start-🧬🧬");
-    console.log(res.identity);
-    console.log("🧬🧬-CyberConnect-identity---end-🧬🧬");
-  }
-
-  return res?.identity;
-}
-
-// Get Address Profile Connections
-export async function getConnections({ address }) {
-  if (!address) return;
-
-  const res = await client.request(GET_FOLLOWLIST, {
-    address: address,
     first: 5,
   });
-
-  console.log("GetConnections: ----------", res);
-
-  if (res && res.identity) {
-    console.log("🧬🧬-CyberConnect-connections-start-🧬🧬");
-    console.log(res.identity);
-    console.log("🧬🧬-CyberConnect-connections---end-🧬🧬");
-  }
 
   return res?.identity;
 }
@@ -99,14 +65,6 @@ export async function getFollowStatus({ fromAddr, toAddr }) {
     fromAddr: fromAddr,
     toAddrList: [toAddr],
   });
-
-  console.log("getFollowStatus:-----------", res);
-
-  if (res && res.connections[0]) {
-    console.log("🧬🧬-CyberConnect-status-start-🧬🧬");
-    console.log(res.connections[0]?.followStatus?.isFollowing);
-    console.log("🧬🧬-CyberConnect-status---end-🧬🧬");
-  }
 
   return res?.connections[0]?.followStatus?.isFollowing;
 }
