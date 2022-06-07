@@ -7,7 +7,7 @@ require("@nomiclabs/hardhat-waffle");
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 
 /*
-      📡 This is where you configure your deploy configuration for 🏗 scaffold-eth
+      📡 This is where you  configure your deploy configuration for 🏗 scaffold-eth
 
       check out `packages/scripts/deploy.js` to customize your deployment
 
