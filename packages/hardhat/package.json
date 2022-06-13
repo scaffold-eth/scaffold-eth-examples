@@ -24,7 +24,7 @@
     "ethers": "^5.4.4",
     "hardhat": "2.6.0",
     "hardhat-abi-exporter": "^2.8.0",
-    "hardhat-circom": "^3.0.2",
+    "hardhat-circom": "^3.1.0",
     "hardhat-deploy": "^0.9.0",
     "hardhat-gas-reporter": "^1.0.4",
     "node-watch": "^0.7.0",

@@ -12080,10 +12080,10 @@ hardhat-abi-exporter@^2.8.0:
     "@ethersproject/abi" "^5.5.0"
     delete-empty "^3.0.0"
 
-hardhat-circom@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/hardhat-circom/-/hardhat-circom-3.0.2.tgz#6b4dbe15c7fb648b3d67f9b334b1c3f6a4defdd4"
-  integrity sha512-h8GcwZ2NVZq1vYis0GJAal5utEYb+KFUFj7unOOY3g5xv6tu/CaZ3LdNVARuM93QA3nGyJ5OQ8/4WZMQ6wwmsg==
+hardhat-circom@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/hardhat-circom/-/hardhat-circom-3.1.0.tgz#c634df41fe23c5c754325c59953b98881f22193a"
+  integrity sha512-8gP5qtc0vIBKNwna6T/71HmPAcc7K8DSuq8U3K9fdvFHR4zdxUWbLhWiEry7d/nUd9Q4wbAhyfS31WDOf4V0dg==
   dependencies:
     "@phated/unionfs" "^4.5.0"
     camelcase "^6.3.0"
@@ -12093,6 +12093,7 @@ hardhat-circom@^3.0.2:
     memfs "^3.4.1"
     shimmer "^1.2.1"
     snarkjs "^0.4.14"
+    undici "^5.4.0"
 
 hardhat-deploy@^0.9.0:
   version "0.9.4"
@@ -22608,6 +22609,11 @@ undertaker@^1.2.1:
     object.defaults "^1.0.0"
     object.reduce "^1.0.0"
     undertaker-registry "^1.0.0"
+
+undici@^5.4.0:
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.5.1.tgz#baaf25844a99eaa0b22e1ef8d205bffe587c8f43"
+  integrity sha512-MEvryPLf18HvlCbLSzCW0U00IMftKGI5udnjrQbC5D4P0Hodwffhv+iGfWuJwg16Y/TK11ZFK8i+BPVW2z/eAw==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"
