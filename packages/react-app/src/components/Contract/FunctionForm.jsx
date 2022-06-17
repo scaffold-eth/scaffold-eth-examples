@@ -1,8 +1,9 @@
 import { Button, Col, Divider, Input, Row, Tooltip } from "antd";
 import React, { useState } from "react";
 import Blockies from "react-blockies";
+
 import { Transactor } from "../../helpers";
-import tryToDisplay from "./utils";
+import { tryToDisplay, tryToDisplayAsText } from "./utils";
 
 const { utils, BigNumber } = require("ethers");
 
@@ -159,6 +160,12 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
     inputs.push(txValueInput);
   }
 
+  const handleForm = returned => {
+    if (returned) {
+      setForm({});
+    }
+  };
+
   const buttonIcon =
     functionInfo.type === "call" ? (
       <Button style={{ marginLeft: -32 }}>Read📡</Button>
@@ -181,7 +188,7 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
               const args = functionInfo.inputs.map((input, inputIndex) => {
                 const key = getFunctionInputKey(functionInfo, input, inputIndex);
                 let value = form[key];
-                if (input.baseType === "array") {
+                if (["array", "tuple"].includes(input.baseType)) {
                   value = JSON.parse(value);
                 } else if (input.type === "bool") {
                   if (value === "true" || value === "1" || value === "0x1" || value === "0x01" || value === "0x0001") {
@@ -197,7 +204,8 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
               if (functionInfo.stateMutability === "view" || functionInfo.stateMutability === "pure") {
                 try {
                   const returned = await contractFunction(...args);
-                  result = tryToDisplay(returned);
+                  handleForm(returned);
+                  result = tryToDisplayAsText(returned);
                 } catch (err) {
                   console.error(err);
                 }
@@ -214,6 +222,7 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
 
                 // console.log("Running with extras",extras)
                 const returned = await tx(contractFunction(...args, overrides));
+                handleForm(returned);
                 result = tryToDisplay(returned);
               }
 
