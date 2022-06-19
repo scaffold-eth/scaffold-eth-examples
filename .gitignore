@@ -26,7 +26,7 @@ build
 
 # misc
 .DS_Store
-.env*
+
 
 # debug
 npm-debug.log*
@@ -34,3 +34,6 @@ yarn-debug.log*
 yarn-error.log*
 
 .idea
+
+# Local Netlify folder
+.netlify
