@@ -2,3 +2,8 @@
   text-align: center;
   padding-left: calc(100vw - 100%);
 }
+
+.ant-dropdown-menu {
+  max-height: 400px;
+  overflow-y: scroll;
+}

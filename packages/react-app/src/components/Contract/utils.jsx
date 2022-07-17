@@ -1,3 +1,4 @@
+import { Typography } from "antd";
 import React from "react";
 
 import Address from "../Address";
@@ -14,7 +15,7 @@ const tryToDisplay = (thing, asText = false, blockExplorer) => {
     }
   }
   if (thing && thing.indexOf && thing.indexOf("0x") === 0 && thing.length === 42) {
-    return asText ? thing : <Address address={thing} fontSize={22} blockExplorer={blockExplorer} />;
+    return asText ? thing : <Address address={thing} fontSize={20} blockExplorer={blockExplorer} />;
   }
   if (thing && thing.constructor && thing.constructor.name === "Array") {
     const mostReadable = v => (["number", "boolean"].includes(typeof v) ? v : tryToDisplayAsText(v));
@@ -25,7 +26,7 @@ const tryToDisplay = (thing, asText = false, blockExplorer) => {
       <span style={{ overflowWrap: "break-word", width: "100%" }}>{displayable.replaceAll(",", ",\n")}</span>
     );
   }
-  return JSON.stringify(thing);
+  return <Typography.Text copyable={{ text: thing }}>{thing}</Typography.Text>;
 };
 
 const tryToDisplayAsText = thing => tryToDisplay(thing, true);

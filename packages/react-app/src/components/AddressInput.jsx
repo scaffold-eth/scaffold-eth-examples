@@ -58,7 +58,7 @@ export default function AddressInput(props) {
         }
         setValue(address);
         if (typeof onChange === "function") {
-          onChange(address);
+          onChange(props.standalone ? { target: { name: props.name, value: address } } : address);
         }
       }
     },
@@ -107,8 +107,9 @@ export default function AddressInput(props) {
       )}
       <Input
         id="0xAddress" // name it something other than address for auto fill doxxing
-        name="0xAddress" // name it something other than address for auto fill doxxing
+        name={props.name || "0xAddress"} // name it something other than address for auto fill doxxing
         autoComplete="off"
+        size={props.size}
         autoFocus={props.autoFocus}
         placeholder={props.placeholder ? props.placeholder : "address"}
         prefix={<Blockie address={currentValue} size={8} scale={3} />}

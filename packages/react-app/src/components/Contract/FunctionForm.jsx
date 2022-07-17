@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Blockies from "react-blockies";
 
 import { Transactor } from "../../helpers";
+import AddressInput from "../AddressInput";
 import { tryToDisplay, tryToDisplayAsText } from "./utils";
 
 const { utils, BigNumber } = require("ethers");
@@ -94,14 +95,17 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
       }
     }
 
+    const ComponentType = input.type === "address" ? AddressInput : Input;
+
     return (
       <div style={{ margin: 2 }} key={key}>
-        <Input
+        <ComponentType
           size="large"
           placeholder={input.name ? input.type + " " + input.name : input.type}
           autoComplete="off"
           value={form[key]}
           name={key}
+          {...(input.type === "address" ? { standalone: true } : {})}
           onChange={event => {
             const formUpdate = { ...form };
             formUpdate[event.target.name] = event.target.value;
@@ -168,9 +172,9 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
 
   const buttonIcon =
     functionInfo.type === "call" ? (
-      <Button style={{ marginLeft: -32 }}>Read📡</Button>
+      <Button style={{ marginLeft: -20 }}>Read📡</Button>
     ) : (
-      <Button style={{ marginLeft: -32 }}>Send💸</Button>
+      <Button style={{ marginLeft: -20 }}>Send💸</Button>
     );
   inputs.push(
     <div style={{ cursor: "pointer", margin: 2 }} key="goButton">

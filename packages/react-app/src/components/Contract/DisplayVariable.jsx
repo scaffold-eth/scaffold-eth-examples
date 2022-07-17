@@ -1,4 +1,4 @@
-import { Button, Col, Divider, Row } from "antd";
+import { Button, Col, Divider, Row, Typography } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 
 import { tryToDisplay } from "./utils";
@@ -28,14 +28,14 @@ const DisplayVariable = ({ contractFunction, functionInfo, refreshRequired, trig
           style={{
             textAlign: "right",
             opacity: 0.333,
-            paddingRight: 6,
-            fontSize: 24,
           }}
         >
-          {functionInfo.name}
+          <Typography.Title level={4}>{functionInfo.name}</Typography.Title>
         </Col>
         <Col span={14}>
-          <h2>{tryToDisplay(variable, false, blockExplorer)}</h2>
+          <Typography.Text style={{ fontSize: "1.1rem" }}>
+            {tryToDisplay(variable, false, blockExplorer)}
+          </Typography.Text>
         </Col>
         <Col span={2}>
           <h2>

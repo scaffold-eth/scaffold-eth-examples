@@ -1,122 +1,78 @@
-import { useContractReader } from "eth-hooks";
+import { Button, Modal, Form, Input, Typography } from "antd";
+import React, { useMemo, useState } from "react";
 import { ethers } from "ethers";
-import React from "react";
-import { Link } from "react-router-dom";
+import { AddressInput, Contract } from "../components";
+import gtc from "../data/gtc";
 
-/**
- * web3 props can be passed from '../App.jsx' into your local view component for use
- * @param {*} yourLocalBalance balance on current network
- * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
- * @returns react component
- **/
-function Home({ yourLocalBalance, readContracts }) {
-  // you can also use hooks locally in your component of choice
-  // in this case, let's keep track of 'purpose' variable from our contract
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+// contract meta { address, abi, name }
+
+function Home({ address, mainnetProvider, blockExplorer, signer, provider }) {
+  const [form] = Form.useForm();
+  const [openModal, setOpenModal] = useState(false);
+  const [contractMeta, setContractMeta] = useState({});
+  const contractModule = useMemo(() => {
+    if (!contractMeta.address) {
+      return null;
+    }
+
+    return { name: contractMeta.name, contract: new ethers.Contract(contractMeta.address, contractMeta.abi, provider) };
+  }, [provider, contractMeta]);
+
+  const loadDemoContract = e => {
+    e.preventDefault();
+    setContractMeta(gtc);
+    setOpenModal(false);
+  };
+
+  const loadContract = v => {
+    setContractMeta(v);
+    form.resetFields();
+    setOpenModal(false);
+  };
 
   return (
-    <div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>📝</span>
-        This Is Your App Home. You can start editing it in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/react-app/src/views/Home.jsx
-        </span>
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", flex: 1, justifyContent: "center", padding: "1.2rem" }}>
+        <Button onClick={() => setOpenModal(true)}>Load Contract</Button>
       </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>✏️</span>
-        Edit your smart contract{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          YourContract.sol
-        </span>{" "}
-        in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/hardhat/contracts
-        </span>
-      </div>
-      {!purpose ? (
-        <div style={{ margin: 32 }}>
-          <span style={{ marginRight: 8 }}>👷‍♀️</span>
-          You haven't deployed your contract yet, run
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            yarn chain
-          </span>{" "}
-          and{" "}
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            yarn deploy
-          </span>{" "}
-          to deploy your first contract!
-        </div>
-      ) : (
-        <div style={{ margin: 32 }}>
-          <span style={{ marginRight: 8 }}>🤓</span>
-          The "purpose" variable from your contract is{" "}
-          <span
-            className="highlight"
-            style={{
-              marginLeft: 4,
-              /* backgroundColor: "#f9f9f9", */ padding: 4,
-              borderRadius: 4,
-              fontWeight: "bolder",
-            }}
-          >
-            {purpose}
-          </span>
-        </div>
+      <Modal
+        title="Load contract"
+        centered
+        visible={openModal}
+        onOk={() => form.submit()}
+        onCancel={() => setOpenModal(false)}
+        footer={
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Typography.Link href="#" onClick={loadDemoContract}>
+              Load sample contract
+            </Typography.Link>
+            <Button type="primary">Load</Button>
+          </div>
+        }
+      >
+        <Form form={form} layout="vertical" onFinish={loadContract} autoComplete="off">
+          <Form.Item name="name" label="Contract Name" rules={[{ required: true }]}>
+            <Input placeholder="Name" />
+          </Form.Item>
+          <Form.Item name="address" label="Contract Address" rules={[{ required: true }]}>
+            <AddressInput ensProvider={mainnetProvider} placeholder="Enter contract address" />
+          </Form.Item>
+          <Form.Item name="abi" label="Contract Name" rules={[{ required: true }]}>
+            <Input.TextArea rows={5} placeholder="Contract ABI" />
+          </Form.Item>
+        </Form>
+      </Modal>
+      {contractModule && (
+        <Contract
+          signer={signer}
+          address={address}
+          provider={provider}
+          name={contractModule.name}
+          blockExplorer={blockExplorer}
+          mainnetProvider={mainnetProvider}
+          customContract={contractModule.contract}
+        />
       )}
-
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤖</span>
-        An example prop of your balance{" "}
-        <span style={{ fontWeight: "bold", color: "green" }}>({ethers.utils.formatEther(yourLocalBalance)})</span> was
-        passed into the
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          Home.jsx
-        </span>{" "}
-        component from
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          App.jsx
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>💭</span>
-        Check out the <Link to="/hints">"Hints"</Link> tab for more tips.
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🛠</span>
-        Tinker with your smart contract using the <Link to="/debug">"Debug Contract"</Link> tab.
-      </div>
     </div>
   );
 }
