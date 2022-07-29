@@ -1,3 +1,9 @@
+# 🏗 Scaffold-Sign-In-With-Ethereum
+
+Welcome to the Scaffold template for Sign-In-With-Ethereum. This template uses the [Blockin](https://blockin.gitbook.com/blockin) library to sign-in and verify users. Blockin supports Sign-In-With-Ethereum and also extends it to support signing in with any blockchain, plus other cool features like native sign in requests with NFTs. 
+
+For pull requests or issues with this repository, please reach out to the Blockin team or @trevormil23 on Twitter. 
+
 # 🏗 Scaffold-ETH
 
 > everything you need to build on Ethereum! 🚀
