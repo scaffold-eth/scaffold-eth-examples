@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+const package = require('../package.json')
+const argv = require('minimist')(process.argv.slice(2))
+const express = require('express')
+const path = require('path')
+const app = express()
+
+process.title = 'eth-contractor'
+
+if (argv.h || argv.help) {
+  console.log(
+    ['', 'usage: eth-contractor', '', 'options', '  -p --port=[PORT]  Port to use. Defaults to 420'].join('\n')
+  )
+
+  process.exit()
+}
+
+if (argv.v || argv.version) {
+  console.log(['', `eth-contractor version: ` + package.version, ''].join('\n'))
+
+  process.exit()
+}
+
+const port = argv.p || argv.port || 420
+const buildRoot = path.resolve(__dirname, '..', 'build')
+
+app.use(express.static(buildRoot))
+
+app.get('/', (req, res) => {
+  const options = {
+    root: buildRoot,
+    dotfiles: 'deny',
+    Headers: {
+      'x-timestamp': Date.now(),
+      'x-sent': true,
+    },
+  }
+
+  res.sendFile('index.html', options)
+})
+
+app.listen(port, () => {
+  console.log(`ETH-contract started on localhost:` + port)
+})
