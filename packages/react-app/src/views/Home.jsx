@@ -25,7 +25,10 @@ function Home({ address, mainnetProvider, blockExplorer, signer, provider }) {
   };
 
   const loadContract = v => {
+    console.log(v);
+
     setContractMeta(v);
+
     form.resetFields();
     setOpenModal(false);
   };
@@ -39,14 +42,15 @@ function Home({ address, mainnetProvider, blockExplorer, signer, provider }) {
         title="Load contract"
         centered
         visible={openModal}
-        onOk={() => form.submit()}
         onCancel={() => setOpenModal(false)}
         footer={
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <Typography.Link href="#" onClick={loadDemoContract}>
               Load sample contract
             </Typography.Link>
-            <Button type="primary">Load</Button>
+            <Button type="primary" onClick={() => form.submit()}>
+              Load
+            </Button>
           </div>
         }
       >
@@ -57,7 +61,7 @@ function Home({ address, mainnetProvider, blockExplorer, signer, provider }) {
           <Form.Item name="address" label="Contract Address" rules={[{ required: true }]}>
             <AddressInput ensProvider={mainnetProvider} placeholder="Enter contract address" />
           </Form.Item>
-          <Form.Item name="abi" label="Contract Name" rules={[{ required: true }]}>
+          <Form.Item name="abi" label="Contract ABI" rules={[{ required: true }]}>
             <Input.TextArea rows={5} placeholder="Contract ABI" />
           </Form.Item>
         </Form>
